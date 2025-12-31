@@ -1,0 +1,679 @@
+/* ═══════════════════════════════════════════════════════
+   🏛️ MODALES ÉVÉNEMENTS SALLES - AAA+ STYLE
+   Grandes modales immersives pour événements de salles
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   🌌 FOND ET OVERLAY
+   ═══════════════════════════════════════════════════════ */
+
+.room-modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.room-modal-background.active {
+  opacity: 1;
+}
+
+.room-modal-background.treasure {
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+}
+
+.room-modal-background.puzzle {
+  background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+}
+
+.room-modal-background.trap {
+  background: radial-gradient(ellipse at center, rgba(220, 38, 38, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+}
+
+.room-modal-background.rest {
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+}
+
+.room-modal-background.merchant {
+  background: radial-gradient(ellipse at center, rgba(251, 146, 60, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+}
+
+.room-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.room-modal-overlay.active {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📦 CONTENEUR PRINCIPAL (Plus grand que corridors)
+   ═══════════════════════════════════════════════════════ */
+
+.room-modal-container {
+  background: linear-gradient(135deg, rgba(20, 20, 30, 0.98) 0%, rgba(10, 10, 20, 0.99) 100%);
+  border: 3px solid rgba(212, 175, 55, 0.6);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.9),
+              0 0 50px rgba(212, 175, 55, 0.3),
+              inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  transform: translateY(50px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.5s ease;
+}
+
+.room-modal-overlay.active .room-modal-container {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Scrollbar personnalisée */
+.room-modal-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.room-modal-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.room-modal-container::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.5);
+  border-radius: 5px;
+}
+
+.room-modal-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 HEADER
+   ═══════════════════════════════════════════════════════ */
+
+.room-modal-header {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.room-modal-icon {
+  font-size: 72px;
+  display: block;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6));
+  animation: roomIconFloat 3s ease-in-out infinite;
+}
+
+.room-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #D4AF37;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.6),
+               0 3px 6px rgba(0, 0, 0, 0.9);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.room-modal-subtitle {
+  font-family: 'Crimson Text', serif;
+  font-size: 18px;
+  color: #CCC;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📝 CONTENU
+   ═══════════════════════════════════════════════════════ */
+
+.room-modal-content {
+  font-family: 'Crimson Text', serif;
+  font-size: 18px;
+  color: #E8E8E8;
+  line-height: 1.8;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══════════════════════════════════════════════════════
+   💎 SALLE TRÉSOR
+   ═══════════════════════════════════════════════════════ */
+
+.room-treasure-chest {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.room-treasure-chest-icon {
+  font-size: 96px;
+  display: block;
+  margin-bottom: 20px;
+  animation: roomTreasureChestOpen 1s ease;
+}
+
+.room-treasure-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.room-treasure-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  animation: roomItemReveal 0.6s ease;
+  animation-fill-mode: both;
+  transition: all 0.3s ease;
+}
+
+.room-treasure-item:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.15) 100%);
+  border-color: rgba(212, 175, 55, 0.6);
+  transform: translateX(5px);
+}
+
+.room-treasure-item:nth-child(1) { animation-delay: 0.2s; }
+.room-treasure-item:nth-child(2) { animation-delay: 0.4s; }
+.room-treasure-item:nth-child(3) { animation-delay: 0.6s; }
+.room-treasure-item:nth-child(4) { animation-delay: 0.8s; }
+
+.room-treasure-item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.room-treasure-item-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.room-treasure-item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+.room-treasure-item-value {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🧩 SALLE ÉNIGME
+   ═══════════════════════════════════════════════════════ */
+
+.room-puzzle-question {
+  font-family: 'Crimson Text', serif;
+  font-size: 20px;
+  color: #D4AF37;
+  text-align: center;
+  padding: 25px;
+  background: rgba(147, 51, 234, 0.1);
+  border: 2px solid rgba(147, 51, 234, 0.4);
+  border-radius: 10px;
+  margin: 25px 0;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+.room-puzzle-input-container {
+  margin: 25px 0;
+}
+
+.room-puzzle-input {
+  width: 100%;
+  padding: 15px 20px;
+  font-family: 'Crimson Text', serif;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(147, 51, 234, 0.5);
+  border-radius: 8px;
+  color: #FFF;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.room-puzzle-input:focus {
+  border-color: rgba(147, 51, 234, 0.8);
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+}
+
+.room-puzzle-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.room-puzzle-hint {
+  font-size: 16px;
+  color: #AAA;
+  text-align: center;
+  padding: 15px;
+  background: rgba(147, 51, 234, 0.05);
+  border-radius: 8px;
+  margin-top: 15px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.room-puzzle-hint.show {
+  opacity: 1;
+  max-height: 200px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🛏️ SALLE REPOS
+   ═══════════════════════════════════════════════════════ */
+
+.room-rest-area {
+  text-align: center;
+  padding: 30px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 2px solid rgba(34, 197, 94, 0.4);
+  border-radius: 12px;
+  margin: 25px 0;
+}
+
+.room-rest-icon {
+  font-size: 80px;
+  display: block;
+  margin-bottom: 20px;
+  animation: roomRestPulse 2s ease-in-out infinite;
+}
+
+.room-rest-heal {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #10B981;
+  text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+  margin: 15px 0;
+}
+
+.room-rest-description {
+  font-size: 18px;
+  color: #CCC;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🏪 SALLE MARCHAND
+   ═══════════════════════════════════════════════════════ */
+
+.room-merchant-welcome {
+  text-align: center;
+  font-size: 18px;
+  color: #D4AF37;
+  margin-bottom: 25px;
+  font-style: italic;
+}
+
+.room-merchant-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.room-merchant-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: rgba(251, 146, 60, 0.1);
+  border: 2px solid rgba(251, 146, 60, 0.4);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.room-merchant-item:hover {
+  background: rgba(251, 146, 60, 0.2);
+  border-color: rgba(251, 146, 60, 0.6);
+  transform: translateX(5px);
+}
+
+.room-merchant-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.room-merchant-item.disabled:hover {
+  transform: none;
+}
+
+.room-merchant-item-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.room-merchant-item-icon {
+  font-size: 40px;
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.room-merchant-item-details {
+  text-align: left;
+}
+
+.room-merchant-item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: #D4AF37;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.room-merchant-item-desc {
+  font-size: 14px;
+  color: #AAA;
+}
+
+.room-merchant-item-price {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #FB923C;
+  text-shadow: 0 0 10px rgba(251, 146, 60, 0.6);
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 BOUTONS
+   ═══════════════════════════════════════════════════════ */
+
+.room-modal-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+}
+
+.room-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 16px 36px;
+  border: 3px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.room-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.room-btn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.room-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.room-btn:active {
+  transform: translateY(-1px);
+}
+
+.room-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.room-btn-primary {
+  background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+  border-color: #FFD700;
+  color: #FFF;
+}
+
+.room-btn-primary:hover {
+  background: linear-gradient(135deg, #A00000 0%, #F01848 100%);
+  border-color: #FFF;
+}
+
+.room-btn-success {
+  background: linear-gradient(135deg, #047857 0%, #10B981 100%);
+  border-color: #6EE7B7;
+  color: #FFF;
+}
+
+.room-btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #34D399 100%);
+  border-color: #FFF;
+}
+
+.room-btn-secondary {
+  background: linear-gradient(135deg, #4B5563 0%, #6B7280 100%);
+  border-color: #9CA3AF;
+  color: #FFF;
+}
+
+.room-btn-secondary:hover {
+  background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  border-color: #FFF;
+}
+
+.room-btn-info {
+  background: linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
+  border-color: #C4B5FD;
+  color: #FFF;
+}
+
+.room-btn-info:hover {
+  background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
+  border-color: #FFF;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✨ PARTICULES
+   ═══════════════════════════════════════════════════════ */
+
+.room-modal-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.room-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #FFD700;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: roomParticleFloat 5s ease-in-out infinite;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes roomIconFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+@keyframes roomTreasureChestOpen {
+  0% {
+    transform: scale(0.5) rotateY(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotateY(180deg);
+  }
+  100% {
+    transform: scale(1) rotateY(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes roomItemReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes roomRestPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.8));
+  }
+}
+
+@keyframes roomParticleFloat {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-120vh) translateX(100px) rotate(360deg) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📱 RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .room-modal-container {
+    padding: 25px;
+    max-width: 95%;
+  }
+
+  .room-modal-title {
+    font-size: 28px;
+  }
+
+  .room-modal-icon {
+    font-size: 56px;
+  }
+
+  .room-btn {
+    font-size: 16px;
+    padding: 14px 28px;
+  }
+
+  .room-treasure-item,
+  .room-merchant-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .room-treasure-item-value,
+  .room-merchant-item-price {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .room-modal-container {
+    padding: 20px;
+  }
+
+  .room-modal-title {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+
+  .room-modal-icon {
+    font-size: 48px;
+  }
+
+  .room-btn {
+    font-size: 14px;
+    padding: 12px 24px;
+    width: 100%;
+  }
+
+  .room-modal-buttons {
+    flex-direction: column;
+  }
+}

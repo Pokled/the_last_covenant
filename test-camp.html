@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛺ Le Cortège des Ombres - THE LAST COVENANT</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Crimson Text', serif;
+            --font-ui: 'Inter', sans-serif;
+            --gold-bright: #f4d03f;
+            --gold-dim: #d4af37;
+            --parchment: #f4e8d0;
+            --blood-red: #8b0000;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-body);
+            color: var(--parchment);
+            background: #0a0a0f;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* BACKGROUND CAMP */
+        /* ═══════════════════════════════════════════════════════ */
+        .camp-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 50% 70%, rgba(255, 102, 0, 0.15) 0%, transparent 40%),
+                linear-gradient(180deg, 
+                    rgba(10, 10, 15, 0.3) 0%, 
+                    rgba(10, 10, 15, 0.1) 60%,
+                    rgba(10, 10, 15, 0.4) 100%
+                ),
+                url('assets/images/background/background_camp.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* PARTICULES */
+        /* ═══════════════════════════════════════════════════════ */
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.7;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* LAYOUT */
+        /* ═══════════════════════════════════════════════════════ */
+        .camp-container {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .camp-header {
+            padding: 30px 40px;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 15, 0.95) 0%,
+                rgba(10, 10, 15, 0.7) 100%
+            );
+            border-bottom: 2px solid rgba(90, 77, 58, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .camp-title {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-shadow: 
+                0 0 20px rgba(244, 208, 63, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.15em;
+        }
+
+        .camp-subtitle {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-style: italic;
+            color: rgba(244, 232, 208, 0.5);
+            margin-top: 5px;
+        }
+
+        .corruption-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.9) 0%,
+                rgba(30, 25, 20, 0.9) 100%
+            );
+            border: 2px solid rgba(139, 0, 0, 0.5);
+            border-left: 3px solid rgba(139, 0, 0, 0.8);
+            padding: 12px 20px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(139, 0, 0, 0.1);
+        }
+
+        .corruption-label {
+            font-family: var(--font-ui);
+            font-size: 0.8rem;
+            color: rgba(244, 232, 208, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .corruption-value {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blood-red);
+            text-shadow: 0 0 15px rgba(139, 0, 0, 0.8);
+        }
+
+        /* MAIN - ZONE DES PNJs EN CERCLE */
+        .camp-main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .npcs-circle {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .npcs-circle::before {
+            content: '';
+            display: block;
+            padding-bottom: 56.25%; /* Ratio 16:9 */
+        }
+
+        /* NPC INDIVIDUEL - POSITIONNEMENT EN CERCLE */
+        .npc {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+        }
+
+        .npc:hover {
+            z-index: 25;
+        }
+
+        /* POSITIONS EN POURCENTAGE (basées sur 1920x1080) - descendu de 145px total */
+        /* Drenvar (⚒️) - 730/1920 = 38.02%, (279+145)/1080 = 39.26% */
+        .npc[data-npc="drenvar"] {
+            left: 38.02%;
+            top: 39.26%;
+        }
+
+        /* Jardinier (🌸) - 525/1920 = 27.34%, (318+145)/1080 = 42.87% */
+        .npc[data-npc="jardinier"] {
+            left: 27.34%;
+            top: 42.87%;
+        }
+
+        /* Mirela (🗺️) - 364/1920 = 18.96%, (291+145)/1080 = 40.37% */
+        .npc[data-npc="mirela"] {
+            left: 18.96%;
+            top: 40.37%;
+        }
+
+        /* Corvus (💰) - 1416/1920 = 73.75%, (322+145)/1080 = 43.24% */
+        .npc[data-npc="corvus"] {
+            left: 73.75%;
+            top: 43.24%;
+        }
+
+        /* Moira (🕯️) - 1583/1920 = 82.45%, (278+145)/1080 = 39.17% */
+        .npc[data-npc="moira"] {
+            left: 82.45%;
+            top: 39.17%;
+        }
+
+        /* Grimm (🔪) - 1239/1920 = 64.53%, (275+145)/1080 = 38.89% */
+        .npc[data-npc="grimm"] {
+            left: 64.53%;
+            top: 38.89%;
+        }
+
+        .npc-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.9));
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .npc:hover .npc-icon {
+            filter: 
+                drop-shadow(0 8px 16px rgba(0, 0, 0, 0.9))
+                drop-shadow(0 0 25px rgba(212, 175, 55, 0.8));
+            animation: none;
+            transform: scale(1.2);
+        }
+
+        .npc-label {
+            background: linear-gradient(135deg,
+                rgba(10, 10, 15, 0.95) 0%,
+                rgba(20, 18, 15, 0.95) 100%
+            );
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-left: 3px solid rgba(212, 175, 55, 0.7);
+            padding: 8px 16px;
+            font-family: var(--font-title);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gold-bright);
+            text-align: center;
+            letter-spacing: 0.05em;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.9),
+                inset 0 0 20px rgba(212, 175, 55, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .npc:hover .npc-label {
+            opacity: 1;
+        }
+
+        .npc-role {
+            font-family: var(--font-ui);
+            font-size: 0.65rem;
+            color: rgba(244, 232, 208, 0.7);
+            text-transform: uppercase;
+            margin-top: 4px;
+            letter-spacing: 0.08em;
+        }
+
+        /* FOOTER */
+        .camp-footer {
+            padding: 20px 40px;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 15, 0.7) 0%,
+                rgba(10, 10, 15, 0.95) 100%
+            );
+            border-top: 2px solid rgba(90, 77, 58, 0.3);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn-camp {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 12px 35px;
+            background: linear-gradient(135deg, 
+                rgba(20, 18, 15, 0.90) 0%, 
+                rgba(30, 25, 20, 0.90) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            border-left: 3px solid rgba(90, 77, 58, 0.6);
+            color: rgba(244, 232, 208, 0.95);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-camp:hover {
+            border-color: rgba(212, 175, 55, 0.7);
+            border-left-color: rgba(212, 175, 55, 0.9);
+            background: linear-gradient(135deg, 
+                rgba(35, 30, 25, 0.95) 0%, 
+                rgba(45, 38, 30, 0.95) 100%
+            );
+            color: var(--gold-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .btn-primary {
+            border-color: rgba(212, 175, 55, 0.6);
+            border-left-color: rgba(212, 175, 55, 0.8);
+        }
+
+        /* MODAL NPC */
+        .npc-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 10, 15, 0.95);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .npc-modal.active {
+            display: flex;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.98) 0%,
+                rgba(30, 25, 20, 0.98) 100%
+            );
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            border-left: 5px solid rgba(212, 175, 55, 0.8);
+            max-width: 700px;
+            width: 90%;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(90, 77, 58, 0.3);
+        }
+
+        .modal-title {
+            font-family: var(--font-title);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            letter-spacing: 0.08em;
+        }
+
+        .modal-close {
+            font-size: 2rem;
+            color: rgba(244, 232, 208, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--gold-bright);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(244, 232, 208, 0.85);
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        /* VIGNETTE */
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(
+                ellipse at center, 
+                transparent 20%, 
+                rgba(10, 10, 15, 0.4) 70%, 
+                rgba(10, 10, 15, 0.9) 100%
+            );
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div id="camp">
+        <!-- BACKGROUND -->
+        <div class="camp-background"></div>
+        
+        <!-- PARTICULES -->
+        <canvas id="particles"></canvas>
+        
+        <!-- CONTAINER -->
+        <div class="camp-container">
+            <!-- HEADER -->
+            <div class="camp-header">
+                <div>
+                    <h1 class="camp-title">LE CORTÈGE DES OMBRES</h1>
+                    <p class="camp-subtitle">Une procession figée entre espoir et désespoir</p>
+                </div>
+                <div class="corruption-display">
+                    <span class="corruption-label">Corruption</span>
+                    <span class="corruption-value" id="corruptionValue">3%</span>
+                </div>
+            </div>
+            
+            <!-- MAIN - CERCLE DES PNJs -->
+            <div class="camp-main">
+                <div class="npcs-circle">
+                    <div class="npc" data-npc="drenvar">
+                        <div class="npc-icon">⚒️</div>
+                        <div class="npc-label">
+                            Drenvar
+                            <div class="npc-role">Forgeron</div>
+                        </div>
+                    </div>
+                    
+                    <div class="npc" data-npc="jardinier">
+                        <div class="npc-icon">🌸</div>
+                        <div class="npc-label">
+                            Le Jardinier
+                            <div class="npc-role">Purificateur</div>
+                        </div>
+                    </div>
+                    
+                    <div class="npc" data-npc="mirela">
+                        <div class="npc-icon">🗺️</div>
+                        <div class="npc-label">
+                            Mirela
+                            <div class="npc-role">Cartographe</div>
+                        </div>
+                    </div>
+                    
+                    <div class="npc" data-npc="corvus">
+                        <div class="npc-icon">💰</div>
+                        <div class="npc-label">
+                            Corvus
+                            <div class="npc-role">Marchand</div>
+                        </div>
+                    </div>
+                    
+                    <div class="npc" data-npc="moira">
+                        <div class="npc-icon">🕯️</div>
+                        <div class="npc-label">
+                            Sœur Moira
+                            <div class="npc-role">Prêtresse</div>
+                        </div>
+                    </div>
+                    
+                    <div class="npc" data-npc="grimm">
+                        <div class="npc-icon">🔪</div>
+                        <div class="npc-label">
+                            Grimm
+                            <div class="npc-role">Boucher</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FOOTER -->
+            <div class="camp-footer">
+                <button class="btn-camp" onclick="alert('🎒 Inventaire en développement')">Inventaire</button>
+                <button class="btn-camp" onclick="alert('⚔️ Statistiques en développement')">Personnage</button>
+                <button class="btn-camp btn-primary" onclick="alert('🗺️ Sélection de donjon...')">Descendre</button>
+            </div>
+        </div>
+        
+        <!-- MODAL NPC -->
+        <div class="npc-modal" id="npcModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle">NPC Name</h2>
+                    <span class="modal-close" onclick="closeModal()">✕</span>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    Description du PNJ...
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-camp" onclick="closeModal()">Fermer</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VIGNETTE -->
+        <div class="vignette"></div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // DATA PNJs
+        // ═══════════════════════════════════════════════════════════
+        const NPCS = {
+            drenvar: {
+                name: "Drenvar",
+                title: "L'Écorcheur de Fer",
+                dialogue: "Alors, Pactisé. Qu'est-ce qui est cassé cette fois ? Mon feu brûle jour et nuit. Donne-moi tes armures cabossées, tes épées fendues. Je recoudrai le métal avec les Larmes de Krovax.",
+                action: "⚒️ Forge - Amélioration d'équipement"
+            },
+            jardinier: {
+                name: "Le Jardinier des Regrets",
+                title: "Cultivateur des Lys",
+                dialogue: "Tu portes l'ombre. Je la sens. Petite encore. Mais elle grandit. Viens... assieds-toi près de mes enfants. Laisse-les manger ta noirceur. Ils souffrent pour toi.",
+                action: "🌸 Purifier la corruption (-2%)"
+            },
+            kael: {
+                name: "Kael",
+                title: "L'Espoir Brisé",
+                dialogue: "Je te dois tout. Tu m'as sauvé de la Cage. Je cherche encore ma sœur Lisa... Je sais que tu penses qu'elle est morte. Mais je ne peux pas abandonner. Pas encore.",
+                action: "🗡️ Recruter comme compagnon"
+            },
+            mirela: {
+                name: "Mirela la Cartographe",
+                title: "Exploratrice Royale",
+                dialogue: "Le donjon ment. Mais les morts ne mentent jamais. Je cartographie les deux. Regarde ces cartes... incomp lètes, contradictoires. Mais elles sauvent des vies. Où veux-tu aller ?",
+                action: "🗺️ Sélectionner un donjon"
+            },
+            corvus: {
+                name: "Corvus",
+                title: "Le Marchand des Ombres",
+                dialogue: "Ah, Pactisé. Toujours en vie, je vois. Fascinant. J'ai des objets... rares. Maudits, certainement. Mais puissants. Tout a un prix. Même ton âme. Surtout ton âme.",
+                action: "💰 Commerce d'objets maudits"
+            },
+            moira: {
+                name: "Sœur Moira",
+                title: "La Prêtresse Déchue",
+                dialogue: "Les dieux nous ont abandonnés. Mais nous ne les abandonnerons pas. Pas encore. L'Autel Silencieux écoute toujours. Sacrifie. Prie. Peut-être... peut-être que leurs échos répondront.",
+                action: "🕯️ Rituel à l'Autel"
+            },
+            grimm: {
+                name: "Grimm",
+                title: "Le Boucher",
+                dialogue: "Mange. Vis. Meurs plus tard.",
+                action: "🔪 Préparer des consommables"
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        // INTERACTIONS NPC
+        // ═══════════════════════════════════════════════════════════
+        document.querySelectorAll('.npc').forEach(npc => {
+            npc.addEventListener('click', () => {
+                const npcId = npc.dataset.npc;
+                const npcData = NPCS[npcId];
+                
+                // Si c'est Drenvar, aller directement à la forge
+                if (npcId === 'drenvar') {
+                    window.location.href = 'test-forge.html';
+                    return;
+                }
+                
+                document.getElementById('modalTitle').textContent = `${npcData.name} — ${npcData.title}`;
+                document.getElementById('modalBody').innerHTML = `
+                    <p style="margin-bottom: 20px;">"${npcData.dialogue}"</p>
+                    <p style="color: rgba(212, 175, 55, 0.8); font-family: var(--font-ui); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        ${npcData.action}
+                    </p>
+                `;
+                
+                document.getElementById('npcModal').classList.add('active');
+            });
+        });
+
+        function closeModal() {
+            document.getElementById('npcModal').classList.remove('active');
+        }
+
+        // ESC pour fermer
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // PARTICULES
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+
+        class Particle {
+            constructor() {
+                const rand = Math.random();
+                this.x = canvas.width / 2 + (Math.random() - 0.5) * 400;
+                
+                if (rand < 0.7) {
+                    // FUMÉE
+                    this.y = canvas.height * 0.7;
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = -Math.random() * 0.4 - 0.2;
+                    this.size = 3 + Math.random() * 5;
+                    this.color = [74, 74, 74];
+                    this.alpha = 0.3 + Math.random() * 0.2;
+                    this.gravity = -0.003;
+                } else {
+                    // BRAISES
+                    this.y = canvas.height * 0.7;
+                    this.vx = (Math.random() - 0.5) * 0.4;
+                    this.vy = -Math.random() * 1.2 - 0.5;
+                    this.size = 1.5 + Math.random() * 2;
+                    this.color = [255, Math.floor(102 + Math.random() * 50), 0];
+                    this.alpha = 0.7 + Math.random() * 0.3;
+                    this.gravity = 0.015;
+                }
+                
+                this.life = 1.0;
+                this.decay = 0.003;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.life -= this.decay;
+                this.vx += (Math.random() - 0.5) * 0.02;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                const alpha = this.alpha * this.life;
+                ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            isDead() {
+                return this.life <= 0 || this.y > canvas.height + 50 || this.y < -50;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (Math.random() < 0.3) {
+                particles.push(new Particle());
+            }
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.isDead()) particles.splice(i, 1);
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        animate();
+        
+        console.log('⛺ LE CORTÈGE DES OMBRES - Version Cercle');
+        console.log('👥 6 PNJs positionnés en cercle autour du feu');
+        console.log('🎭 Modals avec dialogues immersifs');
+        console.log('🎨 Background intégré + UI cohérente');
+    </script>
+</body>
+</html>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Crimson Text', serif;
+            --font-ui: 'Inter', sans-serif;
+            --gold-bright: #f4d03f;
+            --gold-dim: #d4af37;
+            --fire-orange: #ff6600;
+            --fire-red: #cc3300;
+            --smoke-gray: #4a4a4a;
+            --shadow-black: #0a0a0f;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-body);
+            color: #e0e0e0;
+            background: var(--shadow-black);
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* BACKGROUND - CAMP LUGUBRE */
+        /* ═══════════════════════════════════════════════════════ */
+        .camp-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 50% 80%, rgba(204, 51, 0, 0.15) 0%, transparent 40%),
+                linear-gradient(180deg, 
+                    rgba(10, 10, 15, 0.95) 0%, 
+                    rgba(26, 13, 13, 0.85) 60%,
+                    rgba(10, 10, 15, 0.95) 100%
+                ),
+                #120808;
+            z-index: 1;
+            animation: ambientPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes ambientPulse {
+            0%, 100% { filter: brightness(0.8); }
+            50% { filter: brightness(1); }
+        }
+
+        /* FEU CENTRAL */
+        .central-fire {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 250px;
+            z-index: 3;
+        }
+
+        .fire-glow {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(
+                circle,
+                rgba(255, 102, 0, 0.4) 0%,
+                rgba(204, 51, 0, 0.2) 30%,
+                transparent 60%
+            );
+            animation: fireGlow 3s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes fireGlow {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1);
+                opacity: 0.6;
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .flames {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6rem;
+            filter: drop-shadow(0 0 30px rgba(255, 102, 0, 0.8));
+            animation: flameFlicker 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flameFlicker {
+            0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+            25% { transform: translateX(-50%) translateY(-10px) scale(1.1); }
+            50% { transform: translateX(-50%) translateY(-5px) scale(0.95); }
+            75% { transform: translateX(-50%) translateY(-15px) scale(1.05); }
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* PARTICULES - FUMÉE ET BRAISES */
+        /* ═══════════════════════════════════════════════════════ */
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.8;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* LAYOUT CAMP */
+        /* ═══════════════════════════════════════════════════════ */
+        .camp-container {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER - TITRE + CORRUPTION */
+        .camp-header {
+            padding: 30px 40px;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 15, 0.95) 0%,
+                rgba(10, 10, 15, 0.7) 100%
+            );
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .camp-title {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-shadow: 
+                0 0 20px rgba(244, 208, 63, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.15em;
+        }
+
+        .camp-subtitle {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-style: italic;
+            color: rgba(224, 224, 224, 0.6);
+            margin-top: 5px;
+        }
+
+        .corruption-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.9) 0%,
+                rgba(30, 25, 20, 0.9) 100%
+            );
+            border: 2px solid rgba(139, 0, 0, 0.5);
+            border-left: 3px solid rgba(139, 0, 0, 0.8);
+            padding: 15px 25px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(139, 0, 0, 0.1);
+        }
+
+        .corruption-label {
+            font-family: var(--font-ui);
+            font-size: 0.85rem;
+            color: rgba(224, 224, 224, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .corruption-value {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #8b0000;
+            text-shadow: 0 0 15px rgba(139, 0, 0, 0.8);
+        }
+
+        /* MAIN AREA - ZONES INTERACTIVES */
+        .camp-main {
+            flex: 1;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            padding: 40px;
+        }
+
+        /* ZONE INTERACTIVE */
+        .camp-zone {
+            position: relative;
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.7) 0%,
+                rgba(30, 25, 20, 0.7) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.3);
+            border-left: 3px solid rgba(90, 77, 58, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .camp-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                rgba(212, 175, 55, 0.05) 0%,
+                transparent 70%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .camp-zone:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            border-left-color: rgba(212, 175, 55, 0.9);
+            background: linear-gradient(135deg,
+                rgba(35, 30, 25, 0.9) 0%,
+                rgba(45, 38, 30, 0.9) 100%
+            );
+            transform: translateY(-5px);
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.9),
+                inset 0 0 30px rgba(212, 175, 55, 0.1);
+        }
+
+        .camp-zone:hover::before {
+            opacity: 1;
+        }
+
+        .zone-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .zone-title {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gold-bright);
+            margin-bottom: 10px;
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        .zone-description {
+            font-size: 0.95rem;
+            color: rgba(224, 224, 224, 0.7);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .zone-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.75rem;
+            font-family: var(--font-ui);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 5px 12px;
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 3px;
+            color: var(--gold-dim);
+        }
+
+        /* ZONES SPÉCIALES */
+        .zone-forge .zone-icon {
+            animation: forgeHammer 2s ease-in-out infinite;
+        }
+
+        @keyframes forgeHammer {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(-5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .zone-garden .zone-icon {
+            animation: petalSway 4s ease-in-out infinite;
+        }
+
+        @keyframes petalSway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        /* FOOTER - ACTIONS */
+        .camp-footer {
+            padding: 20px 40px;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 15, 0.7) 0%,
+                rgba(10, 10, 15, 0.95) 100%
+            );
+            border-top: 2px solid rgba(90, 77, 58, 0.3);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn-camp {
+            font-family: var(--font-title);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, 
+                rgba(20, 18, 15, 0.90) 0%, 
+                rgba(30, 25, 20, 0.90) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            border-left: 3px solid rgba(90, 77, 58, 0.6);
+            color: rgba(244, 232, 208, 0.95);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-camp:hover {
+            border-color: rgba(212, 175, 55, 0.7);
+            border-left-color: rgba(212, 175, 55, 0.9);
+            background: linear-gradient(135deg, 
+                rgba(35, 30, 25, 0.95) 0%, 
+                rgba(45, 38, 30, 0.95) 100%
+            );
+            color: var(--gold-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .btn-primary {
+            border-color: rgba(212, 175, 55, 0.6);
+            border-left-color: rgba(212, 175, 55, 0.8);
+        }
+
+        /* VIGNETTE */
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(
+                ellipse at center, 
+                transparent 20%, 
+                rgba(10, 10, 15, 0.5) 70%, 
+                rgba(10, 10, 15, 0.9) 100%
+            );
+            z-index: 100;
+        }
+
+        /* EFFET POUSSIÈRE AMBIANTE */
+        .camp-main::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.08), transparent),
+                radial-gradient(1px 1px at 60% 70%, rgba(139, 0, 0, 0.1), transparent),
+                radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.06), transparent);
+            background-size: 300% 300%;
+            background-position: 0% 0%, 40% 60%, 80% 20%;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: dustAmbient 30s ease-in-out infinite;
+        }
+
+        @keyframes dustAmbient {
+            0%, 100% { background-position: 0% 0%, 40% 60%, 80% 20%; }
+            50% { background-position: 100% 100%, 60% 40%, 20% 80%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="camp">
+        <!-- BACKGROUND -->
+        <div class="camp-background"></div>
+        
+        <!-- FEU CENTRAL -->
+        <div class="central-fire">
+            <div class="fire-glow"></div>
+            <div class="flames">🔥</div>
+        </div>
+        
+        <!-- PARTICULES -->
+        <canvas id="particles"></canvas>
+        
+        <!-- CONTAINER -->
+        <div class="camp-container">
+            <!-- HEADER -->
+            <div class="camp-header">
+                <div>
+                    <h1 class="camp-title">LE CORTÈGE DES OMBRES</h1>
+                    <p class="camp-subtitle">Une procession figée entre l'espoir et le désespoir</p>
+                </div>
+                <div class="corruption-display">
+                    <span class="corruption-label">Corruption</span>
+                    <span class="corruption-value" id="corruptionValue">3%</span>
+                </div>
+            </div>
+            
+            <!-- MAIN - ZONES -->
+            <div class="camp-main">
+                <!-- FORGE -->
+                <div class="camp-zone zone-forge" data-zone="forge">
+                    <div class="zone-status">Disponible</div>
+                    <div class="zone-icon">⚒️</div>
+                    <h3 class="zone-title">L'Écorcheur de Fer</h3>
+                    <p class="zone-description">Drenvar recoud le métal brisé. Améliore ton équipement avec les Larmes de Krovax.</p>
+                </div>
+                
+                <!-- JARDIN -->
+                <div class="camp-zone zone-garden" data-zone="garden">
+                    <div class="zone-status">Disponible</div>
+                    <div class="zone-icon">🌸</div>
+                    <h3 class="zone-title">Le Jardinier des Regrets</h3>
+                    <p class="zone-description">Les Lys du Pardon absorbent ta noirceur. Réduis ta corruption... à un prix.</p>
+                </div>
+                
+                <!-- CARTE -->
+                <div class="camp-zone" data-zone="map">
+                    <div class="zone-status">Disponible</div>
+                    <div class="zone-icon">🗺️</div>
+                    <h3 class="zone-title">Carte des Profondeurs</h3>
+                    <p class="zone-description">Choisis ta prochaine descente. Chaque donjon porte ses secrets et ses maudictions.</p>
+                </div>
+                
+                <!-- AUTEL -->
+                <div class="camp-zone" data-zone="altar">
+                    <div class="zone-status">Disponible</div>
+                    <div class="zone-icon">🕯️</div>
+                    <h3 class="zone-title">L'Autel Silencieux</h3>
+                    <p class="zone-description">Sacrifie. Prie. Négocie. Les dieux sont morts, mais leurs échos demeurent.</p>
+                </div>
+                
+                <!-- SURVIVORS -->
+                <div class="camp-zone" data-zone="survivors">
+                    <div class="zone-status"><span id="survivorCount">12</span> âmes</div>
+                    <div class="zone-icon">👥</div>
+                    <h3 class="zone-title">Les Perdus</h3>
+                    <p class="zone-description">Ils te suivent. Ils t'espèrent. Ils te craignent. Écoute leurs histoires.</p>
+                </div>
+                
+                <!-- REPOS -->
+                <div class="camp-zone" data-zone="rest">
+                    <div class="zone-status">Disponible</div>
+                    <div class="zone-icon">🛌</div>
+                    <h3 class="zone-title">Repos Maudit</h3>
+                    <p class="zone-description">Restaure tes forces. Mais le sommeil ici n'apporte jamais la paix.</p>
+                </div>
+            </div>
+            
+            <!-- FOOTER -->
+            <div class="camp-footer">
+                <button class="btn-camp" onclick="alert('🎒 Inventaire en développement')">Inventaire</button>
+                <button class="btn-camp" onclick="alert('⚔️ Statistiques en développement')">Personnage</button>
+                <button class="btn-camp btn-primary" onclick="alert('🗺️ Sélection de donjon...')">Descendre</button>
+            </div>
+        </div>
+        
+        <!-- VIGNETTE -->
+        <div class="vignette"></div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // PARTICULES - FUMÉE ET BRAISES
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+
+        class Particle {
+            constructor() {
+                const rand = Math.random();
+                // Position: autour du feu central
+                this.x = canvas.width / 2 + (Math.random() - 0.5) * 150;
+                
+                if (rand < 0.7) {
+                    // FUMÉE (monte)
+                    this.y = canvas.height * 0.85;
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = -Math.random() * 0.4 - 0.2;
+                    this.size = 3 + Math.random() * 5;
+                    this.color = [74, 74, 74]; // Gris fumée
+                    this.alpha = 0.3 + Math.random() * 0.2;
+                    this.gravity = -0.003;
+                } else {
+                    // BRAISES (montent puis retombent)
+                    this.y = canvas.height * 0.85;
+                    this.vx = (Math.random() - 0.5) * 0.4;
+                    this.vy = -Math.random() * 1.2 - 0.5;
+                    this.size = 1.5 + Math.random() * 2;
+                    this.color = [255, Math.floor(102 + Math.random() * 50), 0]; // Orange-rouge
+                    this.alpha = 0.7 + Math.random() * 0.3;
+                    this.gravity = 0.015;
+                }
+                
+                this.life = 1.0;
+                this.decay = 0.003;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.life -= this.decay;
+                this.vx += (Math.random() - 0.5) * 0.02;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                const alpha = this.alpha * this.life;
+                ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            isDead() {
+                return this.life <= 0 || this.y > canvas.height + 50 || this.y < -50;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Spawn rate: plus de particules
+            if (Math.random() < 0.4) {
+                particles.push(new Particle());
+            }
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.isDead()) particles.splice(i, 1);
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INTERACTIONS ZONES
+        // ═══════════════════════════════════════════════════════════
+        document.querySelectorAll('.camp-zone').forEach(zone => {
+            zone.addEventListener('click', () => {
+                const zoneName = zone.dataset.zone;
+                
+                switch(zoneName) {
+                    case 'forge':
+                        alert('⚒️ DRENVAR - L\'ÉCORCHEUR DE FER\n\n"Alors, Pactisé. Qu\'est-ce qui est cassé cette fois ?"');
+                        break;
+                    case 'garden':
+                        alert('🌸 LE JARDINIER DES REGRETS\n\n"Tu portes l\'ombre, je le sens. Viens... laisse mes enfants te soulager."');
+                        break;
+                    case 'map':
+                        alert('🗺️ CARTE DES PROFONDEURS\n\n→ Système de sélection de donjon en développement');
+                        break;
+                    case 'altar':
+                        alert('🕯️ L\'AUTEL SILENCIEUX\n\nLes chandelles tremblent. Quelque chose écoute.');
+                        break;
+                    case 'survivors':
+                        alert('👥 LES PERDUS\n\n12 visages te regardent. Espoir. Dégoût. Peur.');
+                        break;
+                    case 'rest':
+                        alert('🛌 REPOS MAUDIT\n\n→ Système de repos en développement');
+                        break;
+                }
+            });
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        animate();
+        
+        console.log('⛺ LE CORTÈGE DES OMBRES');
+        console.log('🔥 Feu central + Particules actives');
+        console.log('🏕️ 6 zones interactives');
+        console.log('💀 Ambiance lugubre installée');
+    </script>
+</body>
+</html>

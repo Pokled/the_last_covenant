@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donjon JDR – En Jeu</title>
+<!-- ✅ DESIGN SYSTEM AAA+ (doit être chargé EN PREMIER) -->
+<link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/game-ui-new.css">
+<!-- ❌ SUPPRIMÉ deck-hand.css -->
+<link rel="stylesheet" href="css/event-modals.css">
+<!-- ✅ AJOUTÉ : Thème Dark Medieval -->
+<link rel="stylesheet" href="css/dark-medieval-theme.css">
+<!-- ✅ AJOUTÉ : Buffs Passifs Dark -->
+<link rel="stylesheet" href="css/passive-buffs-dark.css">
+<!-- ✅ NOUVEAU : Combat System Tactique -->
+<link rel="stylesheet" href="css/combat-system.css">
+<link rel="stylesheet" href="css/shop-modal-aaa.css">
+<link rel="stylesheet" href="css/rest-modal-aaa.css">
+<link rel="stylesheet" href="css/event-modal-aaa.css">
+<!-- ✅ NOUVEAU : Modales AAA+ Corridor et Salles -->
+<link rel="stylesheet" href="css/event-modal-corridor.css">
+<link rel="stylesheet" href="css/event-modal-rooms.css">
+<!-- ✅ NOUVEAU : Loot Reveal Animations -->
+<link rel="stylesheet" href="css/loot-reveal.css">
+<!-- ✅ NOUVEAU : Corruption System Visuel -->
+<link rel="stylesheet" href="css/corruption-system.css">
+<!-- ✅ NOUVEAU : Item Inspection Modal -->
+<link rel="stylesheet" href="css/item-inspection-modal.css">
+<!-- ✅ NOUVEAU : Narrator System -->
+<link rel="stylesheet" href="css/narrator-system.css">
+<!-- ✅ NOUVEAU : Dé du Destin System -->
+<link rel="stylesheet" href="css/dice-system.css">
+<!-- ✅ NOUVEAU : Camp/Village System -->
+<link rel="stylesheet" href="css/camp.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Grenze+Gotisch:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="dungeon-background"></div>
+<div class="vignette"></div>
+
+<header class="game-header">
+  <div class="header-left">
+    <h1 class="game-title">☠ Le Donjon des Damnés ☠</h1>
+  </div>
+  <div class="header-center">
+    <div class="turn-display" id="turnDisplay">
+      <span class="turn-label">Tour de</span>
+      <span class="turn-player" id="turnPlayer">Chargement...</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-exit" id="btnReturnToCamp" style="margin-right: 10px;">
+      ⛺ Retour au Camp
+    </button>
+    <button class="btn-exit" onclick="window.location.href='index.html'">
+      🚪 Menu Principal
+    </button>
+  </div>
+</header>
+
+<div class="game-container">
+  
+  <!-- SIDEBAR GAUCHE -->
+  <aside class="sidebar sidebar-left">
+    
+    <!-- PANNEAU HÉROS -->
+    <div class="panel stone-panel">
+      <h2 class="panel-title">⚔ Votre Héros</h2>
+      <div id="currentPlayerInfo" class="hero-card">
+        <div class="hero-portrait">
+          <div class="portrait-icon" id="heroIcon">?</div>
+        </div>
+        
+        <div class="level-badge-center" id="levelBadgeCenter">Niv. 1</div>
+        
+        <div class="hero-stats">
+          <div class="hero-name" id="heroName">Chargement...</div>
+          <div class="hero-class" id="heroClass">Classe</div>
+          
+          <!-- ✅ MODIFIÉ : Barres HP/XP visuelles -->
+          <div class="hp-bar-container">
+            <span class="stat-label">❤️ HP</span>
+            <div class="hp-bar-wrapper">
+              <div class="hp-bar" id="heroHPBar"></div>
+              <span class="hp-text" id="heroHP">10/10</span>
+            </div>
+          </div>
+          
+          <div class="xp-bar-container">
+            <span class="stat-label">⭐ XP</span>
+            <div class="xp-bar-wrapper">
+              <div class="xp-bar" id="heroXPBar"></div>
+              <span class="xp-text" id="heroXP">0/100</span>
+            </div>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-item">⚔️ <span id="heroATK">4</span></span>
+            <span class="stat-item">🛡️ <span id="heroDEF">3</span></span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-item">💰 <span id="heroGold">0</span></span>
+            <span class="stat-item">📍 <span id="heroPosition">0/450</span></span>
+          </div>
+          
+          <!-- Bouton compétences -->
+          <button class="btn-skill-compact" id="skillBtn" onclick="game.showSkillTree()" style="display:none;">
+            <span id="heroSkillPoints">0</span> 🌟 Compétences
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANNEAU INVENTAIRE -->
+    <div class="panel stone-panel">
+      <h2 class="panel-title">🎒 Inventaire</h2>
+      <div class="inventory-grid" id="inventoryGrid">
+        <div class="inv-slot"></div>
+        <div class="inv-slot"></div>
+        <div class="inv-slot"></div>
+        <div class="inv-slot"></div>
+        <div class="inv-slot"></div>
+        <div class="inv-slot"></div>
+      </div>
+      
+      <!-- ✅ Bouton dé avec VRAI CUBE 3D OSSEUX -->
+      <button class="btn-dice-sidebar" id="rollBtn">
+        <!-- 💀 VRAI CUBE 3D OSSEUX qui flotte -->
+        <div class="dice-3d-button-container">
+          <div class="dice-3d-button">
+            <div class="dice-face-btn front">1</div>
+            <div class="dice-face-btn back">6</div>
+            <div class="dice-face-btn right">2</div>
+            <div class="dice-face-btn left">5</div>
+            <div class="dice-face-btn top">3</div>
+            <div class="dice-face-btn bottom">4</div>
+          </div>
+        </div>
+        <span class="dice-label">LANCER LE DÉ</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ZONE CENTRALE -->
+  <main class="game-main">
+    <div class="canvas-container">
+      <canvas id="gameCanvas" width="1200" height="700"></canvas>
+      <div class="canvas-overlay">
+        <div class="compass" id="compass">
+          <div class="compass-needle" id="compassNeedle">
+            <span style="font-size: 20px;">🚪</span>
+          </div>
+        </div>
+        
+        <!-- Contrôles de caméra -->
+        <div class="camera-controls">
+          <button class="camera-btn" id="zoomInBtn" title="Zoom +">
+            <span style="font-size: 20px;">+</span>
+          </button>
+          <button class="camera-btn" id="zoomOutBtn" title="Zoom -">
+            <span style="font-size: 20px;">−</span>
+          </button>
+          <button class="camera-btn" id="recenterBtn" title="Recentrer sur le joueur">
+            <span style="font-size: 16px;">🎯</span>
+          </button>
+          <button class="camera-btn" id="soundToggleBtn" title="Son activé">
+            <span style="font-size: 16px;" id="soundIcon">🔊</span>
+          </button>
+          <button class="camera-btn" id="musicToggleBtn" title="Musique activée">
+            <span style="font-size: 16px;" id="musicIcon">🎵</span>
+          </button>
+          <div class="zoom-indicator" id="zoomIndicator">100%</div>
+          
+          <!-- FPS Counter -->
+          <div style="position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 14px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 4px;">
+            <div id="fpsDisplay" style="color: #0f0;">FPS: 60</div>
+            <div id="frameTimeDisplay" style="color: #888; font-size: 11px;">Frame: 16.67 ms</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SIDEBAR DROITE -->
+  <aside class="sidebar sidebar-right">
+    
+    <div class="panel stone-panel">
+      <h2 class="panel-title">👥 Aventuriers</h2>
+      <div class="players-scroll" id="playersList">
+      </div>
+    </div>
+
+    <div class="panel stone-panel">
+      <h2 class="panel-title">📜 Journal</h2>
+      <div class="event-log" id="eventLog">
+        <div class="log-entry">
+          <span class="log-icon">⚡</span>
+          <span class="log-text">La partie commence...</span>
+        </div>
+      </div>
+      
+      <!-- ✅ AJOUTÉ : Section Buffs Passifs -->
+      <div id="passiveBuffsContainer">
+        <h3>💫 Buffs Actifs</h3>
+        <div id="passiveBuffsList">
+          <div class="no-buffs">Aucun buff actif</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- MODAL DÉ -->
+<div id="diceModal" class="modal">
+  <div class="modal-content dice-modal-content">
+    <div class="dice-container">
+      <div class="pixel-dice" id="pixelDice">
+        <div class="dice-face">?</div>
+      </div>
+    </div>
+    <div class="dice-result" id="diceResult" style="display:none;">
+      <span class="result-number">6</span>
+    </div>
+    <p class="dice-text" id="diceText">Lancement du dé...</p>
+  </div>
+</div>
+
+<!-- MODAL INFO -->
+<div id="infoModal" class="modal">
+  <div class="modal-content stone-panel">
+    <h2 class="panel-title" id="infoTitle">Information</h2>
+    <div id="infoContent" class="modal-text"></div>
+    <button class="btn-blood" id="infoCloseBtn">Continuer</button>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="js/config.js"></script>
+<script src="js/classes.js"></script>
+<!-- ✅ NOUVEAU : Items Database (doit être chargé AVANT inventory) -->
+<script src="js/items-database.js"></script>
+<!-- ✅ NOUVEAU : Enemies Database (Corridor/Room/Boss) -->
+<script src="js/enemies-index.js"></script>
+<!-- ✅ NOUVEAU : Economy System (Rubis/Or) -->
+<script src="js/economy-system.js"></script>
+<!-- ✅ NOUVEAU : Camp/Village System -->
+<script src="js/camp.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/dice-lexicon.js"></script>
+<script src="js/destiny-cards.js"></script>
+<script src="js/card-system.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/events.js"></script>
+<script src="js/events-extended.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/achievements.js"></script>
+
+<!-- ✅ SYSTÈME ISOMÉTRIQUE -->
+<script src="js/dungeon-nodes.js"></script>
+<script src="js/destiny-nodes.js"></script>
+<script src="js/dungeon-linear-generator.js"></script>
+<script src="js/isometric-renderer-cubes.js"></script>
+
+<!-- ❌ ANCIEN SYSTÈME 2D DÉSACTIVÉ -->
+<!-- <script src="js/texture-generator.js"></script> -->
+<!-- <script src="js/lighting-system.js"></script> -->
+<!-- <script src="js/dungeon.js"></script> -->
+<!-- <script src="js/renderer.js"></script> -->
+<!-- <script src="js/renderer-advanced.js"></script> -->
+<!-- <script src="js/game.js"></script> -->
+
+<script src="js/modal-sounds.js"></script>
+<script src="js/event-modals.js"></script>
+<script src="js/combat.js"></script>
+
+<!-- ✅ AJOUTÉ : Système de buffs passifs -->
+<script src="js/passive-buffs.js"></script>
+
+<!-- ✅ AJOUTÉ : Indicateurs de direction -->
+<script src="js/path-indicators.js"></script>
+
+<!-- ✅ AJOUTÉ : Mise à jour barres HP/XP -->
+<script src="js/health-bars-update.js"></script>
+
+<!-- ✅ AJOUTÉ : Animation joueur saut de puce -->
+<script src="js/player-animation.js"></script>
+<script src="js/combat-audio-system.js"></script>
+
+<!-- ✅ NOUVEAU MOTEUR DE JEU ISOMÉTRIQUE -->
+<script src="js/game-iso.js"></script>
+<script src="js/shop-modal-aaa.js"></script>
+<script src="js/rest-modal-aaa.js"></script>
+<script src="js/event-modal-aaa.js"></script>
+<!-- ✅ NOUVEAU : Modales AAA+ Corridor -->
+<script src="js/event-modal-corridor.js"></script>
+<!-- ✅ NOUVEAU : Loot System (Particles + Reveal) -->
+<script src="js/particle-system.js"></script>
+<script src="js/loot-reveal-system.js"></script>
+<!-- ✅ NOUVEAU : Corruption System Visuel -->
+<script src="js/corruption-system.js"></script>
+<!-- ✅ NOUVEAU : Items Lore Integration System -->
+<script src="js/items-lore-integration.js"></script>
+<!-- ✅ NOUVEAU : Narrator System -->
+<script src="js/narrator-system.js"></script>
+
+<!-- ✅ NOUVEAU : Dé du Destin System -->
+<script src="js/dice-visual-system.js"></script>
+<script src="js/dice-destiny-core.js"></script>
+
+<!-- 🧪 BOUTONS TEST -->
+<div style="position: fixed; top: 70px; right: 10px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+
+  <!-- Bouton Test Combat -->
+  <button id="test-combat-btn" style="
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+    color: white;
+    border: 2px solid #FFD700;
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+    transition: all 0.3s ease;
+  " onmouseover="this.style.transform='scale(1.05)'"
+     onmouseout="this.style.transform='scale(1)'">
+    ⚔️ TEST COMBAT
+  </button>
+
+  <!-- Bouton Test Dé du Destin -->
+  <button id="test-dice-destiny-btn" style="
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #4B0082 0%, #9370DB 100%);
+    color: white;
+    border: 2px solid #FFD700;
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 0 20px rgba(75, 0, 130, 0.5);
+    transition: all 0.3s ease;
+  " onmouseover="this.style.transform='scale(1.05)'"
+     onmouseout="this.style.transform='scale(1)'">
+    🎲 TEST DÉ DESTIN
+  </button>
+
+</div>
+
+<script>
+// 🧪 Script de test pour le Combat System
+document.getElementById('test-combat-btn').addEventListener('click', function() {
+  console.log('🧪 Lancement test Combat System...');
+  
+  // Créer joueur test
+  const testPlayer = {
+    id: 'player_test',
+    name: 'Toi',
+    sprite: '🧙',
+    hp: 120,
+    maxHp: 120,
+    atk: 25,
+    def: 10,
+    speed: 5,
+    isAlly: true,
+    isPlayer: true,
+    stress: 30,
+    corruption: 20
+  };
+  
+  // Créer compagnon test
+  const testKnight = {
+    id: 'knight_test',
+    name: 'Chevalier',
+    sprite: '⚔️',
+    hp: 85,
+    maxHp: 85,
+    atk: 20,
+    def: 15,
+    speed: 4,
+    isAlly: true,
+    isPlayer: false
+  };
+  
+  // Créer ennemis test
+  const enemies = [
+    {
+      id: 'orc1',
+      name: 'Orc Guerrier',
+      sprite: '👹',
+      hp: 45,
+      maxHp: 45,
+      atk: 15,
+      def: 5,
+      speed: 4,
+      isAlly: false
+    },
+    {
+      id: 'demon1',
+      name: 'Démon Mineur',
+      sprite: '👺',
+      hp: 60,
+      maxHp: 60,
+      atk: 20,
+      def: 8,
+      speed: 6,
+      isAlly: false
+    },
+    {
+      id: 'skeleton1',
+      name: 'Squelette',
+      sprite: '💀',
+      hp: 30,
+      maxHp: 30,
+      atk: 12,
+      def: 3,
+      speed: 3,
+      isAlly: false
+    }
+  ];
+  
+  const allies = [testPlayer, testKnight];
+  
+  // Vérifier que CombatSystem est chargé
+  if (typeof CombatSystem === 'undefined') {
+    alert('❌ Erreur : combat-system.js n\'est pas chargé !');
+    console.error('❌ CombatSystem non défini. Vérifie que combat-system.js est bien chargé.');
+    return;
+  }
+  
+  // Lancer le combat
+  console.log('✅ Création du combat avec:', { allies, enemies });
+  const combat = new CombatSystem(allies, enemies, 'Chambre de Test');
+  combat.initialize();
+});
+
+// 🧪 Script de test pour le Dé du Destin
+document.getElementById('test-dice-destiny-btn').addEventListener('click', async function() {
+  console.log('🎲 Test du Dé du Destin...');
+
+  if (typeof window.DiceSystem === 'undefined') {
+    alert('❌ Erreur : DiceSystem non chargé !');
+    return;
+  }
+
+  try {
+    // Lancer le Dé
+    const result = await window.DiceSystem.roll();
+    console.log('✅ Résultat du Dé:', result);
+
+    // Afficher info du Dé dans la console
+    console.log('📊 Info du Dé:', window.DiceSystem.getInfo());
+
+  } catch (error) {
+    console.error('❌ Erreur lors du lancer:', error);
+    alert('Erreur: ' + error.message);
+  }
+});
+
+// ==========================================
+// RETOUR AU CAMP - Save & Return
+// ==========================================
+document.getElementById('btnReturnToCamp').addEventListener('click', function() {
+  // Confirmation
+  const confirmed = confirm('⛺ Retourner au Camp ?\n\nLa progression du donjon actuel sera abandonnée, mais tes compagnons et ton or seront sauvegardés.');
+
+  if (confirmed) {
+    // Sauvegarder état actuel du joueur (si disponible)
+    if (typeof game !== 'undefined' && game.currentPlayer) {
+      const currentPlayerData = localStorage.getItem('tlc_player');
+      if (currentPlayerData) {
+        const playerData = JSON.parse(currentPlayerData);
+
+        // Mettre à jour avec stats actuelles
+        playerData.hp = game.currentPlayer.hp;
+        playerData.maxHp = game.currentPlayer.maxHp || playerData.maxHp;
+        playerData.atk = game.currentPlayer.atk;
+        playerData.def = game.currentPlayer.def;
+        playerData.level = game.currentPlayer.level || playerData.level;
+        playerData.corruption = game.currentPlayer.corruption || playerData.corruption;
+        playerData.gold = game.currentPlayer.gold || playerData.gold;
+
+        // ✅ NOUVEAU : Mettre à jour l'état des compagnons
+        if (game.currentPlayer.companions && game.currentPlayer.companions.length > 0) {
+          playerData.companions = game.currentPlayer.companions.map(comp => ({
+            id: comp.id,
+            name: comp.name,
+            hp: comp.hp,
+            maxHp: comp.maxHp,
+            atk: comp.atk,
+            def: comp.def,
+            morale: comp.morale,
+            motivation: comp.motivation,
+            backstory: comp.backstory
+          }));
+          console.log(`⚔️ ${playerData.companions.length} compagnon(s) sauvegardé(s)`);
+        }
+
+        // Sauvegarder
+        localStorage.setItem('tlc_player', JSON.stringify(playerData));
+        console.log('✅ Progression sauvegardée avant retour au camp');
+      }
+    }
+
+    // Déclencher retour de donjon = nuit tombée
+    const dayNightData = JSON.parse(localStorage.getItem('tlc_daynightcycle') || '{"timeOfDay":"morning","dayCount":1,"hour":6}');
+    dayNightData.timeOfDay = 'night';
+    dayNightData.hour = 20;
+    localStorage.setItem('tlc_daynightcycle', JSON.stringify(dayNightData));
+    console.log('🌙 Retour de donjon : la nuit est tombée');
+
+    // Rediriger vers camp
+    window.location.href = 'camp.html';
+  }
+});
+</script>
+
+</body>
+</html>

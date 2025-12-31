@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏰 Test Système de Nœuds - The Last Covenant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Crimson Text', serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e0e0e0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0;
+      border-bottom: 2px solid #d4af37;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 3em;
+      color: #d4af37;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      color: #999;
+      font-style: italic;
+    }
+
+    .test-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+
+    .player-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .control-group {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .control-group label {
+      display: block;
+      color: #d4af37;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .control-group input {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: #e0e0e0;
+      border-radius: 5px;
+      font-size: 1.1em;
+    }
+
+    .control-group .value-display {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #999;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+      color: #1a1a2e;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #555 0%, #333 100%);
+      color: #e0e0e0;
+    }
+
+    .dungeon-result {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .node-visualization {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 4px solid #d4af37;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .node-header h3 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      font-size: 1.5em;
+    }
+
+    .node-description {
+      color: #bbb;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .paths-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .path-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .path-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--path-color);
+      opacity: 0.5;
+    }
+
+    .path-card.active {
+      border-color: var(--path-color);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      transform: scale(1.05);
+    }
+
+    .path-card.active::before {
+      opacity: 1;
+      height: 6px;
+    }
+
+    .path-icon {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    .path-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2em;
+      color: #d4af37;
+      margin-bottom: 8px;
+    }
+
+    .path-condition {
+      display: inline-block;
+      padding: 5px 10px;
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 5px;
+      font-size: 0.85em;
+      margin-bottom: 10px;
+      color: #d4af37;
+    }
+
+    .path-preview {
+      font-size: 0.9em;
+      color: #999;
+      line-height: 1.5;
+    }
+
+    .dungeon-path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .tile {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      padding: 10px 15px;
+      min-width: 150px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .tile-type {
+      font-size: 0.8em;
+      color: #d4af37;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .tile-name {
+      font-weight: bold;
+      color: #e0e0e0;
+    }
+
+    .tile.entrance { border-color: #50E3C2; }
+    .tile.path { border-color: #666; }
+    .tile.combat { border-color: #F5A623; }
+    .tile.event { border-color: #9013FE; }
+    .tile.boss { border-color: #D0021B; }
+    .tile.treasure { border-color: #FFD700; }
+    .tile.shop { border-color: #4A90E2; }
+
+    .decision-log {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .decision-item {
+      padding: 10px;
+      border-left: 3px solid #d4af37;
+      margin-bottom: 10px;
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .decision-item strong {
+      color: #d4af37;
+    }
+
+    .simulation-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .run-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+    }
+
+    .run-id {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .run-route {
+      font-size: 0.9em;
+      color: #bbb;
+      margin: 5px 0;
+    }
+
+    .phantom-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      background: rgba(144, 19, 254, 0.3);
+      border: 1px solid rgba(144, 19, 254, 0.5);
+      border-radius: 4px;
+      font-size: 0.8em;
+      color: #9013FE;
+      margin-top: 5px;
+    }
+
+    .stats-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .stat-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2em;
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .warning {
+      background: rgba(245, 166, 35, 0.1);
+      border-left: 4px solid #F5A623;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .warning strong {
+      color: #F5A623;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏰 Système de Nœuds de Destin</h1>
+      <p class="subtitle">Test du nouveau système de génération de donjon</p>
+    </header>
+
+    <div class="warning">
+      <strong>⚠️ Page de Test</strong> - Ce système est indépendant et n'affecte PAS le jeu principal (game.html). Utilisez cette page pour expérimenter sans risque.
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PANNEAU 1 : CONTRÔLES JOUEUR -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="test-panel">
+      <h2>🎮 État du Joueur</h2>
+      <p style="color: #999; margin-bottom: 20px;">Ajustez les stats du joueur pour voir comment elles affectent les chemins pris aux Nœuds de Destin.</p>
+
+      <div class="player-controls">
+        <div class="control-group">
+          <label for="player-hp">❤️ HP</label>
+          <input type="range" id="player-hp" min="1" max="100" value="100">
+          <span class="value-display" id="hp-display">100 / 100</span>
+        </div>
+
+        <div class="control-group">
+          <label for="player-corruption">💀 Corruption</label>
+          <input type="range" id="player-corruption" min="0" max="100" value="0">
+          <span class="value-display" id="corruption-display">0%</span>
+        </div>
+
+        <div class="control-group">
+          <label for="player-momentum">⚡ Momentum</label>
+          <input type="range" id="player-momentum" min="0" max="3" value="0">
+          <span class="value-display" id="momentum-display">0 / 3</span>
+        </div>
+
+        <div class="control-group">
+          <label for="player-burden">⚖️ Fardeau (objets)</label>
+          <input type="range" id="player-burden" min="0" max="10" value="0">
+          <span class="value-display" id="burden-display">0 objets</span>
+        </div>
+
+        <div class="control-group">
+          <label for="player-pacts">📜 Pactes Signés</label>
+          <input type="range" id="player-pacts" min="0" max="5" value="0">
+          <span class="value-display" id="pacts-display">0 pactes</span>
+        </div>
+
+        <div class="control-group">
+          <label for="player-stage">🎲 Stade du Dé</label>
+          <input type="range" id="player-stage" min="1" max="5" value="1">
+          <span class="value-display" id="stage-display">Stade 1</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <button class="btn" onclick="generateDungeon()">🏰 Générer Donjon</button>
+        <button class="btn btn-secondary" onclick="randomizePlayer()">🎲 Stats Aléatoires</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PANNEAU 2 : RÉSULTATS DE GÉNÉRATION -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="test-panel" id="results-panel" style="display: none;">
+      <h2>📜 Résultat de la Génération</h2>
+
+      <div class="stats-summary" id="stats-summary"></div>
+
+      <div id="node-visualizations"></div>
+
+      <div class="decision-log" id="decision-log"></div>
+
+      <h3 style="color: #d4af37; margin-top: 30px; margin-bottom: 15px;">🗺️ Chemin Complet du Donjon</h3>
+      <div class="dungeon-path" id="dungeon-path"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PANNEAU 3 : SIMULATION MULTIPLE -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="test-panel">
+      <h2>🧪 Simulation de Rejouabilité</h2>
+      <p style="color: #999; margin-bottom: 20px;">Simulez 10 runs avec des stats aléatoires pour voir la variété des chemins générés.</p>
+
+      <button class="btn" onclick="runSimulation()">🔄 Simuler 10 Runs</button>
+
+      <div class="simulation-results" id="simulation-results"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCRIPTS -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <script src="js/dungeon-nodes.js"></script>
+  <script>
+    // Instance du système
+    const dungeonSystem = new NodeBasedDungeon();
+
+    // ═══════════════════════════════════════════════════════════
+    // MISE À JOUR DES AFFICHAGES DE VALEURS
+    // ═══════════════════════════════════════════════════════════
+
+    document.getElementById('player-hp').addEventListener('input', (e) => {
+      document.getElementById('hp-display').textContent = `${e.target.value} / 100`;
+    });
+
+    document.getElementById('player-corruption').addEventListener('input', (e) => {
+      document.getElementById('corruption-display').textContent = `${e.target.value}%`;
+    });
+
+    document.getElementById('player-momentum').addEventListener('input', (e) => {
+      document.getElementById('momentum-display').textContent = `${e.target.value} / 3`;
+    });
+
+    document.getElementById('player-burden').addEventListener('input', (e) => {
+      document.getElementById('burden-display').textContent = `${e.target.value} objets`;
+    });
+
+    document.getElementById('player-pacts').addEventListener('input', (e) => {
+      document.getElementById('pacts-display').textContent = `${e.target.value} pactes`;
+    });
+
+    document.getElementById('player-stage').addEventListener('input', (e) => {
+      document.getElementById('stage-display').textContent = `Stade ${e.target.value}`;
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // FONCTION : GÉNÉRER DONJON
+    // ═══════════════════════════════════════════════════════════
+
+    function generateDungeon() {
+      // Récupérer l'état du joueur
+      const hp = parseInt(document.getElementById('player-hp').value);
+      const corruption = parseInt(document.getElementById('player-corruption').value);
+      const momentum = parseInt(document.getElementById('player-momentum').value);
+      const burden = parseInt(document.getElementById('player-burden').value);
+      const pactsSigned = parseInt(document.getElementById('player-pacts').value);
+      const diceStage = parseInt(document.getElementById('player-stage').value);
+
+      const player = {
+        hp: hp,
+        maxHp: 100,
+        corruption: corruption,
+        momentum: momentum,
+        pactsSigned: pactsSigned,
+        diceStage: diceStage,
+        inventory: { items: Array(burden).fill('item') }
+      };
+
+      // Générer le donjon
+      const result = dungeonSystem.generate(player);
+
+      // Afficher les résultats
+      displayResults(result, player);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // FONCTION : AFFICHER RÉSULTATS
+    // ═══════════════════════════════════════════════════════════
+
+    function displayResults(result, player) {
+      // Afficher le panneau de résultats
+      document.getElementById('results-panel').style.display = 'block';
+
+      // Stats summary
+      const statsSummary = document.getElementById('stats-summary');
+      statsSummary.innerHTML = `
+        <div class="stat-box">
+          <div class="stat-value">${result.metadata.totalLength}</div>
+          <div class="stat-label">Cases Totales</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${result.metadata.nodeCount}</div>
+          <div class="stat-label">Nœuds de Destin</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${result.phantomPaths.length}</div>
+          <div class="stat-label">Chemins Fantômes</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${result.decisions.length}</div>
+          <div class="stat-label">Décisions Prises</div>
+        </div>
+      `;
+
+      // Visualisation des nœuds
+      const nodeViz = document.getElementById('node-visualizations');
+      nodeViz.innerHTML = '';
+
+      dungeonSystem.nodes.forEach((node, index) => {
+        const viz = dungeonSystem.getNodeVisualization(node.id, player);
+
+        const nodeHTML = `
+          <div class="node-visualization">
+            <div class="node-header">
+              <h3>${viz.name}</h3>
+            </div>
+            <div class="node-description">${viz.description}</div>
+            <div style="padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 5px; margin-bottom: 15px;">
+              <strong style="color: #d4af37;">Chemin Pris:</strong> ${viz.reason}
+            </div>
+            <div class="paths-grid">
+              ${viz.paths.map(path => `
+                <div class="path-card ${path.isActive ? 'active' : ''}" style="--path-color: ${path.color}">
+                  <div class="path-icon">${path.icon}</div>
+                  <div class="path-name">${path.name}</div>
+                  <div class="path-condition">${path.condition}</div>
+                  <div class="path-preview">${path.preview}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        nodeViz.innerHTML += nodeHTML;
+      });
+
+      // Decision log
+      const decisionLog = document.getElementById('decision-log');
+      decisionLog.innerHTML = '<h3 style="color: #d4af37; margin-bottom: 15px;">📋 Historique des Décisions</h3>';
+
+      result.decisions.forEach((decision, index) => {
+        decisionLog.innerHTML += `
+          <div class="decision-item">
+            <strong>${decision.nodeName}</strong><br>
+            ${decision.reason}
+          </div>
+        `;
+      });
+
+      // Phantom paths
+      if (result.phantomPaths.length > 0) {
+        decisionLog.innerHTML += `
+          <div style="margin-top: 20px; padding: 15px; background: rgba(144, 19, 254, 0.1); border: 1px solid rgba(144, 19, 254, 0.3); border-radius: 8px;">
+            <strong style="color: #9013FE;">👻 Chemins Fantômes Débloqués:</strong><br>
+            ${result.phantomPaths.map(p => `<span class="phantom-badge">${p.name}</span>`).join(' ')}
+          </div>
+        `;
+      }
+
+      // Dungeon path
+      const dungeonPath = document.getElementById('dungeon-path');
+      dungeonPath.innerHTML = '';
+
+      result.path.forEach((tile, index) => {
+        const tileEl = document.createElement('div');
+        tileEl.className = `tile ${tile.type}`;
+        tileEl.innerHTML = `
+          <div class="tile-type">${tile.type}</div>
+          <div class="tile-name">${tile.name || 'Case ' + (index + 1)}</div>
+        `;
+        dungeonPath.appendChild(tileEl);
+      });
+
+      // Scroll to results
+      document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // FONCTION : RANDOMIZE PLAYER
+    // ═══════════════════════════════════════════════════════════
+
+    function randomizePlayer() {
+      document.getElementById('player-hp').value = 50 + Math.floor(Math.random() * 50);
+      document.getElementById('player-corruption').value = Math.floor(Math.random() * 100);
+      document.getElementById('player-momentum').value = Math.floor(Math.random() * 4);
+      document.getElementById('player-burden').value = Math.floor(Math.random() * 10);
+      document.getElementById('player-pacts').value = Math.floor(Math.random() * 6);
+      document.getElementById('player-stage').value = 1 + Math.floor(Math.random() * 5);
+
+      // Trigger les events pour mettre à jour les displays
+      document.getElementById('player-hp').dispatchEvent(new Event('input'));
+      document.getElementById('player-corruption').dispatchEvent(new Event('input'));
+      document.getElementById('player-momentum').dispatchEvent(new Event('input'));
+      document.getElementById('player-burden').dispatchEvent(new Event('input'));
+      document.getElementById('player-pacts').dispatchEvent(new Event('input'));
+      document.getElementById('player-stage').dispatchEvent(new Event('input'));
+
+      // Auto-générer
+      setTimeout(() => generateDungeon(), 100);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // FONCTION : SIMULATION
+    // ═══════════════════════════════════════════════════════════
+
+    function runSimulation() {
+      const results = dungeonSystem.simulateRuns(10);
+      const container = document.getElementById('simulation-results');
+      container.innerHTML = '';
+
+      results.forEach(run => {
+        const card = document.createElement('div');
+        card.className = 'run-card';
+        card.innerHTML = `
+          <div class="run-id">Run #${run.runId}</div>
+          <div class="run-route"><strong>Route:</strong> ${run.route}</div>
+          <div style="font-size: 0.9em; color: #999; margin-top: 8px;">
+            HP: ${run.playerState.hp}/${run.playerState.maxHp} •
+            Corruption: ${run.playerState.corruption}% •
+            Momentum: ${run.playerState.momentum}
+          </div>
+          <div style="font-size: 0.9em; color: #999;">
+            Longueur: ${run.totalLength} cases
+          </div>
+          ${run.phantomPaths.length > 0 ? `
+            <div style="margin-top: 8px;">
+              ${run.phantomPaths.map(p => `<span class="phantom-badge">${p}</span>`).join(' ')}
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(card);
+      });
+
+      // Scroll to simulation
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // INIT : Générer un donjon par défaut
+    // ═══════════════════════════════════════════════════════════
+
+    window.addEventListener('load', () => {
+      console.log('✅ Page de test chargée');
+      generateDungeon();
+    });
+  </script>
+</body>
+</html>

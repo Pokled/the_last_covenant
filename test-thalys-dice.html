@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲👁️ THALYS - Le Dé Maudit</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="src/systems/ThalysDice3D.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0a0a0f;
+            color: #d4c5b0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* Background animé */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at center, rgba(156, 89, 182, 0.03) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1520 50%, #0a0a0f 100%);
+            z-index: -1;
+            animation: bgPulse 10s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .demo-container {
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            letter-spacing: 0.1em;
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            color: #9b59b6;
+            font-size: 1.3em;
+            font-style: italic;
+            margin-bottom: 50px;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+        }
+
+        /* Zone du dé */
+        .dice-zone {
+            margin: 50px 0;
+        }
+
+        /* Info panels */
+        .info-panels {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 20px;
+            min-width: 250px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            text-align: left;
+        }
+        
+        .info-panel.rewards-panel {
+            border-color: rgba(155, 89, 182, 0.5);
+            border-left-color: rgba(155, 89, 182, 0.8);
+        }
+
+        .info-panel h3 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-shadow: 0 0 10px rgba(244, 208, 63, 0.4);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.3);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #c9a97a;
+        }
+
+        .stat-value {
+            color: #d4c5b0;
+            font-weight: bold;
+        }
+
+        /* Combat log */
+        .combat-log {
+            background: linear-gradient(135deg, rgba(15,13,11,0.95), rgba(25,20,17,0.95));
+            border: 1px solid rgba(80, 70, 50, 0.8);
+            border-left: 3px solid rgba(212, 175, 55, 0.5);
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .combat-log h4 {
+            font-family: 'Crimson Text', serif;
+            color: #c9b998;
+            margin: 0;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(80, 70, 50, 0.5);
+            position: sticky;
+            top: 0;
+        }
+
+        .log-entries {
+            padding: 10px 15px;
+            font-size: 0.85em;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(80, 70, 50, 0.2);
+            color: #d4c5b0;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.info { color: #c9a97a; }
+        .log-entry.attack { color: #e8a091; font-weight: 600; }
+        .log-entry.success { color: #6bc46d; }
+
+        /* Boutons */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(40, 35, 30, 0.9), rgba(30, 25, 20, 0.9));
+            border: 2px solid rgba(80, 70, 50, 0.6);
+            color: #c9b998;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.95), rgba(50, 40, 30, 0.95));
+            border-color: rgba(212, 175, 55, 0.8);
+            color: #f4d03f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(100, 20, 20, 0.9), rgba(80, 0, 0, 0.9));
+            border-color: rgba(209, 67, 67, 0.6);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(140, 30, 30, 0.95), rgba(110, 10, 10, 0.95));
+            border-color: #d14343;
+            color: #fff;
+        }
+
+        /* Lore panel */
+        .lore-panel {
+            margin-top: 50px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(156, 89, 182, 0.3);
+            padding: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        .lore-panel h3 {
+            font-family: 'Cinzel', serif;
+            color: #9b59b6;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(155, 89, 182, 0.6);
+        }
+
+        .lore-panel p {
+            color: #d4c5b0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .lore-panel .quote {
+            font-family: 'Cinzel', serif;
+            font-style: italic;
+            color: #c9a97a;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1em;
+            padding: 20px;
+            border-left: 3px solid rgba(156, 89, 182, 0.5);
+            background: rgba(0,0,0,0.3);
+        }
+        
+        /* Buffs display */
+        .buff-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(155, 89, 182, 0.1);
+            border-left: 3px solid rgba(155, 89, 182, 0.5);
+            border-radius: 4px;
+        }
+        
+        .buff-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .buff-info {
+            flex: 1;
+        }
+        
+        .buff-name {
+            color: #9b59b6;
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95em;
+        }
+        
+        .buff-desc {
+            color: #d4c5b0;
+            font-size: 0.85em;
+            margin-bottom: 3px;
+        }
+        
+        .buff-duration {
+            color: #c9a97a;
+            font-size: 0.8em;
+            font-style: italic;
+        }
+        
+        .no-buffs {
+            color: #8a7a5a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .perm-bonus-item {
+            padding: 8px;
+            margin: 3px 0;
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid rgba(212, 175, 55, 0.5);
+            color: #f4d03f;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        /* Reward particles */
+        @keyframes rewardParticle {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎲 THALYS 👁️</h1>
+        <p class="subtitle">"Je suis le Hasard et la Dette"</p>
+        
+        <!-- Zone du dé -->
+        <div class="dice-zone">
+            <div id="thalys-container"></div>
+        </div>
+        
+        <!-- Info panels -->
+        <div class="info-panels">
+            <!-- Stats du joueur -->
+            <div class="info-panel">
+                <h3>📊 Statistiques</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Corruption</span>
+                    <span class="stat-value" id="statCorruption">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Lancers</span>
+                    <span class="stat-value" id="statRolls">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Thalys révélé</span>
+                    <span class="stat-value" id="statThalys">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">État</span>
+                    <span class="stat-value" id="statState">Endormi</span>
+                </div>
+            </div>
+            
+            <!-- Rewards actives -->
+            <div class="info-panel rewards-panel">
+                <h3>🎁 Buffs Actifs</h3>
+                <div id="activeBuffs"></div>
+            </div>
+            
+            <!-- Bonus permanents -->
+            <div class="info-panel rewards-panel">
+                <h3>⭐ Bonus Permanents</h3>
+                <div id="permBonuses"></div>
+            </div>
+        </div>
+        
+        <!-- Combat log -->
+        <div class="info-panels" style="margin-top: 20px;">
+            <div class="info-panel" style="min-width: 600px;">
+                <div class="combat-log">
+                    <h4>📜 Journal</h4>
+                    <div class="log-entries" id="logEntries"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contrôles -->
+        <div class="controls">
+            <button id="btnRoll" class="btn-primary">🎲 LANCER LE DÉ</button>
+            <button id="btnReset">🔄 Réinitialiser</button>
+            <button id="btnAddCorruption">💀 +10% Corruption (test)</button>
+        </div>
+        
+        <!-- Lore -->
+        <div class="lore-panel">
+            <h3>📜 La Légende de Thalys</h3>
+            
+            <p>
+                <strong>Thalys</strong> était un dieu du Chaos primordial, maître absolu du Hasard et des Destins. 
+                À l'aube des temps, les anciens l'ont banni et emprisonné dans un dé d'ivoire maudit, 
+                forgé à partir d'os de dragon et gravé de runes oubliées.
+            </p>
+            
+            <div class="quote">
+                "Chaque lancer est une invocation. Chaque résultat, un pacte."
+            </div>
+            
+            <p>
+                Quand le dé roule, Thalys s'éveille brièvement dans notre réalité. Il observe, juge, 
+                et corrompt l'âme de ceux qui osent l'invoquer. Plus tu le lances, plus il devient réel. 
+                Plus ta corruption grandit, plus il prend le contrôle.
+            </p>
+            
+            <p>
+                <strong>Face 6</strong> - Quand son œil se révèle, il te voit <em>directement</em>. 
+                À ce moment, il peut parler, offrir des pactes... ou prendre un morceau de ton âme.
+            </p>
+            
+            <p style="color: #d14343; font-weight: bold; text-align: center; margin-top: 20px;">
+                ⚠️ À 100% de corruption, tu lui appartiens complètement.
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ThalysDice3D } from './src/systems/ThalysDice3D.js';
+        import { ThalysPactSystem, showRewardParticles } from './src/systems/ThalysPactSystem.js';
+        
+        // ═══════════════════════════════════════════════════════════
+        // SYSTÈME DE CORRUPTION
+        // ═══════════════════════════════════════════════════════════
+        class CorruptionSystem {
+            constructor() {
+                this.corruption = 0;
+            }
+            
+            addCorruption(amount) {
+                const oldCorruption = this.corruption;
+                this.corruption = Math.min(100, this.corruption + amount);
+                
+                // Check paliers de corruption
+                const unlockedRewards = pactSystem.checkCorruptionTiers(this.corruption);
+                
+                this.updateUI();
+                
+                if (this.corruption >= 100) {
+                    this.onFullCorruption();
+                }
+                
+                return this.corruption - oldCorruption;
+            }
+            
+            getCorruption() {
+                return this.corruption;
+            }
+            
+            reset() {
+                this.corruption = 0;
+                this.updateUI();
+            }
+            
+            updateUI() {
+                document.getElementById('statCorruption').textContent = `${Math.round(this.corruption)}%`;
+                
+                let state = 'Endormi';
+                if (this.corruption >= 67) state = 'POSSÉDÉ';
+                else if (this.corruption >= 34) state = 'Éveillé';
+                
+                document.getElementById('statState').textContent = state;
+            }
+            
+            onFullCorruption() {
+                combatLog.add('💀 CORRUPTION MAXIMALE ! Tu appartiens à Thalys...', 'attack');
+                
+                setTimeout(() => {
+                    alert('👁️ TON ÂME APPARTIENT À THALYS !\n\n💀 Corruption: 100%\n⚡ Mais tu es devenu INVINCIBLE !\n\n🎁 Tous tes bonus sont x2 !');
+                }, 500);
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════
+        // COMBAT LOG
+        // ═══════════════════════════════════════════════════════════
+        class CombatLog {
+            constructor() {
+                this.container = document.getElementById('logEntries');
+                this.maxEntries = 50;
+            }
+            
+            add(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = message;
+                
+                this.container.insertBefore(entry, this.container.firstChild);
+                
+                while (this.container.children.length > this.maxEntries) {
+                    this.container.removeChild(this.container.lastChild);
+                }
+            }
+            
+            clear() {
+                this.container.innerHTML = '';
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        const combatLog = new CombatLog();
+        const corruptionSystem = new CorruptionSystem();
+        const pactSystem = new ThalysPactSystem(combatLog);
+        
+        const thalys = new ThalysDice3D({
+            containerId: 'thalys-container',
+            corruptionSystem: corruptionSystem,
+            combatLog: combatLog
+        });
+        
+        // Stats
+        let totalRolls = 0;
+        let thalysRevealed = 0;
+        
+        // Update UI
+        function updateRewardsUI() {
+            document.getElementById('activeBuffs').innerHTML = pactSystem.getBuffsDisplay();
+            document.getElementById('permBonuses').innerHTML = pactSystem.getPermanentBonusesDisplay();
+        }
+        
+        updateRewardsUI();
+        
+        // Boutons
+        document.getElementById('btnRoll').addEventListener('click', async () => {
+            const btn = document.getElementById('btnRoll');
+            btn.disabled = true;
+            
+            const result = await thalys.roll();
+            
+            totalRolls++;
+            if (result.isThalys) {
+                thalysRevealed++;
+            }
+            
+            // REWARD !
+            const reward = pactSystem.getImmediateReward(result.face, corruptionSystem.getCorruption());
+            pactSystem.applyReward(reward);
+            
+            // Particules de reward
+            const container = document.getElementById('thalys-container');
+            showRewardParticles(container, reward);
+            
+            document.getElementById('statRolls').textContent = totalRolls;
+            document.getElementById('statThalys').textContent = thalysRevealed;
+            
+            updateRewardsUI();
+            
+            btn.disabled = false;
+        });
+        
+        document.getElementById('btnReset').addEventListener('click', () => {
+            thalys.reset();
+            corruptionSystem.reset();
+            pactSystem.reset();
+            combatLog.clear();
+            totalRolls = 0;
+            thalysRevealed = 0;
+            
+            document.getElementById('statRolls').textContent = '0';
+            document.getElementById('statThalys').textContent = '0';
+            
+            updateRewardsUI();
+            
+            combatLog.add('🔄 Réinitialisation complète...', 'info');
+        });
+        
+        document.getElementById('btnAddCorruption').addEventListener('click', () => {
+            corruptionSystem.addCorruption(10);
+            thalys.corruption = corruptionSystem.getCorruption();
+            thalys.updateVisualState();
+            
+            updateRewardsUI();
+            
+            combatLog.add('💀 Corruption augmentée artificiellement (test)', 'info');
+        });
+        
+        // Message de bienvenue
+        combatLog.add('👁️ Thalys s\'éveille...', 'info');
+        combatLog.add('🎲 Clique sur le dé pour le lancer', 'info');
+        
+        console.log('🎲👁️ Thalys Demo initialized');
+    </script>
+</body>
+</html>

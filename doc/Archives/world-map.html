@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte du Monde Brisé - THE LAST COVENANT</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Background */
+        .map-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(180deg, rgba(10, 10, 10, 0.9) 0%, rgba(26, 13, 13, 0.95) 100%),
+                radial-gradient(circle at 30% 50%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        /* Layout */
+        .map-container {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        /* Header */
+        .map-header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26, 13, 13, 0.8), rgba(42, 21, 21, 0.8));
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .map-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .map-subtitle {
+            font-size: 1.1rem;
+            color: #b8860b;
+            font-style: italic;
+        }
+
+        /* Map Content */
+        .map-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        /* Canvas Map */
+        .map-canvas-wrapper {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95));
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+            overflow: hidden;
+        }
+
+        #mapCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .map-legend {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        /* Dungeon Info Panel */
+        .dungeon-info-panel {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95));
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .dungeon-preview {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            font-style: italic;
+        }
+
+        .dungeon-details {
+            display: none;
+        }
+
+        .dungeon-details.active {
+            display: block;
+        }
+
+        .dungeon-header {
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dungeon-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .dungeon-difficulty {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .difficulty-easy { background: #4ade80; color: #000; }
+        .difficulty-medium { background: #fbbf24; color: #000; }
+        .difficulty-hard { background: #f97316; color: #fff; }
+        .difficulty-deadly { background: #dc2626; color: #fff; }
+        .difficulty-nightmare { background: #7c2d12; color: #fff; }
+
+        .dungeon-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            border-left: 3px solid #d4af37;
+        }
+
+        .stat-label {
+            color: #b8860b;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: #e0e0e0;
+        }
+
+        .dungeon-description {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #8b0000;
+            margin: 20px 0;
+            font-style: italic;
+            color: #b8b8b8;
+            line-height: 1.6;
+        }
+
+        .dungeon-rewards {
+            margin-top: 20px;
+        }
+
+        .reward-item {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #d4af37;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .dungeon-locked {
+            text-align: center;
+            padding: 30px;
+            background: rgba(139, 0, 0, 0.2);
+            border: 2px dashed #8b0000;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .locked-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .locked-text {
+            color: #dc143c;
+            font-size: 1.1rem;
+        }
+
+        /* Footer Buttons */
+        .map-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .btn-map {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.9));
+            color: #d4af37;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            flex: 1;
+        }
+
+        .btn-map:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .btn-map.danger {
+            border-color: #4ade80;
+            color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-map.danger:hover:not(:disabled) {
+            box-shadow: 0 5px 30px rgba(74, 222, 128, 0.6);
+        }
+
+        .btn-map:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .map-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+
+            .dungeon-info-panel {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="map-background"></div>
+
+    <!-- Container -->
+    <div class="map-container">
+
+        <!-- Header -->
+        <header class="map-header">
+            <h1 class="map-title">🗺️ Le Monde Brisé</h1>
+            <p class="map-subtitle">"Le Dé a jeté ces terres dans le chaos. Choisis ta prochaine descente... ou fuis."</p>
+        </header>
+
+        <!-- Content -->
+        <div class="map-content">
+
+            <!-- Canvas Map -->
+            <div class="map-canvas-wrapper">
+                <canvas id="mapCanvas" width="1000" height="700"></canvas>
+
+                <!-- Légende -->
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <div class="legend-icon" style="background: #4ade80;"></div>
+                        <span>Débloqué</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon" style="background: #fbbf24;"></div>
+                        <span>Complété</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon" style="background: #6b7280;"></div>
+                        <span>Verrouillé</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dungeon Info -->
+            <aside class="dungeon-info-panel">
+                <div class="dungeon-preview" id="dungeonPreview">
+                    🎯 Sélectionne un donjon sur la carte pour voir ses détails
+                </div>
+
+                <div class="dungeon-details" id="dungeonDetails">
+                    <!-- Injecté dynamiquement -->
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="map-footer">
+            <button class="btn-map" onclick="window.location.href='camp.html'">
+                ⛺ Retour au Camp
+            </button>
+            <button class="btn-map danger" id="btnEnterDungeon" disabled>
+                ⚔️ Entrer dans le Donjon
+            </button>
+        </footer>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // WORLD MAP - DUNGEON SELECTION
+        // ==========================================
+
+        let playerData = null;
+        let selectedDungeon = null;
+
+        // Base de données des donjons
+        const DUNGEONS = {
+            tutorial: {
+                id: 'tutorial',
+                name: 'Les Oubliettes du Premier Pacte',
+                icon: '🏰',
+                difficulty: 'easy',
+                recommendedLevel: 1,
+                floors: 5,
+                enemies: ['Squelette', 'Rat Géant', 'Garde Corrompu'],
+                boss: 'Le Garde du Seuil',
+                rewards: {
+                    rubis: '50-100',
+                    gold: '10-20',
+                    items: ['Épée Rouillée', 'Bouclier de Bois']
+                },
+                description: 'Le premier donjon. Tes premiers pas dans les Abysses. Le Dé ricane déjà.',
+                unlockCondition: null, // Toujours débloqué
+                position: { x: 200, y: 300 }
+            },
+
+            crypte: {
+                id: 'crypte',
+                name: 'La Crypte des Pleureuses',
+                icon: '⚰️',
+                difficulty: 'medium',
+                recommendedLevel: 3,
+                floors: 10,
+                enemies: ['Banshee', 'Zombie', 'Spectre'],
+                boss: 'La Reine des Larmes',
+                rewards: {
+                    rubis: '100-200',
+                    gold: '30-50',
+                    items: ['Dague Spectrale', 'Anneau des Ombres']
+                },
+                description: 'Des cris résonnent dans les couloirs. Les morts pleurent leurs vies perdues.',
+                unlockCondition: { type: 'complete', dungeon: 'tutorial' },
+                position: { x: 400, y: 200 }
+            },
+
+            forge: {
+                id: 'forge',
+                name: 'La Forge Maudite de Krovax',
+                icon: '⚒️',
+                difficulty: 'hard',
+                recommendedLevel: 5,
+                floors: 15,
+                enemies: ['Démon Forgeron', 'Golems de Fer', 'Flammes Vivantes'],
+                boss: 'L\'Écorcheur Primordial',
+                rewards: {
+                    rubis: '200-400',
+                    gold: '60-100',
+                    items: ['Marteau de Krovax', 'Armure Titanesque']
+                },
+                description: 'Les forges où Krovax créa ses armes divines. Maintenant, elles forgent des monstres.',
+                unlockCondition: { type: 'complete', dungeon: 'crypte' },
+                position: { x: 600, y: 350 }
+            },
+
+            jardin: {
+                id: 'jardin',
+                name: 'Le Jardin Corrompu de Morwyn',
+                icon: '🌿',
+                difficulty: 'hard',
+                recommendedLevel: 6,
+                floors: 12,
+                enemies: ['Plantes Carnivores', 'Dryades Folles', 'Corruption Végétale'],
+                boss: 'Morwyn la Pourrissante',
+                rewards: {
+                    rubis: '250-500',
+                    gold: '80-120',
+                    items: ['Lys Noir', 'Sceptre de Vie Morte']
+                },
+                description: 'Le jardin d\'amour de Morwyn, désormais un cauchemar végétal. Les fleurs chantent ta mort.',
+                unlockCondition: { type: 'level', value: 5 },
+                position: { x: 300, y: 450 }
+            },
+
+            abyssal: {
+                id: 'abyssal',
+                name: 'Les Abysses Sans Fin',
+                icon: '🌀',
+                difficulty: 'deadly',
+                recommendedLevel: 8,
+                floors: 20,
+                enemies: ['Horreurs du Vide', 'Anges Déchus', 'Cauchemars Incarnés'],
+                boss: 'Le Dé du Destin (Forme 1)',
+                rewards: {
+                    rubis: '500-1000',
+                    gold: '200-400',
+                    items: ['Fragment Divin', 'Chaîne Équilibrée']
+                },
+                description: 'Le cœur des Abysses. Là où le Dé t\'attend. Es-tu prêt à le défier ?',
+                unlockCondition: { type: 'corruption', value: 50 },
+                position: { x: 700, y: 500 }
+            },
+
+            nightmare: {
+                id: 'nightmare',
+                name: 'Le Cauchemar Éternel',
+                icon: '💀',
+                difficulty: 'nightmare',
+                recommendedLevel: 10,
+                floors: 30,
+                enemies: ['???', '???', '???'],
+                boss: '???',
+                rewards: {
+                    rubis: '???',
+                    gold: '???',
+                    items: ['???']
+                },
+                description: 'Tu ne devrais pas être ici. Fuis. FUIS.',
+                unlockCondition: { type: 'complete', dungeon: 'abyssal' },
+                position: { x: 500, y: 100 }
+            }
+        };
+
+        // Charger données joueur
+        function loadPlayerData() {
+            const saved = localStorage.getItem('tlc_player');
+            if (saved) {
+                playerData = JSON.parse(saved);
+            } else {
+                // Données par défaut
+                playerData = {
+                    level: 1,
+                    corruption: 0,
+                    unlockedDungeons: ['tutorial'],
+                    completedDungeons: []
+                };
+            }
+            return playerData;
+        }
+
+        // Sauvegarder données
+        function savePlayerData() {
+            localStorage.setItem('tlc_player', JSON.stringify(playerData));
+        }
+
+        // Vérifier si donjon est débloqué
+        function isDungeonUnlocked(dungeon) {
+            if (!dungeon.unlockCondition) return true;
+
+            const cond = dungeon.unlockCondition;
+            if (cond.type === 'complete') {
+                return playerData.completedDungeons.includes(cond.dungeon);
+            }
+            if (cond.type === 'level') {
+                return playerData.level >= cond.value;
+            }
+            if (cond.type === 'corruption') {
+                return playerData.corruption >= cond.value;
+            }
+            return false;
+        }
+
+        // Vérifier si donjon est complété
+        function isDungeonCompleted(dungeonId) {
+            return playerData.completedDungeons.includes(dungeonId);
+        }
+
+        // Render map canvas
+        function renderMap() {
+            const canvas = document.getElementById('mapCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Clear
+            ctx.fillStyle = '#0a0808';
+            ctx.fillRect(0, 0, w, h);
+
+            // Background texture
+            ctx.fillStyle = 'rgba(139, 0, 0, 0.05)';
+            for (let i = 0; i < 100; i++) {
+                ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+            }
+
+            // Lignes de connexion entre donjons
+            ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            Object.values(DUNGEONS).forEach(dungeon => {
+                if (dungeon.unlockCondition && dungeon.unlockCondition.type === 'complete') {
+                    const parent = DUNGEONS[dungeon.unlockCondition.dungeon];
+                    if (parent) {
+                        ctx.beginPath();
+                        ctx.moveTo(parent.position.x, parent.position.y);
+                        ctx.lineTo(dungeon.position.x, dungeon.position.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            ctx.setLineDash([]);
+
+            // Render donjons
+            Object.values(DUNGEONS).forEach(dungeon => {
+                const unlocked = isDungeonUnlocked(dungeon);
+                const completed = isDungeonCompleted(dungeon.id);
+                const x = dungeon.position.x;
+                const y = dungeon.position.y;
+
+                // Glow si sélectionné
+                if (selectedDungeon && selectedDungeon.id === dungeon.id) {
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = '#d4af37';
+                }
+
+                // Circle
+                let color;
+                if (!unlocked) {
+                    color = '#6b7280'; // Gris verrouillé
+                } else if (completed) {
+                    color = '#fbbf24'; // Or complété
+                } else {
+                    color = '#4ade80'; // Vert débloqué
+                }
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(x, y, 40, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.shadowBlur = 0;
+
+                // Icon
+                ctx.font = '32px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = unlocked ? '#e0e0e0' : '#404040';
+                ctx.fillText(dungeon.icon, x, y - 5);
+
+                // Label
+                ctx.font = '12px Cinzel';
+                ctx.fillStyle = color;
+                const maxWidth = 100;
+                const words = dungeon.name.split(' ');
+                let line = '';
+                let yOffset = y + 50;
+
+                words.forEach((word, i) => {
+                    const testLine = line + word + ' ';
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && i > 0) {
+                        ctx.fillText(line, x, yOffset);
+                        line = word + ' ';
+                        yOffset += 14;
+                    } else {
+                        line = testLine;
+                    }
+                });
+                ctx.fillText(line, x, yOffset);
+
+                // Lock icon
+                if (!unlocked) {
+                    ctx.font = '20px Arial';
+                    ctx.fillStyle = '#dc143c';
+                    ctx.fillText('🔒', x + 20, y - 20);
+                }
+
+                // Stocker hitbox
+                dungeon.hitbox = { x, y, radius: 40 };
+            });
+
+            // Click handler
+            canvas.onclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clickX = (e.clientX - rect.left) * scaleX;
+                const clickY = (e.clientY - rect.top) * scaleY;
+
+                Object.values(DUNGEONS).forEach(dungeon => {
+                    const hb = dungeon.hitbox;
+                    const dist = Math.sqrt((clickX - hb.x) ** 2 + (clickY - hb.y) ** 2);
+                    if (dist <= hb.radius) {
+                        selectDungeon(dungeon);
+                    }
+                });
+            };
+        }
+
+        // Sélectionner un donjon
+        function selectDungeon(dungeon) {
+            selectedDungeon = dungeon;
+            renderMap(); // Re-render pour highlight
+            showDungeonInfo(dungeon);
+        }
+
+        // Afficher info donjon
+        function showDungeonInfo(dungeon) {
+            const preview = document.getElementById('dungeonPreview');
+            const details = document.getElementById('dungeonDetails');
+            const btnEnter = document.getElementById('btnEnterDungeon');
+
+            preview.style.display = 'none';
+            details.classList.add('active');
+
+            const unlocked = isDungeonUnlocked(dungeon);
+            const completed = isDungeonCompleted(dungeon.id);
+
+            let difficultyClass = '';
+            let difficultyLabel = '';
+            switch(dungeon.difficulty) {
+                case 'easy': difficultyClass = 'difficulty-easy'; difficultyLabel = '⭐ Facile'; break;
+                case 'medium': difficultyClass = 'difficulty-medium'; difficultyLabel = '⭐⭐ Moyen'; break;
+                case 'hard': difficultyClass = 'difficulty-hard'; difficultyLabel = '⭐⭐⭐ Difficile'; break;
+                case 'deadly': difficultyClass = 'difficulty-deadly'; difficultyLabel = '⭐⭐⭐⭐ Mortel'; break;
+                case 'nightmare': difficultyClass = 'difficulty-nightmare'; difficultyLabel = '💀 CAUCHEMAR'; break;
+            }
+
+            let html = `
+                <div class="dungeon-header">
+                    <div class="dungeon-name">${dungeon.icon} ${dungeon.name}</div>
+                    <div class="dungeon-difficulty ${difficultyClass}">${difficultyLabel}</div>
+                    ${completed ? '<div class="dungeon-difficulty" style="background: #fbbf24; color: #000; margin-top: 5px;">✅ Complété</div>' : ''}
+                </div>
+
+                <div class="dungeon-description">
+                    "${dungeon.description}"
+                </div>
+
+                <div class="dungeon-stat">
+                    <span class="stat-label">Niveau Recommandé</span>
+                    <span class="stat-value">Niv. ${dungeon.recommendedLevel}</span>
+                </div>
+
+                <div class="dungeon-stat">
+                    <span class="stat-label">Étages</span>
+                    <span class="stat-value">${dungeon.floors} étages</span>
+                </div>
+
+                <div class="dungeon-stat">
+                    <span class="stat-label">Boss Final</span>
+                    <span class="stat-value">${dungeon.boss}</span>
+                </div>
+
+                <div class="dungeon-stat">
+                    <span class="stat-label">Ennemis</span>
+                    <span class="stat-value">${dungeon.enemies.join(', ')}</span>
+                </div>
+
+                <div class="dungeon-rewards">
+                    <h4 style="color: #d4af37; margin-bottom: 10px; font-family: 'Cinzel', serif;">💎 Récompenses</h4>
+                    <div class="reward-item">💎 Rubis: ${dungeon.rewards.rubis}</div>
+                    <div class="reward-item">🪙 Or: ${dungeon.rewards.gold}</div>
+                    <div class="reward-item">⚔️ Items: ${dungeon.rewards.items.join(', ')}</div>
+                </div>
+            `;
+
+            if (!unlocked) {
+                const cond = dungeon.unlockCondition;
+                let unlockText = '';
+                if (cond.type === 'complete') {
+                    unlockText = `Complète "${DUNGEONS[cond.dungeon].name}" pour débloquer`;
+                } else if (cond.type === 'level') {
+                    unlockText = `Atteins le niveau ${cond.value} pour débloquer`;
+                } else if (cond.type === 'corruption') {
+                    unlockText = `Atteins ${cond.value}% de corruption pour débloquer`;
+                }
+
+                html += `
+                    <div class="dungeon-locked">
+                        <div class="locked-icon">🔒</div>
+                        <div class="locked-text">${unlockText}</div>
+                    </div>
+                `;
+            }
+
+            details.innerHTML = html;
+
+            // Activer/désactiver bouton
+            btnEnter.disabled = !unlocked;
+        }
+
+        // Entrer dans le donjon
+        document.getElementById('btnEnterDungeon').onclick = () => {
+            if (!selectedDungeon) return;
+
+            // Sauvegarder le donjon sélectionné
+            localStorage.setItem('tlc_selected_dungeon', JSON.stringify(selectedDungeon));
+            savePlayerData();
+
+            // Rediriger vers game.html
+            window.location.href = 'game.html';
+        };
+
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPlayerData();
+            renderMap();
+            console.log('✅ World Map initialisée');
+        });
+    </script>
+
+</body>
+</html>

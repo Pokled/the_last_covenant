@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧱 Test Cube Isométrique</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: #e0e0e0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    canvas {
+      border: 2px solid #d4af37;
+    }
+
+    .info {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #d4af37;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .info h2 {
+      color: #d4af37;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="800" height="600"></canvas>
+
+<div class="info">
+  <h2>🧱 TEST CUBE ISOMÉTRIQUE</h2>
+  <p>Un seul cube de mur</p>
+  <p>Toutes les faces doivent être visibles</p>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// Paramètres
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const tileWidth = 64;
+const tileHeight = 32;
+const wallHeight = 48;
+
+// Fonction pour dessiner un cube isométrique COMPLET (6 faces)
+function drawCube(x, y, tw, th, height, colorTop, colorRight, colorLeft) {
+  // Calculer les 8 coins du cube
+  const topNorth = { x: x, y: y - height };
+  const topEast = { x: x + tw / 2, y: y + th / 2 - height };
+  const topSouth = { x: x, y: y + th - height };
+  const topWest = { x: x - tw / 2, y: y + th / 2 - height };
+  
+  const bottomNorth = { x: x, y: y };
+  const bottomEast = { x: x + tw / 2, y: y + th / 2 };
+  const bottomSouth = { x: x, y: y + th };
+  const bottomWest = { x: x - tw / 2, y: y + th / 2 };
+  
+  // Face BAS (dessous - rarement visible)
+  ctx.beginPath();
+  ctx.moveTo(bottomNorth.x, bottomNorth.y);
+  ctx.lineTo(bottomEast.x, bottomEast.y);
+  ctx.lineTo(bottomSouth.x, bottomSouth.y);
+  ctx.lineTo(bottomWest.x, bottomWest.y);
+  ctx.closePath();
+  ctx.fillStyle = '#222222';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  
+  // Face OUEST (gauche - sombre)
+  ctx.beginPath();
+  ctx.moveTo(bottomWest.x, bottomWest.y);
+  ctx.lineTo(bottomNorth.x, bottomNorth.y);
+  ctx.lineTo(topNorth.x, topNorth.y);
+  ctx.lineTo(topWest.x, topWest.y);
+  ctx.closePath();
+  ctx.fillStyle = colorLeft;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Face SUD-OUEST (arrière gauche)
+  ctx.beginPath();
+  ctx.moveTo(bottomSouth.x, bottomSouth.y);
+  ctx.lineTo(bottomWest.x, bottomWest.y);
+  ctx.lineTo(topWest.x, topWest.y);
+  ctx.lineTo(topSouth.x, topSouth.y);
+  ctx.closePath();
+  ctx.fillStyle = '#333333';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Face EST (droite - claire)
+  ctx.beginPath();
+  ctx.moveTo(bottomNorth.x, bottomNorth.y);
+  ctx.lineTo(bottomEast.x, bottomEast.y);
+  ctx.lineTo(topEast.x, topEast.y);
+  ctx.lineTo(topNorth.x, topNorth.y);
+  ctx.closePath();
+  ctx.fillStyle = colorRight;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Face SUD-EST (avant droite)
+  ctx.beginPath();
+  ctx.moveTo(bottomEast.x, bottomEast.y);
+  ctx.lineTo(bottomSouth.x, bottomSouth.y);
+  ctx.lineTo(topSouth.x, topSouth.y);
+  ctx.lineTo(topEast.x, topEast.y);
+  ctx.closePath();
+  ctx.fillStyle = '#555555';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Face DESSUS (horizontal)
+  ctx.beginPath();
+  ctx.moveTo(topNorth.x, topNorth.y);
+  ctx.lineTo(topEast.x, topEast.y);
+  ctx.lineTo(topSouth.x, topSouth.y);
+  ctx.lineTo(topWest.x, topWest.y);
+  ctx.closePath();
+  ctx.fillStyle = colorTop;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+// Clear
+ctx.fillStyle = '#000';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Dessiner UN cube de mur au centre avec des couleurs VISIBLES
+drawCube(
+  centerX, 
+  centerY, 
+  tileWidth, 
+  tileHeight, 
+  wallHeight,
+  '#666666',  // Dessus - gris moyen
+  '#888888',  // Face droite - gris clair
+  '#444444'   // Face gauche - gris foncé
+);
+
+console.log('🧱 Cube de test dessiné au centre');
+console.log(`Position: (${centerX}, ${centerY})`);
+console.log(`Dimensions: ${tileWidth}x${tileHeight}, hauteur: ${wallHeight}`);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+/* ═══════════════════════════════════════════════════════
+   🎰 LOOT REVEAL ANIMATIONS - COIN-COIN DUNGEON
+   Styles pour animation de slot machine
+   ═══════════════════════════════════════════════════════ */
+
+.loot-roll-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📺 FENÊTRE DE ROLL
+   ═══════════════════════════════════════════════════════ */
+
+.loot-roll-window {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(15, 7, 7, 0.9) 0%, rgba(26, 15, 10, 0.95) 100%);
+  border: 3px solid var(--color-gold-primary, #D4AF37);
+  border-radius: var(--border-radius-medium, 8px);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.8),
+    inset 0 0 30px rgba(212, 175, 55, 0.2);
+}
+
+.loot-roll-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.1s linear;
+}
+
+.loot-roll-item {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.loot-roll-item-icon {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  animation: itemPulse 1s ease-in-out infinite;
+}
+
+.loot-roll-item-name {
+  font-family: var(--font-title, 'Cinzel', serif);
+  font-size: 12px;
+  color: var(--color-gold-dark, #C9A877);
+  margin-top: 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎯 INDICATEUR
+   ═══════════════════════════════════════════════════════ */
+
+.loot-roll-indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--color-gold-secondary, #FFD700) 50%,
+    transparent 100%
+  );
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 0 20px var(--color-gold-secondary, #FFD700);
+  animation: indicatorGlow 1s ease-in-out infinite;
+}
+
+.loot-roll-indicator::before,
+.loot-roll-indicator::after {
+  content: '◀';
+  position: absolute;
+  top: 50%;
+  font-size: 20px;
+  color: var(--color-gold-secondary, #FFD700);
+  transform: translateY(-50%);
+  text-shadow: 0 0 10px var(--color-gold-secondary, #FFD700);
+  animation: indicatorArrow 1s ease-in-out infinite;
+}
+
+.loot-roll-indicator::before {
+  left: 10px;
+}
+
+.loot-roll-indicator::after {
+  content: '▶';
+  right: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✨ GLOW EFFECT
+   ═══════════════════════════════════════════════════════ */
+
+.loot-roll-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--border-radius-medium, 8px);
+  opacity: 0;
+  transition: all 0.3s ease-out;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 RARETÉ COLORS
+   ═══════════════════════════════════════════════════════ */
+
+.loot-roll-item[data-rarity="common"] {
+  border-color: #9CA3AF;
+}
+
+.loot-roll-item[data-rarity="uncommon"] {
+  border-color: #10B981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.loot-roll-item[data-rarity="rare"] {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.loot-roll-item[data-rarity="legendary"] {
+  border-color: #F59E0B;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+  animation: legendaryPulse 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes itemPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+  }
+}
+
+@keyframes indicatorGlow {
+  0%, 100% {
+    opacity: 0.8;
+    box-shadow: 0 0 20px var(--color-gold-secondary, #FFD700);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 40px var(--color-gold-secondary, #FFD700);
+  }
+}
+
+@keyframes indicatorArrow {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.2);
+  }
+}
+
+@keyframes legendaryPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 50px rgba(245, 158, 11, 0.8);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📱 RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  .loot-roll-window {
+    height: 150px;
+  }
+
+  .loot-roll-item {
+    height: 70px;
+  }
+
+  .loot-roll-item-icon {
+    font-size: 36px;
+  }
+
+  .loot-roll-item-name {
+    font-size: 10px;
+  }
+}

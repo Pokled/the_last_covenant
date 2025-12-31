@@ -1,0 +1,1273 @@
+/**
+ * THE LAST COVENANT - Dark Fantasy CSS v2.1
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* VARIABLES */
+:root {
+    --abyss-black: #0a0a0f;
+    --stone-dark: #1a1a2e;
+    --stone-light: #2a2a3e;
+    --blood-red: #8b0000;
+    --gold-dim: #d4af37;
+    --gold-bright: #f4d03f;
+    --purple-dark: #4a0e4e;
+    --parchment: #f4e8d0;
+    --parchment-dim: #c4b8a0;
+    
+    --font-title: 'Cinzel', serif;
+    --font-body: 'Crimson Text', serif;
+    --font-ui: 'Inter', sans-serif;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    --spacing-3xl: 64px;
+}
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: var(--parchment);
+    background: var(--abyss-black);
+}
+
+/* GAME CONTAINER */
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* SCENES */
+.scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    z-index: 1;
+}
+
+.scene.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* VIGNETTE */
+.vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.6) 80%, rgba(0, 0, 0, 0.9) 100%);
+    z-index: 100;
+}
+
+/* ENHANCED VIGNETTE FOR TITLE SCREEN */
+.title-scene .vignette {
+    background: radial-gradient(
+        ellipse at center, 
+        transparent 10%, 
+        rgba(10, 10, 15, 0.3) 40%, 
+        rgba(10, 10, 15, 0.7) 80%, 
+        rgba(10, 10, 15, 0.95) 100%
+    );
+    animation: vignetteBreathing 8s ease-in-out infinite alternate;
+}
+
+@keyframes vignetteBreathing {
+    0% { 
+        opacity: 1;
+    }
+    100% { 
+        opacity: 0.85;
+    }
+}
+
+/* PARTICLES */
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.6;
+}
+
+/* ENHANCED PARTICLES FOR TITLE SCREEN */
+.title-scene .particles-container {
+    opacity: 0.8;
+    animation: particlesFadeIn 3s ease-out;
+}
+
+@keyframes particlesFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 0.8; }
+}
+
+/* ==================== TITLE SCENE ==================== */
+.title-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(180deg, 
+            rgba(10, 10, 15, 0.7) 0%, 
+            rgba(10, 10, 15, 0.4) 30%, 
+            rgba(10, 10, 15, 0.3) 50%, 
+            rgba(10, 10, 15, 0.5) 70%, 
+            rgba(10, 10, 15, 0.8) 100%
+        ),
+        url('../../../assets/images/background/Background_index.png') center center / cover no-repeat;
+    background-attachment: fixed;
+    animation: backgroundZoom 30s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundZoom {
+    0% { 
+        transform: scale(1); 
+        filter: brightness(0.7) contrast(1.1);
+    }
+    100% { 
+        transform: scale(1.05); 
+        filter: brightness(0.8) contrast(1.15);
+    }
+}
+
+/* MYSTICAL GLOW OVERLAY (réduit) */
+.title-scene::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+        circle,
+        rgba(212, 175, 55, 0.08) 0%,
+        rgba(212, 175, 55, 0.04) 30%,
+        transparent 60%
+    );
+    pointer-events: none;
+    z-index: 2;
+    animation: mysticalGlow 6s ease-in-out infinite alternate;
+}
+
+@keyframes mysticalGlow {
+    0% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+}
+
+/* FLOATING MIST LAYERS */
+.title-scene::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(ellipse at 30% 40%, rgba(90, 77, 58, 0.15) 0%, transparent 40%),
+        radial-gradient(ellipse at 70% 60%, rgba(61, 52, 38, 0.12) 0%, transparent 35%),
+        radial-gradient(ellipse at 50% 80%, rgba(42, 36, 25, 0.1) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 3;
+    animation: floatingMist 40s ease-in-out infinite;
+}
+
+@keyframes floatingMist {
+    0% {
+        transform: translate(-10%, -10%) rotate(0deg);
+        opacity: 0.7;
+    }
+    33% {
+        transform: translate(-5%, -15%) rotate(5deg);
+        opacity: 0.8;
+    }
+    66% {
+        transform: translate(-15%, -5%) rotate(-5deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-10%, -10%) rotate(0deg);
+        opacity: 0.7;
+    }
+}
+
+@keyframes floatingMist {
+    0% {
+        transform: translate(-10%, -10%) rotate(0deg);
+        opacity: 0.7;
+    }
+    33% {
+        transform: translate(-5%, -15%) rotate(5deg);
+        opacity: 0.8;
+    }
+    66% {
+        transform: translate(-15%, -5%) rotate(-5deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-10%, -10%) rotate(0deg);
+        opacity: 0.7;
+    }
+}
+
+/* ÉCLAIRS DANS LE PORTAIL (SUBTIL) */
+.portal-lightning {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(
+        circle,
+        rgba(212, 175, 55, 0.25) 0%,
+        rgba(212, 175, 55, 0.12) 25%,
+        rgba(138, 90, 74, 0.08) 45%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    filter: blur(40px);
+    animation: portalFlash 10s ease-in-out infinite;
+}
+
+@keyframes portalFlash {
+    0%, 92%, 100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+        filter: blur(40px);
+    }
+    93% {
+        opacity: 0.4;
+        transform: translate(-50%, -50%) scale(1.15);
+        filter: blur(35px);
+    }
+    94% {
+        opacity: 0.1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(40px);
+    }
+    95% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1.2);
+        filter: blur(30px);
+    }
+    96.5% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+        filter: blur(45px);
+    }
+}
+
+.title-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: var(--spacing-3xl);
+    animation: contentFadeIn 2s ease-out;
+}
+
+@keyframes contentFadeIn {
+    0% { 
+        opacity: 0; 
+        transform: translateY(30px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0);
+    }
+}
+
+.title-logo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.logo-line {
+    font-family: var(--font-title);
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--gold-bright);
+    text-shadow: 
+        0 0 30px rgba(212, 175, 55, 0.9),
+        0 0 60px rgba(212, 175, 55, 0.6),
+        0 0 100px rgba(212, 175, 55, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.2em;
+    line-height: 1;
+    animation: logoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlow {
+    0% { 
+        text-shadow: 
+            0 0 30px rgba(212, 175, 55, 0.9),
+            0 0 60px rgba(212, 175, 55, 0.6),
+            0 0 100px rgba(212, 175, 55, 0.3),
+            0 4px 8px rgba(0, 0, 0, 0.8);
+    }
+    100% { 
+        text-shadow: 
+            0 0 40px rgba(212, 175, 55, 1),
+            0 0 80px rgba(212, 175, 55, 0.8),
+            0 0 120px rgba(212, 175, 55, 0.5),
+            0 4px 8px rgba(0, 0, 0, 0.8);
+    }
+}
+
+.title-tagline {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    color: var(--parchment);
+    font-style: italic;
+    line-height: 2;
+    margin-bottom: var(--spacing-3xl);
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 20px rgba(0, 0, 0, 0.5);
+    animation: taglineFade 2s ease-out 0.5s both;
+}
+
+@keyframes taglineFade {
+    0% { 
+        opacity: 0; 
+        transform: translateY(20px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0);
+    }
+}
+
+.press-any-key {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    color: var(--parchment);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 15px rgba(212, 175, 55, 0.3);
+    animation: pressKeyFade 2s ease-out 1s both;
+}
+
+@keyframes pressKeyFade {
+    0% { 
+        opacity: 0; 
+        transform: translateY(15px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0);
+    }
+}
+
+.press-blink {
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+/* VERSION DU JEU */
+.game-version {
+    position: absolute;
+    bottom: 20px;
+    right: 30px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    color: rgba(212, 175, 55, 0.4);
+    letter-spacing: 0.1em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    z-index: 150;
+}
+
+/* ==================== CHARACTER CREATION ==================== */
+.creation-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--abyss-black);
+}
+
+.creation-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-3xl);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.creation-title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    color: var(--gold-bright);
+    font-family: var(--font-title);
+}
+
+.creation-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.step-title {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    color: var(--parchment);
+    font-family: var(--font-title);
+}
+
+.class-grid, .race-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    flex: 1;
+    align-content: start;
+}
+
+.class-card, .race-card {
+    background: var(--stone-dark);
+    border: 2px solid var(--parchment-dim);
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.class-card:hover, .race-card:hover {
+    border-color: var(--gold-dim);
+    background: var(--stone-light);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+}
+
+.class-card.selected, .race-card.selected {
+    border-color: var(--gold-bright);
+    background: var(--stone-light);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+}
+
+.class-icon, .race-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.class-name, .race-name {
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    color: var(--gold-dim);
+    margin-bottom: var(--spacing-sm);
+}
+
+.class-description, .race-description {
+    font-size: 0.9rem;
+    color: var(--parchment-dim);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.6;
+}
+
+.class-stats {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: var(--parchment);
+    font-weight: 600;
+}
+
+/* Name Input */
+.name-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: var(--spacing-lg);
+}
+
+.name-input {
+    font-family: var(--font-title);
+    font-size: 2rem;
+    background: var(--stone-dark);
+    border: 2px solid var(--gold-dim);
+    color: var(--gold-bright);
+    padding: var(--spacing-lg);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    outline: none;
+}
+
+.name-input:focus {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+}
+
+.name-hint {
+    font-style: italic;
+    color: var(--parchment-dim);
+}
+
+/* Navigation */
+.creation-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    padding-top: var(--spacing-xl);
+}
+
+.creation-nav button {
+    flex: 1;
+    max-width: 300px;
+}
+
+/* ==================== BUTTONS ==================== */
+button {
+    font-family: var(--font-ui);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border: 2px solid;
+    background: transparent;
+    color: var(--parchment);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+}
+
+.btn-primary {
+    border-color: var(--gold-dim);
+    color: var(--gold-bright);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--gold-dim);
+    color: var(--abyss-black);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.btn-secondary {
+    border-color: var(--parchment-dim);
+    color: var(--parchment);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    border-color: var(--parchment);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ==================== UTILITY ==================== */
+.hidden {
+    display: none !important;
+}
+
+/* ==================== CAMP SCENE ==================== */
+.camp-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0a0a0f 0%, #1a1520 50%, #0a0a0f 100%);
+}
+
+.camp-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.camp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    margin-bottom: var(--spacing-xl);
+}
+
+.player-info h2 {
+    font-size: 2rem;
+    color: var(--gold-bright);
+    margin-bottom: var(--spacing-xs);
+}
+
+.player-class {
+    color: var(--parchment-dim);
+    font-style: italic;
+}
+
+.player-stats-mini {
+    display: flex;
+    gap: var(--spacing-lg);
+    font-family: var(--font-ui);
+    font-size: 1.1rem;
+    color: var(--parchment);
+}
+
+.camp-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.camp-title {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--gold-dim);
+    margin-bottom: var(--spacing-md);
+}
+
+.camp-description {
+    text-align: center;
+    color: var(--parchment-dim);
+    font-style: italic;
+    margin-bottom: var(--spacing-2xl);
+    line-height: 1.8;
+}
+
+.npc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.npc-card {
+    background: var(--stone-dark);
+    border: 2px solid var(--parchment-dim);
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.npc-card:hover {
+    border-color: var(--gold-dim);
+    background: var(--stone-light);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+}
+
+.npc-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.npc-name {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    color: var(--gold-dim);
+    margin-bottom: var(--spacing-sm);
+}
+
+.npc-description {
+    color: var(--parchment-dim);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
+}
+
+.npc-status {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--gold-bright);
+    font-weight: 600;
+}
+
+.camp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.btn-large {
+    font-size: 1.3rem;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+}
+
+.camp-secondary-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .camp-secondary-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==================== WORLD MAP ==================== */
+.map-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0a0a0f 0%, #1a1220 50%, #0a0a0f 100%);
+}
+
+.map-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.map-title {
+    font-size: 3rem;
+    color: var(--gold-bright);
+    margin-bottom: var(--spacing-sm);
+}
+
+.map-subtitle {
+    font-style: italic;
+    color: var(--parchment-dim);
+    font-size: 1.1rem;
+}
+
+.map-canvas-wrapper {
+    flex: 1;
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+}
+
+.map-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(26, 18, 32, 0.8) 0%, rgba(10, 10, 15, 0.95) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Dungeon Nodes */
+.dungeon-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    padding: var(--spacing-md);
+}
+
+.dungeon-node.unlocked:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+
+
+.dungeon-node.locked 
+
+.dungeon-node.completed 
+
+.dungeon-node.final 
+
+
+    50% { transform: scale(1.1); }
+}
+
+.node-name {
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    color: var(--gold-dim);
+    margin-top: var(--spacing-sm);
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.dungeon-node.locked .node-name {
+    color: var(--parchment-dim);
+}
+
+
+
+
+
+/* Info Panel */
+.dungeon-info-panel {
+    position: absolute;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    width: 400px;
+    background: var(--stone-dark);
+    border: 2px solid var(--gold-dim);
+    padding: var(--spacing-lg);
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 20;
+}
+
+.dungeon-info-panel h3 {
+    color: var(--gold-bright);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.5rem;
+}
+
+.dungeon-info-panel p {
+    color: var(--parchment-dim);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.dungeon-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    font-family: var(--font-ui);
+    color: var(--parchment);
+}
+
+.dungeon-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.dungeon-actions button {
+    flex: 1;
+}
+
+.map-footer {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .dungeon-info-panel {
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .dungeon-node {
+        font-size: 0.8rem;
+    }
+    
+    
+}
+
+/* ==================== WORLD MAP FIX ==================== */
+.map-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0a0a0f 0%, #1a1220 50%, #0a0a0f 100%);
+}
+
+.map-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.map-title {
+    font-size: 3rem;
+    color: var(--gold-bright);
+    margin-bottom: var(--spacing-sm);
+}
+
+.map-subtitle {
+    font-style: italic;
+    color: var(--parchment-dim);
+    font-size: 1.1rem;
+}
+
+.map-canvas-wrapper {
+    flex: 1;
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+    min-height: 500px;
+}
+
+.map-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(26, 18, 32, 0.8) 0%, rgba(10, 10, 15, 0.95) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+}
+
+/* Dungeon Nodes */
+.dungeon-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    padding: var(--spacing-md);
+    z-index: 10;
+}
+
+.dungeon-node.unlocked:hover {
+    transform: translate(-50%, -50%) scale(1.15);
+    z-index: 20;
+}
+
+
+
+.dungeon-node.locked 
+
+.dungeon-node.completed 
+
+.dungeon-node.final 
+
+
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 30px #d4af37); }
+}
+
+.node-name {
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    color: var(--gold-dim);
+    margin-top: var(--spacing-sm);
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+}
+
+.dungeon-node.locked .node-name {
+    color: var(--parchment-dim);
+}
+
+
+
+
+
+/* Info Panel */
+.dungeon-info-panel {
+    position: fixed;
+    bottom: var(--spacing-2xl);
+    right: var(--spacing-2xl);
+    width: 400px;
+    background: var(--stone-dark);
+    border: 2px solid var(--gold-dim);
+    padding: var(--spacing-lg);
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 100;
+}
+
+.dungeon-info-panel h3 {
+    color: var(--gold-bright);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.5rem;
+}
+
+.dungeon-info-panel p {
+    color: var(--parchment-dim);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.dungeon-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    font-family: var(--font-ui);
+    color: var(--parchment);
+}
+
+.dungeon-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.dungeon-actions button {
+    flex: 1;
+}
+
+.map-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .dungeon-info-panel {
+        width: 90%;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+    }
+    
+    .dungeon-node {
+        font-size: 0.8rem;
+    }
+    
+    
+}
+
+
+
+
+
+/* Node Icon Wrapper et Icon */
+.node-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.node-icon {
+    font-size: 4rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 10px currentColor);
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.dungeon-node.locked .node-icon {
+    filter: grayscale(100%) brightness(0.5);
+}
+
+.dungeon-node.completed .node-icon {
+    filter: sepia(100%) hue-rotate(90deg) drop-shadow(0 0 15px #4CAF50);
+}
+
+.dungeon-node.final .node-icon {
+    filter: drop-shadow(0 0 20px #d4af37);
+}
+
+.dungeon-node.final .node-icon {
+    animation: pulse-final-icon 2s infinite;
+}
+
+@keyframes pulse-final-icon {
+    0%, 100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 20px #d4af37); 
+    }
+    50% { 
+        transform: scale(1.1); 
+        filter: drop-shadow(0 0 30px #d4af37); 
+    }
+}
+
+.node-lock {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 1.4rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+    pointer-events: none;
+}
+
+.node-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #4CAF50;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    box-shadow: 0 0 10px #4CAF50;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+/* ==================== GAME SCENE (DUNGEON) ==================== */
+.game-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #0a0a0f;
+}
+
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: var(--spacing-md);
+    z-index: 50;
+    pointer-events: none;
+}
+
+#player-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.stat-bar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.stat-label {
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    color: var(--parchment);
+}
+
+.bar {
+    position: relative;
+    width: 200px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--parchment-dim);
+    overflow: hidden;
+}
+
+.bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.hp-bar .bar-fill {
+    background: linear-gradient(90deg, #8b0000, #ff0000);
+}
+
+.corruption-bar .bar-fill {
+    background: linear-gradient(90deg, #4a0e4e, #8b1a8b);
+}
+
+.bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+#quick-info {
+    display: flex;
+    gap: var(--spacing-lg);
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    color: var(--gold-dim);
+}
+
+#action-panel {
+    position: absolute;
+    bottom: var(--spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    pointer-events: all;
+}
+
+#combat-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.action-btn {
+    font-family: var(--font-ui);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(26, 26, 46, 0.9);
+    border: 2px solid var(--parchment-dim);
+    color: var(--parchment);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    border-color: var(--gold-dim);
+    background: rgba(42, 42, 62, 0.9);
+    transform: translateY(-2px);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}

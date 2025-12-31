@@ -1,0 +1,3449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Cortège des Ombres - THE LAST COVENANT</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/camp.css">
+    <style>
+        /* Camp Page Specific Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Background animé */
+        .camp-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(26, 13, 13, 0.9) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23120808"/><circle cx="600" cy="700" r="150" fill="%23ff6600" opacity="0.3"/></svg>') no-repeat center bottom;
+            background-size: cover;
+            z-index: 1;
+            animation: fireGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes fireGlow {
+            0%, 100% { filter: brightness(0.8); }
+            50% { filter: brightness(1.1); }
+        }
+
+        /* Particules de cendres */
+        .camp-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .ash-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 200, 100, 0.6);
+            border-radius: 50%;
+            animation: ashRise linear infinite;
+        }
+
+        @keyframes ashRise {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(var(--drift));
+                opacity: 0;
+            }
+        }
+
+        /* Layout principal */
+        .camp-layout {
+            position: relative;
+            z-index: 3;
+            display: grid;
+            grid-template-columns: 1fr 800px 1fr;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Header */
+        .camp-header {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26, 13, 13, 0.8), rgba(42, 21, 21, 0.8));
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+        }
+
+        .camp-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .camp-subtitle {
+            font-size: 1.2rem;
+            color: #b8860b;
+            font-style: italic;
+        }
+
+        /* Panel Gauche - Stats Joueur */
+        .player-panel {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95));
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .panel-section {
+            margin-bottom: 30px;
+        }
+
+        .panel-section h3 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: #b8860b;
+        }
+
+        .stat-value {
+            color: #e0e0e0;
+            font-weight: 600;
+        }
+
+        .corruption-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            border: 1px solid #8b0000;
+        }
+
+        .corruption-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #dc143c);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.8);
+        }
+
+        /* Zone Centrale - Village Canvas */
+        .village-container {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95));
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+        }
+
+        .village-canvas-wrapper {
+            flex: 1;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        #villageCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .canvas-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #d4af37;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Cinzel', serif;
+            pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Panel Droit - Compagnons */
+        .companions-panel {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95));
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .companion-card {
+            background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.9));
+            border: 2px solid #b8860b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .companion-card:hover {
+            transform: translateY(-5px);
+            border-color: #d4af37;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .companion-card.selected {
+            border-color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+
+        .companion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .companion-name {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            font-size: 1.2rem;
+        }
+
+        .companion-sprite {
+            font-size: 2rem;
+        }
+
+        .companion-stats {
+            font-size: 0.9rem;
+            color: #b8b8b8;
+        }
+
+        .no-companions {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        /* Footer Actions */
+        .camp-footer {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .btn-camp {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            padding: 15px 40px;
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.9));
+            color: #d4af37;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-camp:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 30px rgba(212, 175, 55, 0.6);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(184, 134, 11, 0.2));
+        }
+
+        .btn-camp.primary {
+            border-color: #4ade80;
+            color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-camp.primary:hover {
+            box-shadow: 0 5px 30px rgba(74, 222, 128, 0.6);
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.2));
+        }
+
+        .btn-camp.danger {
+            border-color: #dc143c;
+            color: #dc143c;
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .camp-layout {
+                grid-template-columns: 1fr 600px 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .camp-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto auto;
+            }
+
+            .player-panel, .companions-panel {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Animé -->
+    <div class="camp-background"></div>
+
+    <!-- Particules de Cendres -->
+    <div class="camp-particles" id="campParticles"></div>
+
+    <!-- Layout Principal -->
+    <div class="camp-layout">
+
+        <!-- Header -->
+        <header class="camp-header">
+            <h1 class="camp-title">⛺ Le Cortège des Ombres ⛺</h1>
+            <p class="camp-subtitle">"Douze chariots. Quinze tentes. Des feux qui puent l'os brûlé. C'est ton village maintenant."</p>
+        </header>
+
+        <!-- Panel Gauche - Stats Joueur -->
+        <aside class="player-panel">
+            <div class="panel-section">
+                <h3>👤 Le Pactiséé</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Nom</span>
+                    <span class="stat-value" id="playerName">Chargement...</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Classe</span>
+                    <span class="stat-value" id="playerClass">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Niveau</span>
+                    <span class="stat-value" id="playerLevel">1</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">❤️ HP</span>
+                    <span class="stat-value" id="playerHP">100/100</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">⚔️ ATK</span>
+                    <span class="stat-value" id="playerATK">10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🛡️ DEF</span>
+                    <span class="stat-value" id="playerDEF">5</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>🔥 Corruption</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Niveau</span>
+                    <span class="stat-value" id="corruptionValue">0%</span>
+                </div>
+                <div class="corruption-bar">
+                    <div class="corruption-fill" id="corruptionFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>💰 Richesses</h3>
+                <div class="stat-item">
+                    <span class="stat-label">💎 Rubis</span>
+                    <span class="stat-value" id="playerRubis">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🪙 Or</span>
+                    <span class="stat-value" id="playerGold">0</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>📊 Moral du Village</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Moral</span>
+                    <span class="stat-value" id="villageMorale">100%</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Zone Centrale - Village Canvas -->
+        <main class="village-container">
+            <div class="village-canvas-wrapper">
+                <canvas id="villageCanvas" width="800" height="600"></canvas>
+                <div class="canvas-hint">
+                    🖱️ Clique sur une zone pour interagir
+                </div>
+            </div>
+        </main>
+
+        <!-- Panel Droit - Compagnons -->
+        <aside class="companions-panel">
+            <div class="panel-section">
+                <h3>⚔️ Compagnons (Max 3)</h3>
+                <div id="companionsList">
+                    <div class="no-companions">
+                        Aucun compagnon recruté.<br>
+                        Sauve des âmes dans les donjons pour agrandir ton groupe.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Repos -->
+            <div class="panel-section" style="margin-top: 20px;">
+                <h3 id="restSectionTitle">🌙 Repos</h3>
+                <div id="restInfo" style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="color: #b8b8b8; font-size: 0.9rem; margin-bottom: 10px;" id="restDescription">
+                        La nuit est tombée. Le camp est silencieux. Le feu crépite doucement.
+                    </p>
+                    <div style="color: #60a5fa; font-size: 0.85rem;">
+                        <div>📅 Jour <span id="currentDay">1</span></div>
+                        <div style="margin-top: 5px;">⏰ <span id="currentTimeOfDay">Aube</span></div>
+                    </div>
+                </div>
+                <button id="btnRest" class="btn-camp" style="width: 100%; opacity: 0.5; cursor: not-allowed;" disabled>
+                    😴 Se Reposer (Disponible la nuit)
+                </button>
+                <p style="font-size: 0.8rem; color: #9ca3af; margin-top: 10px; font-style: italic;">
+                    Le repos avance au jour suivant et déclenche la production/consommation.
+                </p>
+            </div>
+        </aside>
+
+        <!-- Footer Actions -->
+        <footer class="camp-footer">
+            <button class="btn-camp" onclick="window.location.href='index.html'">
+                🏠 Menu Principal
+            </button>
+            <button class="btn-camp primary" id="btnExpedition">
+                🗺️ Partir en Expédition
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/economy-system.js"></script>
+    <script src="js/settlement-system.js"></script>
+    <script src="js/camp.js"></script>
+    <script src="js/camp-narrative.js"></script>
+    <script src="js/camp-services.js"></script>
+
+    <script>
+        // ==========================================
+        // CAMP PAGE INITIALIZATION
+        // ==========================================
+
+        let playerData = null;
+        let campSystem = null;
+        let narrativeSystem = null;
+        let servicesSystem = null;
+
+        // ==========================================
+        // SYSTÈME AUDIO (Web Audio API)
+        // ==========================================
+        const AudioSystem = {
+            context: null,
+
+            init() {
+                if (!this.context) {
+                    this.context = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+
+            // Son hover : note courte métallique
+            playHover() {
+                this.init();
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+
+                oscillator.frequency.value = 800; // Fréquence aiguë
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.1, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.1);
+
+                oscillator.start(this.context.currentTime);
+                oscillator.stop(this.context.currentTime + 0.1);
+            },
+
+            // Son clic : note plus grave
+            playClick() {
+                this.init();
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+
+                oscillator.frequency.value = 400;
+                oscillator.type = 'square';
+
+                gainNode.gain.setValueAtTime(0.15, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.15);
+
+                oscillator.start(this.context.currentTime);
+                oscillator.stop(this.context.currentTime + 0.15);
+            },
+
+            // Son succès : accord ascendant
+            playSuccess() {
+                this.init();
+                const notes = [523.25, 659.25, 783.99]; // Do, Mi, Sol
+                notes.forEach((freq, i) => {
+                    const oscillator = this.context.createOscillator();
+                    const gainNode = this.context.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.context.destination);
+
+                    oscillator.frequency.value = freq;
+                    oscillator.type = 'sine';
+
+                    const startTime = this.context.currentTime + (i * 0.1);
+                    gainNode.gain.setValueAtTime(0.1, startTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + 0.3);
+                });
+            },
+
+            // Son erreur : note descendante
+            playError() {
+                this.init();
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+
+                oscillator.frequency.setValueAtTime(600, this.context.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, this.context.currentTime + 0.2);
+                oscillator.type = 'sawtooth';
+
+                gainNode.gain.setValueAtTime(0.15, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.2);
+
+                oscillator.start(this.context.currentTime);
+                oscillator.stop(this.context.currentTime + 0.2);
+            }
+        };
+
+        // Générer particules de cendres
+        function generateAshParticles() {
+            const container = document.getElementById('campParticles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'ash-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (5 + Math.random() * 10) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+                container.appendChild(particle);
+            }
+        }
+
+        // Charger données joueur depuis localStorage
+        function loadPlayerData() {
+            const saved = localStorage.getItem('tlc_player');
+            if (saved) {
+                playerData = JSON.parse(saved);
+            } else {
+                // Données par défaut pour nouveau joueur
+                playerData = {
+                    name: 'Le Pactisé',
+                    class: 'Shattered Knight',
+                    level: 1,
+                    hp: 100,
+                    maxHp: 100,
+                    atk: 10,
+                    def: 5,
+                    corruption: 0,
+                    rubis: 50,
+                    gold: 10,
+                    companions: [],
+                    unlockedDungeons: ['tutorial'], // Donjons débloqués
+                    completedDungeons: []
+                };
+                savePlayerData();
+            }
+            return playerData;
+        }
+
+        // Sauvegarder données joueur
+        function savePlayerData() {
+            localStorage.setItem('tlc_player', JSON.stringify(playerData));
+        }
+
+        // Mettre à jour UI avec données joueur
+        function updatePlayerUI() {
+            document.getElementById('playerName').textContent = playerData.name;
+            document.getElementById('playerClass').textContent = playerData.class;
+            document.getElementById('playerLevel').textContent = playerData.level;
+            document.getElementById('playerHP').textContent = `${playerData.hp}/${playerData.maxHp}`;
+            document.getElementById('playerATK').textContent = playerData.atk;
+            document.getElementById('playerDEF').textContent = playerData.def;
+            document.getElementById('corruptionValue').textContent = playerData.corruption + '%';
+            document.getElementById('corruptionFill').style.width = playerData.corruption + '%';
+            document.getElementById('playerRubis').textContent = playerData.rubis;
+            document.getElementById('playerGold').textContent = playerData.gold;
+
+            // Moral village (calculé par CampSystem)
+            if (campSystem) {
+                document.getElementById('villageMorale').textContent = campSystem.morale + '%';
+            }
+        }
+
+        // Mettre à jour liste compagnons
+        function updateCompanionsList() {
+            const container = document.getElementById('companionsList');
+
+            if (!playerData.companions || playerData.companions.length === 0) {
+                container.innerHTML = `
+                    <div class="no-companions">
+                        Aucun compagnon en expédition.<br>
+                        Sélectionne des guerriers avant de partir.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            playerData.companions.forEach((companion, index) => {
+                const hpPercent = (companion.hp / companion.maxHp) * 100;
+                const hpColor = hpPercent >= 70 ? '#22c55e' : hpPercent >= 40 ? '#eab308' : '#ef4444';
+                const motivationColor = {
+                    'conviction': '#22c55e',
+                    'faith': '#eab308',
+                    'fear': '#ef4444',
+                    'opportunism': '#06b6d4',
+                    'despair': '#8b5cf6'
+                }[companion.motivation?.id] || '#9ca3af';
+
+                const card = document.createElement('div');
+                card.className = 'companion-card';
+                card.style.cssText = `
+                    background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.8));
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    border: 2px solid ${motivationColor};
+                    box-shadow: 0 0 10px ${motivationColor}33;
+                `;
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: bold; color: #ffffff; font-size: 1rem;">⚔️ ${companion.name}</span>
+                        <span style="color: ${motivationColor}; font-size: 0.7rem;">${companion.motivation?.icon || '💪'}</span>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.3); border-radius: 4px; padding: 6px; font-size: 0.8rem;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
+                            <div style="color: ${hpColor};">❤️ ${companion.hp}/${companion.maxHp}</div>
+                            <div style="color: #f97316;">⚔️ ${companion.atk}</div>
+                            <div style="color: #3b82f6;">🛡️ ${companion.def}</div>
+                            <div style="color: ${companion.morale >= 70 ? '#22c55e' : companion.morale >= 40 ? '#eab308' : '#ef4444'};">
+                                😊 ${companion.morale || 100}%
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Toggle sélection compagnon (max 3)
+        function toggleCompanion(index) {
+            const companion = playerData.companions[index];
+            const selectedCount = playerData.companions.filter(c => c.selected).length;
+
+            if (companion.selected) {
+                companion.selected = false;
+            } else {
+                if (selectedCount >= 3) {
+                    alert('❌ Maximum 3 compagnons ! Désélectionne-en un d\'abord.');
+                    return;
+                }
+                companion.selected = true;
+            }
+
+            savePlayerData();
+            updateCompanionsList();
+        }
+
+        // Render village canvas avec zones cliquables + décors
+        function renderVillageCanvas() {
+            const canvas = document.getElementById('villageCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            const centerX = w / 2;
+            const centerY = h / 2;
+
+            // ============================================
+            // 0. INITIALISER CYCLE JOUR/NUIT
+            // ============================================
+            if (!window.dayNightSystem) {
+                window.dayNightSystem = new DayNightSystem();
+                // Charger sauvegarde
+                const savedCycle = localStorage.getItem('tlc_daynightcycle');
+                if (savedCycle) {
+                    const data = JSON.parse(savedCycle);
+                    window.dayNightSystem.timeOfDay = data.timeOfDay || 'morning';
+                    window.dayNightSystem.dayCount = data.dayCount || 1;
+                    window.dayNightSystem.hour = data.hour || 6;
+                }
+            }
+
+            const skyData = window.dayNightSystem.getSkyColor();
+            const timeDesc = window.dayNightSystem.getTimeDescription();
+
+            // ============================================
+            // 1. SOL TEXTURÉ (terre et pierres)
+            // ============================================
+            ctx.fillStyle = '#2a1f1a'; // Terre brune foncée
+            ctx.fillRect(0, 0, w, h);
+
+            // Texture terre (points aléatoires)
+            for (let i = 0; i < 500; i++) {
+                const x = Math.random() * w;
+                const y = Math.random() * h;
+                const size = Math.random() * 2 + 1;
+                const opacity = Math.random() * 0.3;
+                ctx.fillStyle = `rgba(${40 + Math.random() * 30}, ${25 + Math.random() * 20}, ${15 + Math.random() * 15}, ${opacity})`;
+                ctx.fillRect(x, y, size, size);
+            }
+
+            // ============================================
+            // 1.5. CIEL ET AMBIANCE (gradient selon heure)
+            // ============================================
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, h);
+            skyGradient.addColorStop(0, skyData.top);
+            skyGradient.addColorStop(1, skyData.bottom);
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, w, h);
+
+            // Étoiles la nuit
+            if (skyData.stars) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                for (let i = 0; i < 100; i++) {
+                    const starX = Math.random() * w;
+                    const starY = Math.random() * (h * 0.6); // Étoiles dans les 60% supérieurs
+                    const starSize = Math.random() * 2;
+                    const twinkle = Math.random() > 0.5 ? 1 : 0.3;
+                    ctx.globalAlpha = twinkle;
+                    ctx.fillRect(starX, starY, starSize, starSize);
+                }
+                ctx.globalAlpha = 1; // Reset alpha
+            }
+
+            // ============================================
+            // 2. ZONES ET CHEMINS
+            // ============================================
+            const zones = [
+                { name: 'HUB', icon: '🏕️', angle: 0, color: '#d4af37', decor: 'tent' },
+                { name: 'FORGE', icon: '⚒️', angle: Math.PI / 3, color: '#ff6600', decor: 'wagon' },
+                { name: 'AUTEL', icon: '🕯️', angle: 2 * Math.PI / 3, color: '#ffd700', decor: 'candles' },
+                { name: 'MARCHÉ', icon: '🛒', angle: Math.PI, color: '#4ade80', decor: 'crates' },
+                { name: 'RECRUTEMENT', icon: '👥', angle: 4 * Math.PI / 3, color: '#60a5fa', decor: 'campfire' },
+                { name: 'BIBLIOTHÈQUE', icon: '📖', angle: 5 * Math.PI / 3, color: '#a78bfa', decor: 'tent' }
+            ];
+
+            const radius = 200;
+
+            // CHEMINS en terre battue (du centre vers chaque zone)
+            zones.forEach(zone => {
+                const x = centerX + Math.cos(zone.angle) * radius;
+                const y = centerY + Math.sin(zone.angle) * radius;
+
+                // Chemin large
+                ctx.strokeStyle = 'rgba(50, 35, 25, 0.7)';
+                ctx.lineWidth = 25;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+
+                // Traces de roues/pas
+                for (let i = 0; i < 5; i++) {
+                    const t = i / 5;
+                    const px = centerX + (x - centerX) * t;
+                    const py = centerY + (y - centerY) * t;
+                    ctx.fillStyle = 'rgba(40, 28, 20, 0.5)';
+                    ctx.fillRect(px - 2, py - 2, 4, 4);
+                }
+            });
+
+            // ============================================
+            // 3. FEU CENTRAL ANIMÉ (intensité selon heure)
+            // ============================================
+            // Intensité du feu selon l'heure
+            const fireIntensity = skyData.timeOfDay === 'night' ? 1.5 :
+                                  skyData.timeOfDay === 'morning' ? 0.6 : 1.0;
+            const glowRadius = 80 * fireIntensity;
+            const glowAlpha = skyData.timeOfDay === 'night' ? 1.0 : 0.6;
+
+            // Glow orangé (plus intense la nuit)
+            const fireGlow = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, glowRadius);
+            fireGlow.addColorStop(0, `rgba(255, 120, 0, ${0.8 * glowAlpha})`);
+            fireGlow.addColorStop(0.5, `rgba(255, 80, 0, ${0.4 * glowAlpha})`);
+            fireGlow.addColorStop(1, 'rgba(139, 0, 0, 0)');
+            ctx.fillStyle = fireGlow;
+            ctx.fillRect(centerX - glowRadius, centerY - glowRadius, glowRadius * 2, glowRadius * 2);
+
+            // Bûches
+            ctx.fillStyle = '#3d2817';
+            ctx.fillRect(centerX - 25, centerY - 5, 50, 10);
+            ctx.fillRect(centerX - 5, centerY - 25, 10, 50);
+
+            // Flammes (3 triangles animés, plus hautes la nuit)
+            const flameColors = ['#ff6600', '#ff8c00', '#ffa500'];
+            for (let i = 0; i < 3; i++) {
+                const offsetX = (Math.random() - 0.5) * 10;
+                const offsetY = Math.random() * -10;
+                const flameHeight = (25 + Math.random() * 10) * fireIntensity;
+
+                ctx.fillStyle = flameColors[i];
+                ctx.globalAlpha = glowAlpha;
+                ctx.beginPath();
+                ctx.moveTo(centerX + offsetX - 8, centerY + 5);
+                ctx.lineTo(centerX + offsetX + 8, centerY + 5);
+                ctx.lineTo(centerX + offsetX, centerY - flameHeight);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1; // Reset alpha
+
+            // Étincelles (plus nombreuses la nuit)
+            const sparkCount = skyData.timeOfDay === 'night' ? 12 : 8;
+            for (let i = 0; i < sparkCount; i++) {
+                const angle = (Math.PI * 2 * i) / sparkCount;
+                const sparkDist = 30 + Math.random() * 15;
+                const sparkX = centerX + Math.cos(angle) * sparkDist;
+                const sparkY = centerY + Math.sin(angle) * sparkDist - Math.random() * 20;
+                ctx.fillStyle = `rgba(255, 200, 0, ${0.8 * glowAlpha})`;
+                ctx.fillRect(sparkX - 1, sparkY - 1, 2, 2);
+            }
+
+            // ============================================
+            // 4. DÉCORS AUTOUR DES ZONES
+            // ============================================
+            zones.forEach((zone, i) => {
+                const x = centerX + Math.cos(zone.angle) * radius;
+                const y = centerY + Math.sin(zone.angle) * radius;
+
+                // Stocker hitbox pour clic
+                zone.x = x;
+                zone.y = y;
+                zone.radius = 50;
+
+                // Dessiner décor selon type
+                switch(zone.decor) {
+                    case 'tent':
+                        // Tente triangulaire
+                        ctx.fillStyle = '#4a3a2a';
+                        ctx.beginPath();
+                        ctx.moveTo(x - 35, y + 40);
+                        ctx.lineTo(x, y - 15);
+                        ctx.lineTo(x + 35, y + 40);
+                        ctx.closePath();
+                        ctx.fill();
+                        // Entrée
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.fillRect(x - 8, y + 20, 16, 20);
+                        break;
+
+                    case 'wagon':
+                        // Chariot blindé
+                        ctx.fillStyle = '#5a4a3a';
+                        ctx.fillRect(x - 30, y + 15, 60, 30);
+                        // Roues
+                        ctx.fillStyle = '#2a2a2a';
+                        ctx.beginPath();
+                        ctx.arc(x - 20, y + 45, 8, 0, Math.PI * 2);
+                        ctx.arc(x + 20, y + 45, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+
+                    case 'candles':
+                        // 3 bougies
+                        for (let j = 0; j < 3; j++) {
+                            const cx = x - 20 + j * 20;
+                            const cy = y + 30;
+                            ctx.fillStyle = '#d4af37';
+                            ctx.fillRect(cx - 3, cy, 6, 15);
+                            // Flamme
+                            ctx.fillStyle = '#ffd700';
+                            ctx.beginPath();
+                            ctx.arc(cx, cy - 3, 4, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        break;
+
+                    case 'crates':
+                        // Caisses empilées
+                        ctx.fillStyle = '#3d2817';
+                        ctx.fillRect(x - 25, y + 20, 20, 20);
+                        ctx.fillRect(x + 5, y + 20, 20, 20);
+                        ctx.fillRect(x - 10, y + 0, 20, 20);
+                        break;
+
+                    case 'campfire':
+                        // Petit feu de camp
+                        ctx.fillStyle = '#ff6600';
+                        ctx.beginPath();
+                        ctx.moveTo(x - 10, y + 35);
+                        ctx.lineTo(x + 10, y + 35);
+                        ctx.lineTo(x, y + 15);
+                        ctx.closePath();
+                        ctx.fill();
+                        // Pierres autour
+                        for (let j = 0; j < 6; j++) {
+                            const angle = (Math.PI * 2 * j) / 6;
+                            const sx = x + Math.cos(angle) * 15;
+                            const sy = y + 30 + Math.sin(angle) * 15;
+                            ctx.fillStyle = '#555';
+                            ctx.beginPath();
+                            ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        break;
+                }
+
+                // ============================================
+                // 5. ZONE CLIQUABLE (cercle + icône)
+                // ============================================
+                // Ombre portée
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.beginPath();
+                ctx.arc(x + 3, y + 3, 50, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cercle zone
+                ctx.fillStyle = 'rgba(20, 15, 10, 0.7)';
+                ctx.strokeStyle = zone.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, 50, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Icône
+                ctx.font = '36px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = zone.color;
+                ctx.fillText(zone.icon, x, y - 10);
+
+                // Label
+                ctx.font = 'bold 13px Cinzel';
+                ctx.fillStyle = '#e0e0e0';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 4;
+                ctx.fillText(zone.name, x, y + 28);
+                ctx.shadowBlur = 0;
+            });
+
+            // ============================================
+            // 6. ÉLÉMENTS DE VIE (débris, tonneaux, os)
+            // ============================================
+            // Tonneaux épars
+            const barrelPositions = [
+                {x: 100, y: 150}, {x: 650, y: 200}, {x: 150, y: 450}, {x: 700, y: 400}
+            ];
+            barrelPositions.forEach(pos => {
+                ctx.fillStyle = '#3d2817';
+                ctx.beginPath();
+                ctx.ellipse(pos.x, pos.y, 12, 15, 0, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Os épars (lugubre)
+            const bonePositions = [
+                {x: 120, y: 300}, {x: 600, y: 150}, {x: 200, y: 500}, {x: 680, y: 480}
+            ];
+            bonePositions.forEach(pos => {
+                ctx.fillStyle = '#d4d4d4';
+                ctx.fillRect(pos.x, pos.y, 20, 4);
+                ctx.fillRect(pos.x - 3, pos.y - 2, 4, 8);
+                ctx.fillRect(pos.x + 19, pos.y - 2, 4, 8);
+            });
+
+            // Piquets
+            const stakePositions = [
+                {x: 180, y: 100}, {x: 620, y: 120}, {x: 150, y: 500}, {x: 650, y: 480}
+            ];
+            stakePositions.forEach((pos, i) => {
+                // Piquet
+                ctx.fillStyle = '#3d2817';
+                ctx.fillRect(pos.x - 2, pos.y, 4, 30);
+                // Sommet pointu
+                ctx.beginPath();
+                ctx.moveTo(pos.x - 4, pos.y);
+                ctx.lineTo(pos.x, pos.y - 8);
+                ctx.lineTo(pos.x + 4, pos.y);
+                ctx.fill();
+            });
+
+            // ============================================
+            // 6.5. AFFICHAGE HEURE ET JOUR
+            // ============================================
+            // Bandeau en haut avec heure et jour
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(0, 0, w, 60);
+
+            // Icône + Titre
+            ctx.font = 'bold 24px Cinzel, serif';
+            ctx.fillStyle = '#d4af37';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${timeDesc.icon} ${timeDesc.title} - Jour ${window.dayNightSystem.dayCount}`, centerX, 30);
+
+            // Description
+            ctx.font = '14px Crimson Text, serif';
+            ctx.fillStyle = '#b8b8b8';
+            ctx.fillText(timeDesc.desc, centerX, 50);
+
+            ctx.textAlign = 'left'; // Reset align
+
+            // ============================================
+            // 7. HOVER + CLICK HANDLER
+            // ============================================
+            let currentHoveredZone = null;
+
+            // Mouse move pour hover
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mouseX = (e.clientX - rect.left) * scaleX;
+                const mouseY = (e.clientY - rect.top) * scaleY;
+
+                let hovering = false;
+                zones.forEach(zone => {
+                    const dist = Math.sqrt((mouseX - zone.x) ** 2 + (mouseY - zone.y) ** 2);
+                    if (dist <= zone.radius) {
+                        hovering = true;
+                        // Nouvelle zone survolée
+                        if (currentHoveredZone !== zone.name) {
+                            AudioSystem.playHover();
+                            currentHoveredZone = zone.name;
+                        }
+                        canvas.style.cursor = 'pointer';
+                    }
+                });
+
+                if (!hovering) {
+                    canvas.style.cursor = 'default';
+                    currentHoveredZone = null;
+                }
+            };
+
+            // Click handler
+            canvas.onclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clickX = (e.clientX - rect.left) * scaleX;
+                const clickY = (e.clientY - rect.top) * scaleY;
+
+                zones.forEach(zone => {
+                    const dist = Math.sqrt((clickX - zone.x) ** 2 + (clickY - zone.y) ** 2);
+                    if (dist <= zone.radius) {
+                        AudioSystem.playClick();
+                        onZoneClick(zone.name.toLowerCase());
+                    }
+                });
+            };
+
+            // Animation des flammes (re-render périodique)
+            setTimeout(() => renderVillageCanvas(), 200);
+
+            // Mettre à jour l'affichage du panneau repos
+            updateRestPanel();
+        }
+
+        // Mettre à jour le panneau de repos
+        function updateRestPanel() {
+            if (!window.dayNightSystem) return;
+
+            const cycle = window.dayNightSystem.getCurrentCycle();
+            const timeDesc = window.dayNightSystem.getTimeDescription();
+
+            // Mettre à jour affichage
+            document.getElementById('currentDay').textContent = cycle.dayCount;
+            document.getElementById('currentTimeOfDay').textContent = timeDesc.title;
+            document.getElementById('restDescription').textContent = timeDesc.desc;
+
+            // Icône du titre selon moment
+            const titleIcons = {
+                morning: '🌅',
+                afternoon: '☀️',
+                night: '🌙'
+            };
+            document.getElementById('restSectionTitle').textContent = `${titleIcons[cycle.timeOfDay]} Repos`;
+
+            // Bouton repos
+            const btnRest = document.getElementById('btnRest');
+            if (cycle.canRest) {
+                btnRest.disabled = false;
+                btnRest.style.opacity = '1';
+                btnRest.style.cursor = 'pointer';
+                btnRest.textContent = '😴 Se Reposer (Passer au jour suivant)';
+            } else {
+                btnRest.disabled = true;
+                btnRest.style.opacity = '0.5';
+                btnRest.style.cursor = 'not-allowed';
+                btnRest.textContent = '😴 Se Reposer (Disponible la nuit)';
+            }
+        }
+
+        // Fonction de repos
+        function performRest() {
+            if (!window.dayNightSystem || !window.dayNightSystem.getCurrentCycle().canRest) {
+                AudioSystem.playError();
+                return;
+            }
+
+            AudioSystem.playClick();
+
+            // Simuler journée si settlement existe
+            let simulationResult = null;
+            if (window.settlementSystem) {
+                simulationResult = window.settlementSystem.simulateDay();
+                saveSettlement();
+            }
+
+            // Avancer au jour suivant
+            const result = window.dayNightSystem.rest();
+
+            // Sauvegarder cycle
+            localStorage.setItem('tlc_daynightcycle', JSON.stringify({
+                timeOfDay: window.dayNightSystem.timeOfDay,
+                dayCount: window.dayNightSystem.dayCount,
+                hour: window.dayNightSystem.hour
+            }));
+
+            // Afficher modale de résumé
+            showRestSummaryModal(result, simulationResult);
+
+            // Refresh UI
+            renderVillageCanvas();
+            updateRestPanel();
+        }
+
+        // Modale de résumé après repos
+        function showRestSummaryModal(restResult, simulationResult) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(8px);
+                z-index: 10000; display: flex; justify-content: center; align-items: center;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+                border: 3px solid #d4af37;
+                border-radius: 15px;
+                padding: 40px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 0 60px rgba(212, 175, 55, 0.5);
+            `;
+
+            let content = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 4rem; margin-bottom: 10px;">🌅</div>
+                    <h2 style="font-family: 'Cinzel', serif; color: #d4af37; font-size: 2rem; margin: 0;">
+                        Jour ${restResult.newDay}
+                    </h2>
+                    <p style="color: #b8860b; margin-top: 10px; font-size: 1.1rem;">
+                        Une nouvelle aube se lève...
+                    </p>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.4); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="color: #60a5fa; margin-bottom: 15px;">📊 Bilan de la Nuit</h3>
+            `;
+
+            if (simulationResult) {
+                // Production
+                content += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: #22c55e; font-weight: bold; margin-bottom: 8px;">➕ Production</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.9rem;">
+                            <div style="color: #86efac;">🌾 +${Math.floor(simulationResult.produced.food)} Nourriture</div>
+                            <div style="color: #d4a574;">🪵 +${Math.floor(simulationResult.produced.wood)} Bois</div>
+                            <div style="color: #94a3b8;">⚙️ +${Math.floor(simulationResult.produced.materials)} Matériaux</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: #ef4444; font-weight: bold; margin-bottom: 8px;">➖ Consommation</div>
+                        <div style="font-size: 0.9rem; color: #fca5a5;">
+                            🌾 -${simulationResult.consumed.food} Nourriture
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(96, 165, 250, 0.3); padding-top: 15px;">
+                        <div style="color: #60a5fa; font-weight: bold; margin-bottom: 8px;">📦 Ressources Actuelles</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem;">
+                            <div style="color: ${simulationResult.resources.food >= 0 ? '#22c55e' : '#ef4444'};">
+                                🌾 ${simulationResult.resources.food} Nourriture
+                            </div>
+                            <div style="color: #d4a574;">🪵 ${simulationResult.resources.wood} Bois</div>
+                            <div style="color: #94a3b8;">⚙️ ${simulationResult.resources.materials} Matériaux</div>
+                            <div style="color: #c084fc;">👻 ${simulationResult.resources.souls} Âmes</div>
+                        </div>
+                    </div>
+                `;
+
+                // Événements
+                if (simulationResult.events && simulationResult.events.length > 0) {
+                    content += `
+                        <div style="border-top: 1px solid rgba(239, 68, 68, 0.3); padding-top: 15px; margin-top: 15px;">
+                            <div style="color: #ef4444; font-weight: bold; margin-bottom: 8px;">⚠️ Événements</div>
+                    `;
+                    simulationResult.events.forEach(event => {
+                        content += `
+                            <div style="background: rgba(139, 0, 0, 0.2); padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #ef4444;">
+                                <div style="color: #fca5a5; font-size: 0.85rem;">${event.message}</div>
+                            </div>
+                        `;
+                    });
+                    content += `</div>`;
+                }
+            } else {
+                content += `
+                    <p style="color: #9ca3af; font-style: italic;">
+                        Le camp se repose. Aucune colonie active pour le moment.
+                    </p>
+                `;
+            }
+
+            content += `
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="continue-btn" style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 1.2rem;
+                        padding: 15px 50px;
+                        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(184, 134, 11, 0.1));
+                        border: 2px solid #d4af37;
+                        border-radius: 8px;
+                        color: #d4af37;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-transform: uppercase;
+                    ">
+                        Continuer
+                    </button>
+                </div>
+            `;
+
+            modal.innerHTML = content;
+
+            setTimeout(() => {
+                const btn = modal.querySelector('.continue-btn');
+                btn.addEventListener('mouseenter', () => {
+                    AudioSystem.playHover();
+                    btn.style.transform = 'translateY(-3px)';
+                    btn.style.boxShadow = '0 5px 30px rgba(212, 175, 55, 0.6)';
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translateY(0)';
+                    btn.style.boxShadow = 'none';
+                });
+                btn.onclick = () => {
+                    AudioSystem.playClick();
+                    AudioSystem.playSuccess();
+                    overlay.remove();
+                };
+            }, 100);
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+
+        // Afficher Autel avec services AAA+
+        function showAltarServices() {
+            const corruption = playerData?.corruption || 0;
+            const gold = playerData?.gold || 0;
+
+            // Description évolutive
+            let altarDesc = '';
+            let lilyVisual = '';
+            if (corruption < 25) {
+                altarDesc = 'Trois pots de terre noire. Des lys blancs qui ne devraient pas exister ici. Ils murmurent ton nom.';
+                lilyVisual = '🌸 🌸 🌸';
+            } else if (corruption < 50) {
+                altarDesc = 'Les lys grisent. Leurs pétales absorbent ta noirceur. Combien de temps tiendront-ils ?';
+                lilyVisual = '🥀 🌸 🌸';
+            } else if (corruption < 75) {
+                altarDesc = 'Les lys sont gris anthracite. Leurs tiges suintent. Ils souffrent. Comme toi.';
+                lilyVisual = '🥀 🥀 🌸';
+            } else {
+                altarDesc = 'Un lys est mort. Noir. Ratatiné. Les autres tremblent. Même eux ont des limites.';
+                lilyVisual = '💀 🥀 🥀';
+            }
+
+            // Créer modale
+            const overlay = document.createElement('div');
+            overlay.className = 'altar-services-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(8px);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 0.5s ease;
+            `;
+
+            const purifyPrice = 100;
+            const pactPrice = 50;
+            const canPurify = gold >= purifyPrice && corruption >= 10;
+            const canPact = gold >= pactPrice;
+
+            overlay.innerHTML = `
+                <div class="altar-modal" style="
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+                    border: 3px solid #d4af37;
+                    border-radius: 15px;
+                    padding: 50px;
+                    max-width: 900px;
+                    width: 95%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 0 60px rgba(212, 175, 55, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.6);
+                    animation: scaleIn 0.5s ease;
+                    position: relative;
+                ">
+                    <button class="close-altar-btn" style="
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background: none;
+                        border: 2px solid #d4af37;
+                        color: #d4af37;
+                        font-size: 2rem;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#d4af37'; this.style.color='#000';"
+                       onmouseout="this.style.background='none'; this.style.color='#d4af37';">
+                        ×
+                    </button>
+
+                    <h2 style="font-family: 'Cinzel', serif; color: #d4af37; font-size: 2.5rem; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);">
+                        🕯️ Le Jardin des Regrets
+                    </h2>
+
+                    <p style="text-align: center; font-style: italic; color: #b8860b; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;">
+                        ${altarDesc}
+                    </p>
+
+                    <div style="text-align: center; font-size: 4rem; margin: 30px 0;">
+                        ${lilyVisual}
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px;">
+                        <!-- PURIFICATION -->
+                        <div class="service-card-altar purification ${!canPurify ? 'disabled' : ''}" style="
+                            border: 3px solid #ffd700;
+                            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.05));
+                            padding: 30px;
+                            border-radius: 10px;
+                            position: relative;
+                            overflow: hidden;
+                            ${!canPurify ? 'opacity: 0.5; pointer-events: none;' : ''}
+                        ">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%); animation: pulseGlow 3s ease-in-out infinite;"></div>
+
+                            <h3 style="font-family: 'Cinzel', serif; color: #ffd700; font-size: 1.8rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); position: relative;">
+                                ✨ Purification
+                            </h3>
+
+                            <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1.1rem; position: relative;">
+                                Les Lys du Pardon absorbent ta noirceur. Un lys mourra pour toi.
+                            </p>
+
+                            <div style="position: relative; margin: 20px 0;">
+                                <p style="color: #4ade80; font-weight: 700; font-size: 1.3rem;">
+                                    -10% Corruption
+                                </p>
+                                <p style="color: #d4af37; font-size: 1.2rem; margin-top: 10px;">
+                                    💰 ${purifyPrice} Or
+                                </p>
+                            </div>
+
+                            ${!canPurify && corruption < 10 ? '<p style="color: #dc143c; font-style: italic; position: relative;">Corruption trop faible (min 10%)</p>' : ''}
+                            ${!canPurify && gold < purifyPrice && corruption >= 10 ? '<p style="color: #dc143c; font-style: italic; position: relative;">Or insuffisant</p>' : ''}
+
+                            <button class="btn-purify-altar ${!canPurify ? 'disabled' : ''}"
+                                    ${!canPurify ? 'disabled' : ''}
+                                    style="
+                                        margin-top: 20px;
+                                        width: 100%;
+                                        background: linear-gradient(135deg, #ffd700, #ffed4e);
+                                        color: #000;
+                                        font-weight: 700;
+                                        border: none;
+                                        padding: 18px;
+                                        border-radius: 8px;
+                                        cursor: ${!canPurify ? 'not-allowed' : 'pointer'};
+                                        font-family: 'Cinzel', serif;
+                                        font-size: 1.2rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2px;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+                                        position: relative;
+                                    "
+                                    onmouseover="if(!this.disabled) { this.style.transform='translateY(-5px) scale(1.05)'; this.style.boxShadow='0 10px 40px rgba(255, 215, 0, 0.9)'; }"
+                                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 0 20px rgba(255, 215, 0, 0.5)';">
+                                🕊️ Purifier
+                            </button>
+                        </div>
+
+                        <!-- PACTE DÉMONIAQUE -->
+                        <div class="service-card-altar pact ${!canPact ? 'disabled' : ''}" style="
+                            border: 3px solid #8b0000;
+                            background: linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+                            padding: 30px;
+                            border-radius: 10px;
+                            position: relative;
+                            overflow: hidden;
+                            ${!canPact ? 'opacity: 0.5; pointer-events: none;' : ''}
+                        ">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(139, 0, 0, 0.4) 0%, transparent 70%); animation: pulseDark 2s ease-in-out infinite;"></div>
+
+                            <h3 style="font-family: 'Cinzel', serif; color: #dc143c; font-size: 1.8rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(220, 20, 60, 0.8); position: relative;">
+                                👿 Pacte Démoniaque
+                            </h3>
+
+                            <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1.1rem; position: relative;">
+                                Brûle un lys noir. Invoque une entité. Gagne du pouvoir. Perds ton âme.
+                            </p>
+
+                            <div style="position: relative; margin: 20px 0;">
+                                <p style="color: #4ade80; font-weight: 700; font-size: 1.3rem;">
+                                    +5 ATK permanent
+                                </p>
+                                <p style="color: #dc143c; font-weight: 700; font-size: 1.3rem; margin-top: 5px;">
+                                    +15% Corruption
+                                </p>
+                                <p style="color: #d4af37; font-size: 1.2rem; margin-top: 10px;">
+                                    💰 ${pactPrice} Or
+                                </p>
+                            </div>
+
+                            ${!canPact ? '<p style="color: #dc143c; font-style: italic; position: relative;">Or insuffisant</p>' : ''}
+
+                            <button class="btn-pact-altar ${!canPact ? 'disabled' : ''}"
+                                    ${!canPact ? 'disabled' : ''}
+                                    style="
+                                        margin-top: 20px;
+                                        width: 100%;
+                                        background: linear-gradient(135deg, #8b0000, #dc143c);
+                                        color: #fff;
+                                        font-weight: 700;
+                                        border: none;
+                                        padding: 18px;
+                                        border-radius: 8px;
+                                        cursor: ${!canPact ? 'not-allowed' : 'pointer'};
+                                        font-family: 'Cinzel', serif;
+                                        font-size: 1.2rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2px;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+                                        position: relative;
+                                    "
+                                    onmouseover="if(!this.disabled) { this.style.transform='translateY(-5px) scale(1.05)'; this.style.boxShadow='0 10px 40px rgba(220, 20, 60, 0.9)'; }"
+                                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 0 20px rgba(220, 20, 60, 0.5)';">
+                                🔥 Pactiser
+                            </button>
+                        </div>
+                    </div>
+
+                    <p style="text-align: center; margin-top: 40px; font-style: italic; color: #888; font-size: 1rem;">
+                        "Elles prennent ce que tu leur donnes. Ni plus. Ni moins."
+                    </p>
+                </div>
+
+                <style>
+                    @keyframes pulseGlow {
+                        0%, 100% { opacity: 0.5; }
+                        50% { opacity: 1; }
+                    }
+                    @keyframes pulseDark {
+                        0%, 100% { opacity: 0.6; }
+                        50% { opacity: 1; }
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes scaleIn {
+                        from { transform: scale(0.8); opacity: 0; }
+                        to { transform: scale(1); opacity: 1; }
+                    }
+                    .service-card-altar {
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    }
+                </style>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // ==========================================
+            // EFFETS VISUELS + SONS AU SURVOL
+            // ==========================================
+            const altarCards = overlay.querySelectorAll('.service-card-altar');
+            altarCards.forEach(card => {
+                if (!card.classList.contains('disabled')) {
+                    card.addEventListener('mouseenter', () => {
+                        AudioSystem.playHover();
+                        card.style.transform = 'translateY(-10px) scale(1.05)';
+
+                        // Glow différent selon type
+                        if (card.classList.contains('purification')) {
+                            card.style.boxShadow = '0 15px 50px rgba(255, 215, 0, 0.9)';
+                        } else if (card.classList.contains('pact')) {
+                            card.style.boxShadow = '0 15px 50px rgba(220, 20, 60, 0.9)';
+                        }
+                        card.style.filter = 'brightness(1.2)';
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.boxShadow = 'none';
+                        card.style.filter = 'brightness(1)';
+                    });
+                }
+            });
+
+            // Event listeners
+            overlay.querySelector('.close-altar-btn').onclick = () => {
+                AudioSystem.playClick();
+                overlay.remove();
+            };
+
+            const purifyBtn = overlay.querySelector('.btn-purify-altar');
+            if (purifyBtn && !purifyBtn.disabled) {
+                purifyBtn.onclick = async () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                    await servicesSystem.purifyCorruption();
+                    // Refresh UI et recharger si besoin
+                    updatePlayerUI();
+                };
+            }
+
+            const pactBtn = overlay.querySelector('.btn-pact-altar');
+            if (pactBtn && !pactBtn.disabled) {
+                pactBtn.onclick = async () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                    await servicesSystem.demonicPact();
+                    // Refresh UI
+                    updatePlayerUI();
+                };
+            }
+        }
+
+        // Afficher Forge avec services AAA+
+        function showForgeServices() {
+            const corruption = playerData?.corruption || 0;
+            const gold = playerData?.gold || 0;
+
+            // Description évolutive de la forge
+            let forgeDesc = '';
+            if (corruption < 25) {
+                forgeDesc = 'Une forge mobile. Enclume rivée sur un chariot blindé. Drenvar tape le métal comme s\'il lui devait de l\'argent. Les étincelles dansent proprement.';
+            } else if (corruption < 50) {
+                forgeDesc = 'Le feu de forge crépite des mots que tu ne devrais pas comprendre. Drenvar fronce les sourcils en te regardant. "Cette tache sur ton cou..."';
+            } else if (corruption < 75) {
+                forgeDesc = 'Les Larmes de Krovax tremblent quand tu approches. Drenvar recule légèrement. "Approche pas trop près avec cette puanteur."';
+            } else {
+                forgeDesc = 'Drenvar forge dans l\'eau noire maintenant. Pour toi uniquement. "Je touche plus ta peau. Compris ?"';
+            }
+
+            // Créer modale
+            const overlay = document.createElement('div');
+            overlay.className = 'forge-services-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(8px);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 0.5s ease;
+            `;
+
+            const weaponTier1Price = 100;
+            const weaponTier2Price = 200;
+            const armorTier1Price = 80;
+            const armorTier2Price = 160;
+
+            const canWeaponT1 = gold >= weaponTier1Price;
+            const canWeaponT2 = gold >= weaponTier2Price;
+            const canArmorT1 = gold >= armorTier1Price;
+            const canArmorT2 = gold >= armorTier2Price;
+
+            overlay.innerHTML = `
+                <div class="forge-modal" style="
+                    background: linear-gradient(135deg, #1a0f0f 0%, #2d1a1a 50%, #1a0f0f 100%);
+                    border: 3px solid #ff6347;
+                    border-radius: 15px;
+                    padding: 50px;
+                    max-width: 1000px;
+                    width: 95%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 0 60px rgba(255, 99, 71, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.6);
+                    animation: scaleIn 0.5s ease;
+                    position: relative;
+                ">
+                    <button class="close-forge-btn" style="
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background: none;
+                        border: 2px solid #ff6347;
+                        color: #ff6347;
+                        font-size: 2rem;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#ff6347'; this.style.color='#000';"
+                       onmouseout="this.style.background='none'; this.style.color='#ff6347';">
+                        ×
+                    </button>
+
+                    <h2 style="font-family: 'Cinzel', serif; color: #ff6347; font-size: 2.5rem; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255, 99, 71, 0.8);">
+                        ⚒️ L'Écorcheur de Fer
+                    </h2>
+
+                    <p style="text-align: center; font-style: italic; color: #ffa07a; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;">
+                        ${forgeDesc}
+                    </p>
+
+                    <div style="text-align: center; font-size: 3rem; margin: 20px 0;">
+                        🔨 ⚔️ 🛡️
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+                        <!-- AMÉLIORER ARME T1 -->
+                        <div class="service-card-forge weapon ${!canWeaponT1 ? 'disabled' : ''}" style="
+                            border: 3px solid #ff4500;
+                            background: linear-gradient(135deg, rgba(255, 69, 0, 0.2), rgba(139, 0, 0, 0.3));
+                            padding: 25px;
+                            border-radius: 10px;
+                            position: relative;
+                            overflow: hidden;
+                            ${!canWeaponT1 ? 'opacity: 0.5; pointer-events: none;' : ''}
+                        ">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 69, 0, 0.3) 0%, transparent 70%); animation: pulseForge 2.5s ease-in-out infinite;"></div>
+
+                            <h3 style="font-family: 'Cinzel', serif; color: #ff6347; font-size: 1.6rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255, 99, 71, 0.8); position: relative;">
+                                ⚔️ Arme Basique
+                            </h3>
+
+                            <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1rem; position: relative;">
+                                Trempe dans les Larmes de Krovax${corruption >= 50 ? ' Corrompues' : ''}.
+                            </p>
+
+                            <div style="position: relative; margin: 20px 0;">
+                                <p style="color: #4ade80; font-weight: 700; font-size: 1.2rem;">
+                                    +5 ATK permanent
+                                </p>
+                                ${corruption >= 50 ? '<p style="color: #ffa500; font-size: 0.9rem; margin-top: 5px;">⚠️ Échec: 15%</p>' : ''}
+                                <p style="color: #d4af37; font-size: 1.1rem; margin-top: 10px;">
+                                    💰 ${weaponTier1Price} Or
+                                </p>
+                            </div>
+
+                            ${!canWeaponT1 ? '<p style="color: #dc143c; font-style: italic; position: relative;">Or insuffisant</p>' : ''}
+
+                            <button class="btn-weapon-t1 ${!canWeaponT1 ? 'disabled' : ''}"
+                                    ${!canWeaponT1 ? 'disabled' : ''}
+                                    style="
+                                        margin-top: 15px;
+                                        width: 100%;
+                                        background: linear-gradient(135deg, #ff4500, #ff6347);
+                                        color: #fff;
+                                        font-weight: 700;
+                                        border: none;
+                                        padding: 15px;
+                                        border-radius: 8px;
+                                        cursor: ${!canWeaponT1 ? 'not-allowed' : 'pointer'};
+                                        font-family: 'Cinzel', serif;
+                                        font-size: 1.1rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2px;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 0 20px rgba(255, 69, 0, 0.5);
+                                        position: relative;
+                                    "
+                                    onmouseover="if(!this.disabled) { this.style.transform='translateY(-5px) scale(1.05)'; this.style.boxShadow='0 10px 40px rgba(255, 69, 0, 0.9)'; }"
+                                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 0 20px rgba(255, 69, 0, 0.5)';">
+                                🔨 Forger
+                            </button>
+                        </div>
+
+                        <!-- AMÉLIORER ARME T2 -->
+                        <div class="service-card-forge weapon-advanced ${!canWeaponT2 ? 'disabled' : ''}" style="
+                            border: 3px solid #dc143c;
+                            background: linear-gradient(135deg, rgba(220, 20, 60, 0.2), rgba(139, 0, 0, 0.4));
+                            padding: 25px;
+                            border-radius: 10px;
+                            position: relative;
+                            overflow: hidden;
+                            ${!canWeaponT2 ? 'opacity: 0.5; pointer-events: none;' : ''}
+                        ">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(220, 20, 60, 0.3) 0%, transparent 70%); animation: pulseForge 2s ease-in-out infinite;"></div>
+
+                            <h3 style="font-family: 'Cinzel', serif; color: #dc143c; font-size: 1.6rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(220, 20, 60, 0.8); position: relative;">
+                                ⚔️ Arme Avancée
+                            </h3>
+
+                            <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1rem; position: relative;">
+                                Double trempe. Rituel de forge complexe.
+                            </p>
+
+                            <div style="position: relative; margin: 20px 0;">
+                                <p style="color: #4ade80; font-weight: 700; font-size: 1.2rem;">
+                                    +10 ATK permanent
+                                </p>
+                                ${corruption >= 50 ? '<p style="color: #ff4500; font-size: 0.9rem; margin-top: 5px;">⚠️ Échec: 15%</p>' : ''}
+                                <p style="color: #d4af37; font-size: 1.1rem; margin-top: 10px;">
+                                    💰 ${weaponTier2Price} Or
+                                </p>
+                            </div>
+
+                            ${!canWeaponT2 ? '<p style="color: #dc143c; font-style: italic; position: relative;">Or insuffisant</p>' : ''}
+
+                            <button class="btn-weapon-t2 ${!canWeaponT2 ? 'disabled' : ''}"
+                                    ${!canWeaponT2 ? 'disabled' : ''}
+                                    style="
+                                        margin-top: 15px;
+                                        width: 100%;
+                                        background: linear-gradient(135deg, #8b0000, #dc143c);
+                                        color: #fff;
+                                        font-weight: 700;
+                                        border: none;
+                                        padding: 15px;
+                                        border-radius: 8px;
+                                        cursor: ${!canWeaponT2 ? 'not-allowed' : 'pointer'};
+                                        font-family: 'Cinzel', serif;
+                                        font-size: 1.1rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2px;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+                                        position: relative;
+                                    "
+                                    onmouseover="if(!this.disabled) { this.style.transform='translateY(-5px) scale(1.05)'; this.style.boxShadow='0 10px 40px rgba(220, 20, 60, 0.9)'; }"
+                                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 0 20px rgba(220, 20, 60, 0.5)';">
+                                ⚒️ Forger
+                            </button>
+                        </div>
+
+                        <!-- AMÉLIORER ARMURE T1 -->
+                        <div class="service-card-forge armor ${!canArmorT1 ? 'disabled' : ''}" style="
+                            border: 3px solid #c0c0c0;
+                            background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(128, 128, 128, 0.3));
+                            padding: 25px;
+                            border-radius: 10px;
+                            position: relative;
+                            overflow: hidden;
+                            ${!canArmorT1 ? 'opacity: 0.5; pointer-events: none;' : ''}
+                        ">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(192, 192, 192, 0.3) 0%, transparent 70%); animation: pulseMetal 2.5s ease-in-out infinite;"></div>
+
+                            <h3 style="font-family: 'Cinzel', serif; color: #c0c0c0; font-size: 1.6rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(192, 192, 192, 0.8); position: relative;">
+                                🛡️ Armure Légère
+                            </h3>
+
+                            <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1rem; position: relative;">
+                                Plaques rivées. Cuir tanné. Protection renforcée.
+                            </p>
+
+                            <div style="position: relative; margin: 20px 0;">
+                                <p style="color: #60a5fa; font-weight: 700; font-size: 1.2rem;">
+                                    +3 DEF permanent
+                                </p>
+                                <p style="color: #d4af37; font-size: 1.1rem; margin-top: 10px;">
+                                    💰 ${armorTier1Price} Or
+                                </p>
+                            </div>
+
+                            ${!canArmorT1 ? '<p style="color: #dc143c; font-style: italic; position: relative;">Or insuffisant</p>' : ''}
+
+                            <button class="btn-armor-t1 ${!canArmorT1 ? 'disabled' : ''}"
+                                    ${!canArmorT1 ? 'disabled' : ''}
+                                    style="
+                                        margin-top: 15px;
+                                        width: 100%;
+                                        background: linear-gradient(135deg, #808080, #c0c0c0);
+                                        color: #000;
+                                        font-weight: 700;
+                                        border: none;
+                                        padding: 15px;
+                                        border-radius: 8px;
+                                        cursor: ${!canArmorT1 ? 'not-allowed' : 'pointer'};
+                                        font-family: 'Cinzel', serif;
+                                        font-size: 1.1rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2px;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+                                        position: relative;
+                                    "
+                                    onmouseover="if(!this.disabled) { this.style.transform='translateY(-5px) scale(1.05)'; this.style.boxShadow='0 10px 40px rgba(192, 192, 192, 0.9)'; }"
+                                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 0 20px rgba(192, 192, 192, 0.5)';">
+                                🔨 Renforcer
+                            </button>
+                        </div>
+
+                        <!-- AMÉLIORER ARMURE T2 -->
+                        <div class="service-card-forge armor-heavy ${!canArmorT2 ? 'disabled' : ''}" style="
+                            border: 3px solid #4a4a4a;
+                            background: linear-gradient(135deg, rgba(74, 74, 74, 0.3), rgba(42, 42, 42, 0.4));
+                            padding: 25px;
+                            border-radius: 10px;
+                            position: relative;
+                            overflow: hidden;
+                            ${!canArmorT2 ? 'opacity: 0.5; pointer-events: none;' : ''}
+                        ">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(74, 74, 74, 0.4) 0%, transparent 70%); animation: pulseMetal 2s ease-in-out infinite;"></div>
+
+                            <h3 style="font-family: 'Cinzel', serif; color: #a0a0a0; font-size: 1.6rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(160, 160, 160, 0.8); position: relative;">
+                                🛡️ Armure Lourde
+                            </h3>
+
+                            <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1rem; position: relative;">
+                                Acier plein. Couches multiples. Forteresse ambulante.
+                            </p>
+
+                            <div style="position: relative; margin: 20px 0;">
+                                <p style="color: #60a5fa; font-weight: 700; font-size: 1.2rem;">
+                                    +5 DEF permanent
+                                </p>
+                                <p style="color: #d4af37; font-size: 1.1rem; margin-top: 10px;">
+                                    💰 ${armorTier2Price} Or
+                                </p>
+                            </div>
+
+                            ${!canArmorT2 ? '<p style="color: #dc143c; font-style: italic; position: relative;">Or insuffisant</p>' : ''}
+
+                            <button class="btn-armor-t2 ${!canArmorT2 ? 'disabled' : ''}"
+                                    ${!canArmorT2 ? 'disabled' : ''}
+                                    style="
+                                        margin-top: 15px;
+                                        width: 100%;
+                                        background: linear-gradient(135deg, #4a4a4a, #6a6a6a);
+                                        color: #fff;
+                                        font-weight: 700;
+                                        border: none;
+                                        padding: 15px;
+                                        border-radius: 8px;
+                                        cursor: ${!canArmorT2 ? 'not-allowed' : 'pointer'};
+                                        font-family: 'Cinzel', serif;
+                                        font-size: 1.1rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2px;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 0 20px rgba(106, 106, 106, 0.5);
+                                        position: relative;
+                                    "
+                                    onmouseover="if(!this.disabled) { this.style.transform='translateY(-5px) scale(1.05)'; this.style.boxShadow='0 10px 40px rgba(106, 106, 106, 0.9)'; }"
+                                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 0 20px rgba(106, 106, 106, 0.5)';">
+                                ⚒️ Renforcer
+                            </button>
+                        </div>
+                    </div>
+
+                    <p style="text-align: center; margin-top: 40px; font-style: italic; color: #888; font-size: 1rem;">
+                        "Enclume chaude. Larmes de Krovax prêtes. Bouges pas."
+                    </p>
+                </div>
+
+                <style>
+                    @keyframes pulseForge {
+                        0%, 100% { opacity: 0.4; }
+                        50% { opacity: 0.8; }
+                    }
+                    @keyframes pulseMetal {
+                        0%, 100% { opacity: 0.5; }
+                        50% { opacity: 1; }
+                    }
+                    .service-card-forge {
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    }
+                </style>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // ==========================================
+            // EFFETS VISUELS + SONS AU SURVOL
+            // ==========================================
+            const serviceCards = overlay.querySelectorAll('.service-card-forge');
+            serviceCards.forEach(card => {
+                if (!card.classList.contains('disabled')) {
+                    card.addEventListener('mouseenter', () => {
+                        AudioSystem.playHover();
+                        card.style.transform = 'translateY(-10px) scale(1.05)';
+                        card.style.boxShadow = '0 15px 50px rgba(255, 100, 0, 0.8)';
+                        card.style.filter = 'brightness(1.2)';
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.boxShadow = 'none';
+                        card.style.filter = 'brightness(1)';
+                    });
+                }
+            });
+
+            // Event listeners
+            overlay.querySelector('.close-forge-btn').onclick = () => {
+                AudioSystem.playClick();
+                overlay.remove();
+            };
+
+            // Weapon T1
+            const weaponT1Btn = overlay.querySelector('.btn-weapon-t1');
+            if (weaponT1Btn && !weaponT1Btn.disabled) {
+                weaponT1Btn.onclick = async () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                    await servicesSystem.upgradeWeapon(1);
+                    updatePlayerUI();
+                };
+            }
+
+            // Weapon T2
+            const weaponT2Btn = overlay.querySelector('.btn-weapon-t2');
+            if (weaponT2Btn && !weaponT2Btn.disabled) {
+                weaponT2Btn.onclick = async () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                    await servicesSystem.upgradeWeapon(2);
+                    updatePlayerUI();
+                };
+            }
+
+            // Armor T1
+            const armorT1Btn = overlay.querySelector('.btn-armor-t1');
+            if (armorT1Btn && !armorT1Btn.disabled) {
+                armorT1Btn.onclick = async () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                    await servicesSystem.upgradeArmor(1);
+                    updatePlayerUI();
+                };
+            }
+
+            // Armor T2
+            const armorT2Btn = overlay.querySelector('.btn-armor-t2');
+            if (armorT2Btn && !armorT2Btn.disabled) {
+                armorT2Btn.onclick = async () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                    await servicesSystem.upgradeArmor(2);
+                    updatePlayerUI();
+                };
+            }
+        }
+
+        // Afficher Marché avec items AAA+
+        function showMarketServices() {
+            const corruption = playerData?.corruption || 0;
+            const gold = playerData?.gold || 0;
+
+            // Catalogue
+            const catalog = servicesSystem.getMarketCatalog();
+
+            // Description évolutive
+            let marketDesc = '';
+            if (corruption < 25) {
+                marketDesc = 'Trois tables. Des artefacts volés sur des cadavres. Le marchand sourit. Standard.';
+            } else if (corruption < 50) {
+                marketDesc = 'Le marchand tapote sa balance. "Les prix fluctuent. Comme toi."';
+            } else if (corruption < 75) {
+                marketDesc = '"Pour toi ? Remise spéciale." Son sourire se fend. Trop large.';
+            } else {
+                marketDesc = 'Il se prosterne. "Prenez. Servez-vous. Je... je vous dois tout."';
+            }
+
+            // Créer modale
+            const overlay = document.createElement('div');
+            overlay.className = 'market-services-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(8px);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 0.5s ease;
+            `;
+
+            let itemsHTML = '';
+            catalog.forEach((item, index) => {
+                const finalPrice = servicesSystem.calculateMarketPrice(item.basePrice, corruption);
+                const canBuy = gold >= finalPrice;
+
+                // Couleur selon type
+                let borderColor = '#4ade80'; // Vert par défaut
+                if (item.dangerous) borderColor = '#dc143c';
+                else if (item.effect.type === 'multi') borderColor = '#d4af37';
+
+                itemsHTML += `
+                    <div class="market-item-card ${!canBuy ? 'disabled' : ''}" data-item-index="${index}" style="
+                        border: 3px solid ${borderColor};
+                        background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05));
+                        ${item.dangerous ? 'background: linear-gradient(135deg, rgba(220, 20, 60, 0.2), rgba(139, 0, 0, 0.1));' : ''}
+                        padding: 20px;
+                        border-radius: 10px;
+                        position: relative;
+                        overflow: hidden;
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        cursor: ${canBuy ? 'pointer' : 'not-allowed'};
+                        ${!canBuy ? 'opacity: 0.5; pointer-events: none;' : ''}
+                    ">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, ${borderColor}22 0%, transparent 70%); animation: pulseGlow 3s ease-in-out infinite;"></div>
+
+                        <div style="text-align: center; font-size: 3rem; margin-bottom: 10px; position: relative;">
+                            ${item.icon}
+                        </div>
+
+                        <h3 style="font-family: 'Cinzel', serif; color: ${borderColor}; font-size: 1.3rem; margin-bottom: 10px; text-align: center; position: relative;">
+                            ${item.name}
+                        </h3>
+
+                        <p style="color: #e0e0e0; margin-bottom: 10px; font-size: 0.95rem; line-height: 1.4; text-align: center; position: relative; font-style: italic;">
+                            ${item.description}
+                        </p>
+
+                        <div style="position: relative; margin: 15px 0; padding: 10px; background: rgba(0, 0, 0, 0.3); border-radius: 5px;">
+                            <p style="color: #60a5fa; font-weight: 600; font-size: 0.9rem; text-align: center;">
+                                ${item.effect.type === 'heal' ? `+${item.effect.value} HP` :
+                                  item.effect.type === 'buff_atk' ? `+${item.effect.value} ATK` :
+                                  item.effect.type === 'buff_def' ? `+${item.effect.value} DEF` :
+                                  item.effect.type === 'multi' ? `+${item.effect.heal} HP + ${item.effect.buff_atk} ATK` : 'Effet'}
+                            </p>
+                            ${item.effect.corruption ? `<p style="color: #dc143c; font-size: 0.85rem; text-align: center; margin-top: 5px;">⚠️ +${item.effect.corruption}% Corruption</p>` : ''}
+                        </div>
+
+                        <div style="position: relative; text-align: center;">
+                            <p style="color: #d4af37; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">
+                                💰 ${finalPrice} Or
+                            </p>
+                            ${item.basePrice !== finalPrice ? `<p style="color: #888; font-size: 0.8rem; text-decoration: line-through;">${item.basePrice} Or</p>` : ''}
+                        </div>
+
+                        ${!canBuy ? '<p style="color: #dc143c; font-style: italic; text-align: center; font-size: 0.9rem; position: relative;">Or insuffisant</p>' : ''}
+                    </div>
+                `;
+            });
+
+            overlay.innerHTML = `
+                <div class="market-modal" style="
+                    background: linear-gradient(135deg, #0f1a0f 0%, #1a2d1a 50%, #0f1a0f 100%);
+                    border: 3px solid #4ade80;
+                    border-radius: 15px;
+                    padding: 50px;
+                    max-width: 1100px;
+                    width: 95%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 0 60px rgba(74, 222, 128, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.6);
+                    animation: scaleIn 0.5s ease;
+                    position: relative;
+                ">
+                    <button class="close-market-btn" style="
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background: none;
+                        border: 2px solid #4ade80;
+                        color: #4ade80;
+                        font-size: 2rem;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#4ade80'; this.style.color='#000';"
+                       onmouseout="this.style.background='none'; this.style.color='#4ade80';">
+                        ×
+                    </button>
+
+                    <h2 style="font-family: 'Cinzel', serif; color: #4ade80; font-size: 2.5rem; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);">
+                        🛒 Le Bazar des Ruines
+                    </h2>
+
+                    <p style="text-align: center; font-style: italic; color: #86efac; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;">
+                        ${marketDesc}
+                    </p>
+
+                    <div style="text-align: center; font-size: 2.5rem; margin: 20px 0;">
+                        📦 💰 🧪
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;">
+                        ${itemsHTML}
+                    </div>
+
+                    <p style="text-align: center; margin-top: 40px; font-style: italic; color: #888; font-size: 1rem;">
+                        "Argent standard. Produit standard. Tout le monde est content."
+                    </p>
+                </div>
+
+                <style>
+                    @keyframes pulseGlow {
+                        0%, 100% { opacity: 0.5; }
+                        50% { opacity: 1; }
+                    }
+                    .market-item-card:hover {
+                        transform: translateY(-10px) scale(1.05) !important;
+                        box-shadow: 0 15px 50px rgba(74, 222, 128, 0.8);
+                        filter: brightness(1.2);
+                    }
+                </style>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Event listeners
+            overlay.querySelector('.close-market-btn').onclick = () => {
+                AudioSystem.playClick();
+                overlay.remove();
+            };
+
+            // Click sur items
+            overlay.querySelectorAll('.market-item-card').forEach((card, index) => {
+                if (!card.classList.contains('disabled')) {
+                    card.addEventListener('mouseenter', () => AudioSystem.playHover());
+                    card.onclick = async () => {
+                        AudioSystem.playClick();
+                        overlay.remove();
+                        await servicesSystem.buyItem(catalog[index]);
+                        // Recharger le marché
+                        showMarketServices();
+                    };
+                }
+            });
+        }
+
+        // Afficher Bibliothèque avec révélations de lore AAA+
+        function showLibraryServices() {
+            const corruption = playerData?.corruption || 0;
+            const gold = playerData?.gold || 0;
+            const completedDungeons = playerData?.completedDungeons || [];
+
+            // Fragments de lore débloquables
+            const loreFragments = [
+                {
+                    id: 'fragment_1',
+                    title: 'Les Sept Dieux',
+                    icon: '📜',
+                    unlocked: true, // Toujours accessible
+                    cost: 0,
+                    content: `"Les Sept se sont mangés. Pas par rage. Par ennui."
+
+L'Archiviste trace des lignes sur sa peau. Des batailles s'animent.
+
+"Morwyn. Krovax. Ael'mora. Theros. Nyx. Valdris. Oryaas. Sept divinités immortelles. Sept ego coincés dans l'éternité. Ils se sont fusionnés pour MOURIR. Pour DISPARAÎTRE. Mais l'immortalité... elle ne pardonne pas."
+
+Son bras saigne d'encre noire.
+
+"Leur fusion a créé les Abysses. Un cadavre divin qui refuse de pourrir. Nous ? Nous sommes les parasites. Les explorateurs d'intestins célestes."`
+                },
+                {
+                    id: 'fragment_2',
+                    title: 'Thalys, le Huitième Dieu',
+                    icon: '🎲',
+                    unlocked: corruption >= 25,
+                    cost: 50,
+                    content: `"Le Dé n'est pas un dieu. Pas vraiment. Pas encore."
+
+L'Archiviste rit. Amer.
+
+"Thalys est né du CHAOS de leur mort. L'écho d'une fusion ratée. Il contrôle les cycles. Les réincarnations. Les boucles temporelles. Il t'observe. T'étudie. Te teste."
+
+Un tatouage de dé apparaît sur son front.
+
+"Pourquoi ? Parce qu'il cherche un REMPLAÇANT. Quelqu'un pour briser le cycle. Ou le perpétuer. Encore. Encore. Encore. Trois cent douze fois, Pactisé. Trois cent douze."`
+                },
+                {
+                    id: 'fragment_3',
+                    title: 'La Corruption',
+                    icon: '🕷️',
+                    unlocked: corruption >= 50,
+                    cost: 75,
+                    content: `"La Souillure n'est pas une maladie. C'est une MÉMOIRE."
+
+Ses veines deviennent noires.
+
+"Chaque fois que tu tues un démon, tu absorbes un fragment de leur essence. Un souvenir des Sept. De leurs regrets. De leur rage. De leur ennui divin. À 100% ? Tu DEVIENS eux. Tu comprends pourquoi ils voulaient mourir."
+
+Il se griffe la peau.
+
+"Mais il y a un équilibre. Une Balance. Ael'mora l'a cachée. 50% corruption + 50% pureté = SORTIE. Ni trop pur, ni trop corrompu. Juste... HUMAIN."`
+                },
+                {
+                    id: 'fragment_4',
+                    title: 'Le Premier Pactisé',
+                    icon: '⚔️',
+                    unlocked: completedDungeons.length >= 2,
+                    cost: 100,
+                    content: `"Avant toi... il y en a eu d'autres."
+
+L'Archiviste montre son dos. Des noms gravés dans sa chair.
+
+"Kaelith. 87 runs. Morte à 98% de corruption. Elle a fusionné avec Nyx.
+Dravos. 156 runs. Mort à 2% de corruption. Trop pur. Les Abysses l'ont rejeté.
+Syreth. 241 runs. Atteignit l'équilibre. 50/50. Mais refusa de sortir. Pourquoi ?"
+
+Il te fixe.
+
+"Parce que sortir signifie tuer Thalys. Le Dé. Tuer un dieu pour devenir le Huitième. Es-tu prêt à ça, Pactisé ?"`
+                },
+                {
+                    id: 'fragment_5',
+                    title: 'La Balance d\'Ael\'mora',
+                    icon: '⚖️',
+                    unlocked: corruption >= 40 && corruption <= 60,
+                    cost: 150,
+                    content: `"Elle existe. Je l'ai vue."
+
+L'Archiviste tremble.
+
+"Au cœur des Abysses. Une balance dorée. Deux plateaux. Pureté. Corruption. Si tu atteins 50/50... la balance s'active. Un portail s'ouvre. Vers la SORTIE."
+
+Il pleure de l'encre.
+
+"Mais Thalys te teste. Chaque choix. Chaque pacte. Chaque purification. Il VEUT que tu échoues. Ou... qu'il veut que tu RÉUSSISSES pour le remplacer. Je ne sais plus."
+
+Ses tatouages hurlent.
+
+"La Sortie est réelle. Mais le prix... le prix est ton humanité. Ou celle de Thalys. Quelqu'un doit mourir."`
+                }
+            ];
+
+            // Description évolutive
+            let libraryDesc = '';
+            if (corruption < 25) {
+                libraryDesc = 'L\'Archiviste lève son bras. Des scènes de bataille ondulent sur sa peau. "Ta peau est presque vierge. Pour l\'instant."';
+            } else if (corruption < 50) {
+                libraryDesc = 'Des veines noires apparaissent dans l\'encre. "Intéressant. Tu dévies du script habituel."';
+            } else if (corruption < 75) {
+                libraryDesc = 'Les tatouages saignent. "Ta peau accepte la noirceur. Comme la mienne autrefois."';
+            } else {
+                libraryDesc = 'Il rit. Amer. "Tu approches de la Sortie. Je la connais. Mais le prix... putain, le prix."';
+            }
+
+            // Créer modale
+            const overlay = document.createElement('div');
+            overlay.className = 'library-services-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(8px);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 0.5s ease;
+            `;
+
+            let fragmentsHTML = '';
+            loreFragments.forEach((fragment, index) => {
+                const canUnlock = fragment.unlocked && gold >= fragment.cost;
+                const alreadyUnlocked = playerData.unlockedLore?.includes(fragment.id);
+
+                fragmentsHTML += `
+                    <div class="lore-fragment-card ${!canUnlock && !alreadyUnlocked ? 'locked' : ''}" data-fragment-index="${index}" style="
+                        border: 3px solid ${alreadyUnlocked ? '#d4af37' : fragment.unlocked ? '#a78bfa' : '#555'};
+                        background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(139, 92, 246, 0.05));
+                        ${!fragment.unlocked ? 'background: linear-gradient(135deg, rgba(60, 60, 60, 0.3), rgba(40, 40, 40, 0.2));' : ''}
+                        padding: 25px;
+                        border-radius: 10px;
+                        position: relative;
+                        overflow: hidden;
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        cursor: ${canUnlock || alreadyUnlocked ? 'pointer' : 'not-allowed'};
+                        ${!fragment.unlocked ? 'opacity: 0.4;' : ''}
+                    ">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(167, 139, 250, 0.2) 0%, transparent 70%); animation: pulseGlow 4s ease-in-out infinite;"></div>
+
+                        <div style="text-align: center; font-size: 4rem; margin-bottom: 15px; position: relative;">
+                            ${fragment.unlocked ? fragment.icon : '🔒'}
+                        </div>
+
+                        <h3 style="font-family: 'Cinzel', serif; color: ${alreadyUnlocked ? '#d4af37' : fragment.unlocked ? '#a78bfa' : '#888'}; font-size: 1.5rem; margin-bottom: 15px; text-align: center; position: relative;">
+                            ${fragment.unlocked ? fragment.title : '??? Fragment Verrouillé'}
+                        </h3>
+
+                        ${fragment.unlocked ? `
+                            <p style="color: #d4af37; font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 15px; position: relative;">
+                                ${fragment.cost > 0 ? `💰 ${fragment.cost} Or` : '✨ Gratuit'}
+                            </p>
+                        ` : `
+                            <p style="color: #888; font-size: 0.95rem; text-align: center; font-style: italic; position: relative;">
+                                ${fragment.id === 'fragment_2' ? 'Corruption 25% requise' :
+                                  fragment.id === 'fragment_3' ? 'Corruption 50% requise' :
+                                  fragment.id === 'fragment_4' ? '2 donjons complétés requis' :
+                                  fragment.id === 'fragment_5' ? 'Corruption 40-60% requise' : 'Conditions non remplies'}
+                            </p>
+                        `}
+
+                        ${alreadyUnlocked ? `
+                            <div style="position: relative; text-align: center; margin-top: 10px;">
+                                <p style="color: #4ade80; font-weight: 600; font-size: 1rem;">
+                                    ✅ Déjà lu
+                                </p>
+                            </div>
+                        ` : ''}
+
+                        ${!fragment.unlocked ? '<div style="position: relative; text-align: center; margin-top: 10px;"><p style="color: #dc143c; font-style: italic; font-size: 0.9rem;">Verrouillé</p></div>' : ''}
+                    </div>
+                `;
+            });
+
+            overlay.innerHTML = `
+                <div class="library-modal" style="
+                    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2d 50%, #0a0a1a 100%);
+                    border: 3px solid #a78bfa;
+                    border-radius: 15px;
+                    padding: 50px;
+                    max-width: 1100px;
+                    width: 95%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 0 60px rgba(167, 139, 250, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.6);
+                    animation: scaleIn 0.5s ease;
+                    position: relative;
+                ">
+                    <button class="close-library-btn" style="
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background: none;
+                        border: 2px solid #a78bfa;
+                        color: #a78bfa;
+                        font-size: 2rem;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#a78bfa'; this.style.color='#000';"
+                       onmouseout="this.style.background='none'; this.style.color='#a78bfa';">
+                        ×
+                    </button>
+
+                    <h2 style="font-family: 'Cinzel', serif; color: #a78bfa; font-size: 2.5rem; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px rgba(167, 139, 250, 0.8);">
+                        📖 L'Enlumineur d'Âmes
+                    </h2>
+
+                    <p style="text-align: center; font-style: italic; color: #c4b5fd; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px;">
+                        ${libraryDesc}
+                    </p>
+
+                    <div style="text-align: center; font-size: 2.5rem; margin: 20px 0;">
+                        ✍️ 📜 🕯️
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-top: 40px;">
+                        ${fragmentsHTML}
+                    </div>
+
+                    <p style="text-align: center; margin-top: 40px; font-style: italic; color: #888; font-size: 1rem;">
+                        "Chaque mort laisse une trace. Sur toi. Sur moi. Montre-moi tes cicatrices."
+                    </p>
+                </div>
+
+                <style>
+                    .lore-fragment-card:hover {
+                        transform: translateY(-10px) scale(1.03) !important;
+                        box-shadow: 0 15px 50px rgba(167, 139, 250, 0.8);
+                        filter: brightness(1.2);
+                    }
+                    .lore-fragment-card.locked:hover {
+                        transform: none !important;
+                        box-shadow: none !important;
+                        filter: brightness(1) !important;
+                    }
+                </style>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Event listeners
+            overlay.querySelector('.close-library-btn').onclick = () => {
+                AudioSystem.playClick();
+                overlay.remove();
+            };
+
+            // Click sur fragments
+            overlay.querySelectorAll('.lore-fragment-card').forEach((card, index) => {
+                const fragment = loreFragments[index];
+                const alreadyUnlocked = playerData.unlockedLore?.includes(fragment.id);
+                const canUnlock = fragment.unlocked && gold >= fragment.cost;
+
+                if ((canUnlock || alreadyUnlocked) && !card.classList.contains('locked')) {
+                    card.addEventListener('mouseenter', () => AudioSystem.playHover());
+                    card.onclick = async () => {
+                        AudioSystem.playClick();
+
+                        if (!alreadyUnlocked && fragment.cost > 0) {
+                            // Acheter fragment
+                            playerData.gold -= fragment.cost;
+                            if (!playerData.unlockedLore) playerData.unlockedLore = [];
+                            playerData.unlockedLore.push(fragment.id);
+                            savePlayerData();
+                            updatePlayerUI();
+                        }
+
+                        overlay.remove();
+
+                        // Afficher le fragment de lore
+                        narrativeSystem.showNarrativeModal({
+                            title: fragment.title,
+                            icon: fragment.icon,
+                            speaker: 'L\'Archiviste',
+                            dialogue: fragment.content,
+                            description: alreadyUnlocked ? 'Fragment relu' : 'Nouveau fragment débloqué !'
+                        });
+
+                        AudioSystem.playSuccess();
+                    };
+                }
+            });
+        }
+
+        // Afficher Recrutement avec gestion de colonie AAA+
+        function showRecruitmentServices() {
+            // Initialiser le système de settlement si nécessaire
+            if (!window.settlementSystem) {
+                window.settlementSystem = new SettlementSystem();
+
+                // Charger données sauvegardées ou créer quelques NPCs de démo
+                const savedSettlement = localStorage.getItem('tlc_settlement');
+                if (savedSettlement) {
+                    const data = JSON.parse(savedSettlement);
+                    window.settlementSystem.resources = data.resources || window.settlementSystem.resources;
+                    window.settlementSystem.npcs = data.npcs || [];
+                    window.settlementSystem.buildings = data.buildings || window.settlementSystem.buildings;
+                    window.settlementSystem.updateProduction();
+                    window.settlementSystem.updateConsumption();
+                } else {
+                    // Créer 3 NPCs de démo pour montrer le système
+                    const demo1 = window.settlementSystem.createNPC({
+                        name: 'Kaelor',
+                        motivation: SettlementSystem.MOTIVATIONS.CONVICTION
+                    });
+                    const demo2 = window.settlementSystem.createNPC({
+                        name: 'Nyxia',
+                        motivation: SettlementSystem.MOTIVATIONS.FEAR
+                    });
+                    const demo3 = window.settlementSystem.createNPC({
+                        name: 'Vorix',
+                        motivation: SettlementSystem.MOTIVATIONS.OPPORTUNISM
+                    });
+
+                    window.settlementSystem.recruitNPC(demo1);
+                    window.settlementSystem.recruitNPC(demo2);
+                    window.settlementSystem.recruitNPC(demo3);
+                }
+            }
+
+            const settlement = window.settlementSystem;
+            const corruption = playerData?.corruption || 0;
+
+            // Description évolutive
+            let recruitDesc = '';
+            if (corruption < 25) {
+                recruitDesc = 'Douze âmes autour du feu. Certaines te regardent avec espoir. D\'autres avec méfiance. Tous cherchent une raison de ne pas fuir.';
+            } else if (corruption < 50) {
+                recruitDesc = 'Les regards changent. Tu n\'es plus juste un survivant. Tu es... autre chose. Ils travaillent plus dur. Par peur ou par foi ?';
+            } else if (corruption < 75) {
+                recruitDesc = 'La colonie grandit malgré tout. Ou à cause de tout. Tes ordres sont suivis sans question. C\'est inquiétant.';
+            } else {
+                recruitDesc = 'Ils te vénèrent. Ou te craignent. La frontière est floue. Certains murmurent ton nom comme une prière. D\'autres comme une malédiction.';
+            }
+
+            // Créer overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'service-modal-overlay';
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(8px);
+                z-index: 10000; display: flex; justify-content: center; align-items: center;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            // Créer modal (plus large pour dashboard complexe)
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+                border: 3px solid #60a5fa;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 1400px;
+                width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 0 60px rgba(96, 165, 250, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.6);
+                animation: scaleIn 0.3s ease;
+            `;
+
+            // === HEADER ===
+            const headerHTML = `
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid rgba(96, 165, 250, 0.3); padding-bottom: 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 10px;">👥</div>
+                    <h2 style="font-family: 'Cinzel', serif; color: #60a5fa; font-size: 2.5rem; text-shadow: 0 0 20px rgba(96, 165, 250, 0.8); margin: 0;">
+                        Le Cortège des Ombres
+                    </h2>
+                    <p style="color: #9ca3af; font-style: italic; margin-top: 10px; font-size: 1.1rem;">
+                        Gestion de la Colonie
+                    </p>
+                    <p style="color: #b8b8b8; margin-top: 15px; font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin-left: auto; margin-right: auto;">
+                        ${recruitDesc}
+                    </p>
+                </div>
+            `;
+
+            // === DASHBOARD RESSOURCES ===
+            const resourcesHTML = `
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+                    <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05)); border: 2px solid #22c55e; border-radius: 12px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">🌾</div>
+                        <div style="font-family: 'Cinzel', serif; color: #22c55e; font-size: 1.8rem; font-weight: bold;">${settlement.resources.food}</div>
+                        <div style="color: #86efac; font-size: 0.9rem; margin-top: 5px;">Nourriture</div>
+                        <div style="color: #4ade80; font-size: 0.85rem; margin-top: 8px;">
+                            ${settlement.dailyProduction.food > 0 ? '+' : ''}${Math.floor(settlement.dailyProduction.food)}
+                            / -${settlement.dailyConsumption.food} par jour
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(139, 92, 46, 0.2), rgba(101, 67, 33, 0.1)); border: 2px solid #8b5c2e; border-radius: 12px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">🪵</div>
+                        <div style="font-family: 'Cinzel', serif; color: #d4a574; font-size: 1.8rem; font-weight: bold;">${settlement.resources.wood}</div>
+                        <div style="color: #c9a87c; font-size: 0.9rem; margin-top: 5px;">Bois</div>
+                        <div style="color: #b8956a; font-size: 0.85rem; margin-top: 8px;">
+                            ${settlement.dailyProduction.wood > 0 ? '+' : ''}${Math.floor(settlement.dailyProduction.wood)} par jour
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(100, 116, 139, 0.2), rgba(71, 85, 105, 0.1)); border: 2px solid #64748b; border-radius: 12px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">⚙️</div>
+                        <div style="font-family: 'Cinzel', serif; color: #94a3b8; font-size: 1.8rem; font-weight: bold;">${settlement.resources.materials}</div>
+                        <div style="color: #cbd5e1; font-size: 0.9rem; margin-top: 5px;">Matériaux</div>
+                        <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 8px;">
+                            ${settlement.dailyProduction.materials > 0 ? '+' : ''}${Math.floor(settlement.dailyProduction.materials)} par jour
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(126, 34, 206, 0.1)); border: 2px solid #a855f7; border-radius: 12px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">👻</div>
+                        <div style="font-family: 'Cinzel', serif; color: #c084fc; font-size: 1.8rem; font-weight: bold;">${settlement.resources.souls}</div>
+                        <div style="color: #e9d5ff; font-size: 0.9rem; margin-top: 5px;">Âmes</div>
+                        <div style="color: #d8b4fe; font-size: 0.85rem; margin-top: 8px;">Monnaie rare</div>
+                    </div>
+                </div>
+            `;
+
+            // === POPULATION SUMMARY ===
+            const summary = settlement.getSummary();
+            const summaryHTML = `
+                <div style="background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(96, 165, 250, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center;">
+                        <div>
+                            <div style="color: #60a5fa; font-size: 1.1rem; margin-bottom: 5px;">👥 Population</div>
+                            <div style="font-family: 'Cinzel', serif; color: #ffffff; font-size: 2rem;">${summary.population}</div>
+                        </div>
+                        <div>
+                            <div style="color: #60a5fa; font-size: 1.1rem; margin-bottom: 5px;">😊 Moral Moyen</div>
+                            <div style="font-family: 'Cinzel', serif; color: ${summary.morale >= 70 ? '#22c55e' : summary.morale >= 40 ? '#eab308' : '#ef4444'}; font-size: 2rem;">${summary.morale}%</div>
+                        </div>
+                        <div>
+                            <div style="color: #60a5fa; font-size: 1.1rem; margin-bottom: 5px;">🏗️ Bâtiments</div>
+                            <div style="font-family: 'Cinzel', serif; color: #ffffff; font-size: 2rem;">${Object.values(summary.buildings).reduce((a, b) => a + b, 0)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // === LISTE NPCs ===
+            let npcsHTML = `
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-family: 'Cinzel', serif; color: #60a5fa; font-size: 1.8rem; margin-bottom: 20px; text-align: center;">
+                        🧑‍🤝‍🧑 Habitants de la Colonie
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+            `;
+
+            settlement.npcs.forEach((npc, index) => {
+                const motivationColor = {
+                    'conviction': '#22c55e',
+                    'faith': '#eab308',
+                    'fear': '#ef4444',
+                    'opportunism': '#06b6d4',
+                    'despair': '#8b5cf6'
+                }[npc.motivation.id] || '#9ca3af';
+
+                const moraleColor = npc.morale >= 70 ? '#22c55e' : npc.morale >= 40 ? '#eab308' : '#ef4444';
+
+                npcsHTML += `
+                    <div class="npc-card" data-npc-id="${npc.id}" style="
+                        background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.9));
+                        border: 2px solid ${motivationColor};
+                        border-radius: 12px;
+                        padding: 20px;
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        cursor: pointer;
+                    ">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div>
+                                <div style="font-family: 'Cinzel', serif; color: #ffffff; font-size: 1.4rem; margin-bottom: 5px;">
+                                    ${npc.name}
+                                </div>
+                                <div style="color: ${motivationColor}; font-size: 0.9rem;">
+                                    ${npc.motivation.icon} ${npc.motivation.name}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #9ca3af; font-size: 0.85rem;">Jour ${npc.daysInCamp}</div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem;">
+                                <div style="color: #ef4444;">❤️ ${npc.stats.hp}/${npc.stats.maxHp}</div>
+                                <div style="color: #f97316;">⚔️ ATK ${npc.stats.atk}</div>
+                                <div style="color: #3b82f6;">🛡️ DEF ${npc.stats.def}</div>
+                                <div style="color: ${moraleColor};">😊 ${npc.morale}%</div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(0, 0, 0, 0.4); border-left: 3px solid ${npc.job.id === 'idle' ? '#6b7280' : '#60a5fa'}; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+                            <div style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 5px;">Tâche actuelle:</div>
+                            <div style="color: #ffffff; font-size: 1rem;">
+                                ${npc.job.icon} ${npc.job.name}
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.85rem; color: #b8b8b8; font-style: italic; line-height: 1.4; margin-bottom: 12px;">
+                            ${npc.backstory}
+                        </div>
+
+                        <button class="assign-job-btn" data-npc-index="${index}" style="
+                            width: 100%;
+                            font-family: 'Cinzel', serif;
+                            font-size: 1rem;
+                            padding: 10px;
+                            background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(59, 130, 246, 0.1));
+                            border: 2px solid #60a5fa;
+                            border-radius: 8px;
+                            color: #60a5fa;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                        ">
+                            Assigner Tâche
+                        </button>
+                    </div>
+                `;
+            });
+
+            npcsHTML += `</div></div>`;
+
+            // === BUILDINGS PANEL ===
+            const buildingsData = [
+                { id: 'fields', name: 'Champs', icon: '🌾', cost: { wood: 30, materials: 20 }, description: 'Permet aux Cultivateurs de produire de la nourriture.' },
+                { id: 'lumberyard', name: 'Scierie', icon: '🪓', cost: { wood: 20, materials: 30 }, description: 'Permet aux Bûcherons de produire du bois.' },
+                { id: 'scavenger_post', name: 'Poste de Charognards', icon: '🦴', cost: { wood: 25, materials: 25 }, description: 'Permet aux Charognards de récupérer ressources sur cadavres.' },
+                { id: 'barracks', name: 'Baraquements', icon: '⚔️', cost: { wood: 40, materials: 50 }, description: 'Permet d\'entraîner des Guerriers pour le combat.' }
+            ];
+
+            let buildingsHTML = `
+                <div>
+                    <h3 style="font-family: 'Cinzel', serif; color: #60a5fa; font-size: 1.8rem; margin-bottom: 20px; text-align: center;">
+                        🏗️ Construction de Bâtiments
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            `;
+
+            buildingsData.forEach(building => {
+                const count = settlement.buildings[building.id] || 0;
+                const canBuild = settlement.resources.wood >= building.cost.wood &&
+                                settlement.resources.materials >= building.cost.materials;
+
+                buildingsHTML += `
+                    <div class="building-card ${!canBuild ? 'disabled' : ''}" data-building-id="${building.id}" style="
+                        background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.9));
+                        border: 2px solid ${canBuild ? '#8b5c2e' : '#4b5563'};
+                        border-radius: 12px;
+                        padding: 20px;
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        cursor: ${canBuild ? 'pointer' : 'not-allowed'};
+                        opacity: ${canBuild ? '1' : '0.5'};
+                    ">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">${building.icon}</div>
+                            <div style="font-family: 'Cinzel', serif; color: #d4a574; font-size: 1.3rem; margin-bottom: 5px;">
+                                ${building.name}
+                            </div>
+                            <div style="color: #22c55e; font-size: 1.1rem; margin-bottom: 10px;">
+                                Possédés: ${count}
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.9rem; color: #b8b8b8; line-height: 1.5; margin-bottom: 15px; text-align: center;">
+                            ${building.description}
+                        </div>
+
+                        <div style="background: rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                            <div style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 8px; text-align: center;">Coût:</div>
+                            <div style="display: flex; justify-content: center; gap: 15px; font-size: 0.95rem;">
+                                <div style="color: ${settlement.resources.wood >= building.cost.wood ? '#d4a574' : '#ef4444'};">
+                                    🪵 ${building.cost.wood}
+                                </div>
+                                <div style="color: ${settlement.resources.materials >= building.cost.materials ? '#94a3b8' : '#ef4444'};">
+                                    ⚙️ ${building.cost.materials}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="build-btn" data-building-id="${building.id}" ${!canBuild ? 'disabled' : ''} style="
+                            width: 100%;
+                            font-family: 'Cinzel', serif;
+                            font-size: 1rem;
+                            padding: 10px;
+                            background: ${canBuild ? 'linear-gradient(135deg, rgba(139, 92, 46, 0.3), rgba(101, 67, 33, 0.2))' : 'rgba(75, 85, 99, 0.3)'};
+                            border: 2px solid ${canBuild ? '#8b5c2e' : '#4b5563'};
+                            border-radius: 8px;
+                            color: ${canBuild ? '#d4a574' : '#6b7280'};
+                            cursor: ${canBuild ? 'pointer' : 'not-allowed'};
+                            transition: all 0.3s ease;
+                            text-transform: uppercase;
+                        ">
+                            Construire
+                        </button>
+                    </div>
+                `;
+            });
+
+            buildingsHTML += `</div></div>`;
+
+            // === BOUTON FERMER ===
+            const closeButtonHTML = `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="close-recruitment-btn" style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 1.2rem;
+                        padding: 15px 50px;
+                        background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(59, 130, 246, 0.1));
+                        border: 2px solid #60a5fa;
+                        border-radius: 8px;
+                        color: #60a5fa;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                    ">
+                        Fermer
+                    </button>
+                </div>
+            `;
+
+            modal.innerHTML = headerHTML + resourcesHTML + summaryHTML + npcsHTML + buildingsHTML + closeButtonHTML;
+
+            // === EVENT LISTENERS ===
+            setTimeout(() => {
+                // Hover sur NPCs
+                modal.querySelectorAll('.npc-card').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        AudioSystem.playHover();
+                        card.style.transform = 'translateY(-5px) scale(1.02)';
+                        card.style.boxShadow = `0 10px 40px rgba(96, 165, 250, 0.4)`;
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.boxShadow = 'none';
+                    });
+                });
+
+                // Hover sur buildings
+                modal.querySelectorAll('.building-card:not(.disabled)').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        AudioSystem.playHover();
+                        card.style.transform = 'translateY(-5px) scale(1.02)';
+                        card.style.boxShadow = `0 10px 40px rgba(139, 92, 46, 0.4)`;
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.boxShadow = 'none';
+                    });
+                });
+
+                // Assigner tâche
+                modal.querySelectorAll('.assign-job-btn').forEach(btn => {
+                    btn.addEventListener('mouseenter', () => AudioSystem.playHover());
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        AudioSystem.playClick();
+                        const npcIndex = parseInt(btn.dataset.npcIndex);
+                        showJobAssignmentModal(settlement.npcs[npcIndex], overlay);
+                    };
+                });
+
+                // Construire bâtiment
+                modal.querySelectorAll('.build-btn:not([disabled])').forEach(btn => {
+                    btn.addEventListener('mouseenter', () => AudioSystem.playHover());
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        AudioSystem.playClick();
+                        const buildingId = btn.dataset.buildingId;
+                        const buildingData = buildingsData.find(b => b.id === buildingId);
+
+                        if (settlement.buildStructure(buildingId, buildingData.cost).success) {
+                            AudioSystem.playSuccess();
+                            saveSettlement();
+                            overlay.remove();
+                            showRecruitmentServices(); // Refresh
+                        } else {
+                            AudioSystem.playError();
+                        }
+                    };
+                });
+
+                // Fermer
+                const closeBtn = modal.querySelector('.close-recruitment-btn');
+                closeBtn.addEventListener('mouseenter', () => {
+                    AudioSystem.playHover();
+                    closeBtn.style.transform = 'translateY(-3px)';
+                    closeBtn.style.boxShadow = '0 5px 30px rgba(96, 165, 250, 0.6)';
+                });
+                closeBtn.addEventListener('mouseleave', () => {
+                    closeBtn.style.transform = 'translateY(0)';
+                    closeBtn.style.boxShadow = 'none';
+                });
+                closeBtn.onclick = () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                };
+            }, 100);
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+
+        // Modal d'assignation de job
+        function showJobAssignmentModal(npc, parentOverlay) {
+            const jobsOverlay = document.createElement('div');
+            jobsOverlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
+                z-index: 10001; display: flex; justify-content: center; align-items: center;
+            `;
+
+            const jobsModal = document.createElement('div');
+            jobsModal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+                border: 3px solid #60a5fa;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 0 60px rgba(96, 165, 250, 0.5);
+            `;
+
+            let jobsHTML = `
+                <h3 style="font-family: 'Cinzel', serif; color: #60a5fa; text-align: center; margin-bottom: 20px; font-size: 1.8rem;">
+                    Assigner ${npc.name}
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            `;
+
+            Object.values(SettlementSystem.JOBS).forEach(job => {
+                const settlement = window.settlementSystem;
+                const hasBuilding = !job.requiredBuilding || (settlement.buildings[job.requiredBuilding] > 0);
+                const isDisabled = !hasBuilding;
+
+                jobsHTML += `
+                    <button class="job-option-btn" data-job-id="${job.id}" ${isDisabled ? 'disabled' : ''} style="
+                        font-family: 'Crimson Text', serif;
+                        font-size: 1.1rem;
+                        padding: 15px;
+                        background: ${isDisabled ? 'rgba(75, 85, 99, 0.3)' : 'linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(59, 130, 246, 0.1))'};
+                        border: 2px solid ${isDisabled ? '#4b5563' : '#60a5fa'};
+                        border-radius: 10px;
+                        color: ${isDisabled ? '#6b7280' : '#60a5fa'};
+                        cursor: ${isDisabled ? 'not-allowed' : 'pointer'};
+                        transition: all 0.3s ease;
+                        text-align: left;
+                        opacity: ${isDisabled ? '0.5' : '1'};
+                    ">
+                        <div style="font-size: 2rem; margin-bottom: 8px;">${job.icon}</div>
+                        <div style="font-weight: bold; margin-bottom: 5px;">${job.name}</div>
+                        <div style="font-size: 0.85rem; color: #9ca3af; line-height: 1.3;">${job.description}</div>
+                        ${!hasBuilding ? '<div style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;">⚠️ Bâtiment requis</div>' : ''}
+                    </button>
+                `;
+            });
+
+            jobsHTML += `</div>`;
+
+            jobsModal.innerHTML = jobsHTML;
+
+            setTimeout(() => {
+                jobsModal.querySelectorAll('.job-option-btn:not([disabled])').forEach(btn => {
+                    btn.addEventListener('mouseenter', () => {
+                        AudioSystem.playHover();
+                        btn.style.transform = 'translateY(-3px)';
+                        btn.style.boxShadow = '0 5px 20px rgba(96, 165, 250, 0.4)';
+                    });
+                    btn.addEventListener('mouseleave', () => {
+                        btn.style.transform = 'translateY(0)';
+                        btn.style.boxShadow = 'none';
+                    });
+                    btn.onclick = () => {
+                        AudioSystem.playClick();
+                        const jobId = btn.dataset.jobId;
+                        const result = window.settlementSystem.assignJob(npc.id, jobId);
+
+                        if (result.success) {
+                            AudioSystem.playSuccess();
+                            saveSettlement();
+                            jobsOverlay.remove();
+                            parentOverlay.remove();
+                            showRecruitmentServices(); // Refresh
+                        } else {
+                            AudioSystem.playError();
+                            alert(result.error);
+                        }
+                    };
+                });
+            }, 100);
+
+            jobsOverlay.appendChild(jobsModal);
+            document.body.appendChild(jobsOverlay);
+
+            // Clic sur overlay pour fermer
+            jobsOverlay.onclick = (e) => {
+                if (e.target === jobsOverlay) {
+                    AudioSystem.playClick();
+                    jobsOverlay.remove();
+                }
+            };
+        }
+
+        // Sauvegarder settlement
+        function saveSettlement() {
+            const settlement = window.settlementSystem;
+            if (settlement) {
+                localStorage.setItem('tlc_settlement', JSON.stringify({
+                    resources: settlement.resources,
+                    npcs: settlement.npcs,
+                    buildings: settlement.buildings,
+                    dailyProduction: settlement.dailyProduction,
+                    dailyConsumption: settlement.dailyConsumption
+                }));
+            }
+        }
+
+        // Handler clic zone
+        function onZoneClick(zoneName) {
+            console.log('🖱️ Zone cliquée:', zoneName);
+
+            // Mapping zone → NPC et zone ID pour narratives
+            const zoneMapping = {
+                'forge': { zoneId: 'forge', npcId: 'drenvar' },
+                'autel': { zoneId: 'altar', npcId: 'gardener' },
+                'bibliothèque': { zoneId: 'library', npcId: 'archivist' },
+                'marché': { zoneId: 'market', npcId: null },
+                'recrutement': { zoneId: 'recruitment', npcId: null },
+                'hub': { zoneId: 'hub', npcId: null }
+            };
+
+            const mapping = zoneMapping[zoneName] || { zoneId: zoneName, npcId: null };
+            const zoneId = mapping.zoneId;
+            const npcId = mapping.npcId;
+            const corruption = playerData?.corruption || 0;
+
+            // Fonction pour ouvrir les services après le dialogue
+            const openServices = () => {
+                switch(zoneName) {
+                    case 'hub':
+                        if (campSystem) campSystem.showOverview();
+                        break;
+                    case 'forge':
+                        // Utiliser notre nouvelle interface AAA+
+                        showForgeServices();
+                        break;
+                    case 'autel':
+                        // Utiliser notre nouvelle interface AAA+
+                        showAltarServices();
+                        break;
+                    case 'marché':
+                        // Utiliser notre nouvelle interface AAA+
+                        showMarketServices();
+                        break;
+                    case 'recrutement':
+                        // Utiliser notre nouvelle interface AAA+
+                        showRecruitmentServices();
+                        break;
+                    case 'bibliothèque':
+                        // Utiliser notre nouvelle interface AAA+
+                        showLibraryServices();
+                        break;
+                    default:
+                        alert(`Zone ${zoneName} - Fonctionnalité en développement`);
+                }
+            };
+
+            // Si NPC présent, afficher dialogue narratif d'abord
+            if (narrativeSystem && npcId) {
+                narrativeSystem.showZoneNarrativeIntro(zoneId, npcId, corruption, openServices);
+            } else {
+                // Sinon ouvrir directement les services
+                openServices();
+            }
+        }
+
+        // Bouton Partir en Expédition
+        document.getElementById('btnExpedition').onclick = () => {
+            AudioSystem.playClick();
+            showCompanionSelectionModal();
+        };
+
+        // Modale de sélection des compagnons
+        function showCompanionSelectionModal() {
+            // Récupérer les guerriers disponibles
+            const warriors = window.settlementSystem ?
+                window.settlementSystem.npcs.filter(npc => npc.job.id === 'warrior') : [];
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(8px);
+                z-index: 10000; display: flex; justify-content: center; align-items: center;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+                border: 3px solid #ef4444;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 900px;
+                width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 0 60px rgba(239, 68, 68, 0.5);
+            `;
+
+            let content = `
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid rgba(239, 68, 68, 0.3); padding-bottom: 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 10px;">⚔️</div>
+                    <h2 style="font-family: 'Cinzel', serif; color: #ef4444; font-size: 2.5rem; margin: 0;">
+                        Sélection des Compagnons
+                    </h2>
+                    <p style="color: #9ca3af; margin-top: 10px; font-size: 1.1rem;">
+                        Choisis jusqu'à 3 guerriers pour t'accompagner en expédition
+                    </p>
+                </div>
+            `;
+
+            if (warriors.length === 0) {
+                content += `
+                    <div style="background: rgba(139, 0, 0, 0.2); border: 2px solid #ef4444; border-radius: 12px; padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">😔</div>
+                        <p style="color: #fca5a5; font-size: 1.2rem; margin-bottom: 10px;">
+                            Aucun guerrier disponible
+                        </p>
+                        <p style="color: #b8b8b8; font-size: 0.95rem;">
+                            Va dans la zone RECRUTEMENT pour assigner des NPCs comme guerriers.<br>
+                            Tu dois d'abord construire des Baraquements.
+                        </p>
+                    </div>
+                `;
+            } else {
+                content += `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                `;
+
+                warriors.forEach((warrior, index) => {
+                    const moraleColor = warrior.morale >= 70 ? '#22c55e' : warrior.morale >= 40 ? '#eab308' : '#ef4444';
+                    const motivationColor = {
+                        'conviction': '#22c55e',
+                        'faith': '#eab308',
+                        'fear': '#ef4444',
+                        'opportunism': '#06b6d4',
+                        'despair': '#8b5cf6'
+                    }[warrior.motivation.id] || '#9ca3af';
+
+                    content += `
+                        <div class="companion-select-card" data-warrior-id="${warrior.id}" style="
+                            background: linear-gradient(135deg, rgba(42, 42, 42, 0.9), rgba(26, 26, 26, 0.9));
+                            border: 2px solid #6b7280;
+                            border-radius: 12px;
+                            padding: 20px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            position: relative;
+                        ">
+                            <div class="selection-indicator" style="
+                                position: absolute;
+                                top: 10px;
+                                right: 10px;
+                                width: 30px;
+                                height: 30px;
+                                border: 3px solid #6b7280;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: rgba(0, 0, 0, 0.5);
+                                transition: all 0.3s ease;
+                            ">
+                                <span style="font-size: 1.2rem; opacity: 0;">✓</span>
+                            </div>
+
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <div style="font-size: 3rem; margin-bottom: 10px;">⚔️</div>
+                                <div style="font-family: 'Cinzel', serif; color: #ffffff; font-size: 1.3rem; margin-bottom: 5px;">
+                                    ${warrior.name}
+                                </div>
+                                <div style="color: ${motivationColor}; font-size: 0.85rem;">
+                                    ${warrior.motivation.icon} ${warrior.motivation.name}
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.85rem;">
+                                    <div style="color: #ef4444;">❤️ ${warrior.stats.hp}/${warrior.stats.maxHp}</div>
+                                    <div style="color: #f97316;">⚔️ ${warrior.stats.atk}</div>
+                                    <div style="color: #3b82f6;">🛡️ ${warrior.stats.def}</div>
+                                    <div style="color: ${moraleColor};">😊 ${warrior.morale}%</div>
+                                </div>
+                            </div>
+
+                            <div style="font-size: 0.75rem; color: #b8b8b8; font-style: italic; line-height: 1.3;">
+                                ${warrior.backstory.substring(0, 80)}...
+                            </div>
+                        </div>
+                    `;
+                });
+
+                content += `</div>`;
+            }
+
+            content += `
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="cancel-btn" style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 1.1rem;
+                        padding: 15px 40px;
+                        background: linear-gradient(135deg, rgba(75, 85, 99, 0.3), rgba(55, 65, 81, 0.2));
+                        border: 2px solid #6b7280;
+                        border-radius: 8px;
+                        color: #9ca3af;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    ">
+                        Annuler
+                    </button>
+                    <button class="confirm-btn" style="
+                        font-family: 'Cinzel', serif;
+                        font-size: 1.1rem;
+                        padding: 15px 40px;
+                        background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.2));
+                        border: 2px solid #ef4444;
+                        border-radius: 8px;
+                        color: #ef4444;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-transform: uppercase;
+                    ">
+                        Partir en Expédition (<span id="selectedCount">0</span>/3)
+                    </button>
+                </div>
+            `;
+
+            modal.innerHTML = content;
+
+            // Gestion de la sélection
+            const selectedWarriors = new Set();
+
+            setTimeout(() => {
+                modal.querySelectorAll('.companion-select-card').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        AudioSystem.playHover();
+                        if (!card.classList.contains('selected')) {
+                            card.style.transform = 'translateY(-5px)';
+                            card.style.borderColor = '#ef4444';
+                        }
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        if (!card.classList.contains('selected')) {
+                            card.style.transform = 'translateY(0)';
+                            card.style.borderColor = '#6b7280';
+                        }
+                    });
+
+                    card.onclick = () => {
+                        const warriorId = card.dataset.warriorId;
+                        const indicator = card.querySelector('.selection-indicator');
+                        const checkmark = indicator.querySelector('span');
+
+                        if (selectedWarriors.has(warriorId)) {
+                            // Désélectionner
+                            selectedWarriors.delete(warriorId);
+                            card.classList.remove('selected');
+                            card.style.borderColor = '#6b7280';
+                            card.style.boxShadow = 'none';
+                            indicator.style.borderColor = '#6b7280';
+                            indicator.style.background = 'rgba(0, 0, 0, 0.5)';
+                            checkmark.style.opacity = '0';
+                            AudioSystem.playClick();
+                        } else if (selectedWarriors.size < 3) {
+                            // Sélectionner
+                            selectedWarriors.add(warriorId);
+                            card.classList.add('selected');
+                            card.style.borderColor = '#ef4444';
+                            card.style.boxShadow = '0 0 30px rgba(239, 68, 68, 0.5)';
+                            indicator.style.borderColor = '#22c55e';
+                            indicator.style.background = '#22c55e';
+                            checkmark.style.opacity = '1';
+                            AudioSystem.playSuccess();
+                        } else {
+                            AudioSystem.playError();
+                        }
+
+                        document.getElementById('selectedCount').textContent = selectedWarriors.size;
+                    };
+                });
+
+                // Bouton Annuler
+                const cancelBtn = modal.querySelector('.cancel-btn');
+                cancelBtn.addEventListener('mouseenter', () => {
+                    AudioSystem.playHover();
+                    cancelBtn.style.transform = 'translateY(-3px)';
+                    cancelBtn.style.boxShadow = '0 5px 20px rgba(107, 114, 128, 0.4)';
+                });
+                cancelBtn.addEventListener('mouseleave', () => {
+                    cancelBtn.style.transform = 'translateY(0)';
+                    cancelBtn.style.boxShadow = 'none';
+                });
+                cancelBtn.onclick = () => {
+                    AudioSystem.playClick();
+                    overlay.remove();
+                };
+
+                // Bouton Confirmer
+                const confirmBtn = modal.querySelector('.confirm-btn');
+                confirmBtn.addEventListener('mouseenter', () => {
+                    AudioSystem.playHover();
+                    confirmBtn.style.transform = 'translateY(-3px)';
+                    confirmBtn.style.boxShadow = '0 5px 30px rgba(239, 68, 68, 0.6)';
+                });
+                confirmBtn.addEventListener('mouseleave', () => {
+                    confirmBtn.style.transform = 'translateY(0)';
+                    confirmBtn.style.boxShadow = 'none';
+                });
+                confirmBtn.onclick = () => {
+                    AudioSystem.playClick();
+
+                    // Sauvegarder les compagnons sélectionnés
+                    const selectedCompanions = Array.from(selectedWarriors).map(id => {
+                        const warrior = warriors.find(w => w.id === id);
+                        return {
+                            id: warrior.id,
+                            name: warrior.name,
+                            hp: warrior.stats.hp,
+                            maxHp: warrior.stats.maxHp,
+                            atk: warrior.stats.atk,
+                            def: warrior.stats.def,
+                            morale: warrior.morale,
+                            motivation: warrior.motivation,
+                            backstory: warrior.backstory
+                        };
+                    });
+
+                    playerData.companions = selectedCompanions;
+
+                    // Passer à l'après-midi
+                    if (window.dayNightSystem) {
+                        window.dayNightSystem.advanceToAfternoon();
+                        localStorage.setItem('tlc_daynightcycle', JSON.stringify({
+                            timeOfDay: window.dayNightSystem.timeOfDay,
+                            dayCount: window.dayNightSystem.dayCount,
+                            hour: window.dayNightSystem.hour
+                        }));
+                    }
+
+                    // Sauvegarder et partir
+                    savePlayerData();
+                    AudioSystem.playSuccess();
+                    window.location.href = 'world-map.html';
+                };
+            }, 100);
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+
+        // Bouton Se Reposer
+        document.getElementById('btnRest').onclick = performRest;
+
+        // Ajouter sons hover sur tous les boutons
+        document.querySelectorAll('.btn-camp').forEach(btn => {
+            btn.addEventListener('mouseenter', () => AudioSystem.playHover());
+            btn.addEventListener('click', () => AudioSystem.playClick());
+        });
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Générer particules
+            generateAshParticles();
+
+            // Charger données
+            loadPlayerData();
+
+            // Initialiser CampSystem
+            campSystem = new CampSystem();
+            campSystem.init(playerData);
+
+            // Initialiser Narrative System
+            narrativeSystem = new CampNarrativeSystem();
+            await narrativeSystem.loadNarratives();
+
+            // Initialiser Services System
+            servicesSystem = new CampServicesSystem();
+            servicesSystem.init(playerData, narrativeSystem);
+
+            // Exposer globalement pour les boutons
+            window.servicesSystem = servicesSystem;
+
+            // Update UI
+            updatePlayerUI();
+            updateCompanionsList();
+            renderVillageCanvas();
+
+            console.log('✅ Camp initialisé avec succès');
+            console.log('📊 Données joueur:', playerData);
+
+            // 🎲 Afficher greeting du Dé à l'arrivée (délai pour effet dramatique)
+            setTimeout(() => {
+                const isFirstVisit = !sessionStorage.getItem('camp_visited');
+                if (isFirstVisit) {
+                    sessionStorage.setItem('camp_visited', 'true');
+                }
+
+                // Toujours afficher un commentaire du Dé
+                if (narrativeSystem) {
+                    narrativeSystem.showDiceGreeting(playerData.corruption || 0);
+                }
+            }, 1000);
+        });
+    </script>
+
+</body>
+</html>

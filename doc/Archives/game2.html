@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donjon JDR – Version Optimisée 2D Iso</title>
+<!-- ✅ DESIGN SYSTEM AAA+ -->
+<link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/game-ui-new.css">
+<link rel="stylesheet" href="css/event-modals.css">
+<link rel="stylesheet" href="css/dark-medieval-theme.css">
+<link rel="stylesheet" href="css/passive-buffs-dark.css">
+<link rel="stylesheet" href="css/combat-system.css">
+<link rel="stylesheet" href="css/shop-modal-aaa.css">
+<link rel="stylesheet" href="css/rest-modal-aaa.css">
+<link rel="stylesheet" href="css/event-modal-aaa.css">
+<link rel="stylesheet" href="css/event-modal-corridor.css">
+<link rel="stylesheet" href="css/event-modal-rooms.css">
+<link rel="stylesheet" href="css/loot-reveal.css">
+<link rel="stylesheet" href="css/corruption-system.css">
+<link rel="stylesheet" href="css/item-inspection-modal.css">
+<link rel="stylesheet" href="css/narrator-system.css">
+<link rel="stylesheet" href="css/dice-system.css">
+<link rel="stylesheet" href="css/camp.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Grenze+Gotisch:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="dungeon-background"></div>
+<div class="vignette"></div>
+
+<header class="game-header">
+  <div class="header-left">
+    <h1 class="game-title">☠ Le Donjon des Damnés ☠ (v2 Optimisée)</h1>
+  </div>
+  <div class="header-center">
+    <button id="dice-btn-main" class="dice-btn-main pulse-animation">
+      <span class="dice-icon">🎲</span>
+      <span class="dice-text">Lancer le Dé</span>
+    </button>
+    <div id="fps-counter" style="color: #00ff00; font-size: 14px; margin-left: 10px;">FPS: 60</div>
+  </div>
+  <div class="header-right">
+    <button id="inventory-btn-main" class="inventory-btn-main" title="Inventaire (I)">
+      <span class="inventory-icon">🎒</span>
+      <span class="inventory-count">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- Canvas isométrique 2D optimisé -->
+<div id="game-container" style="width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1; overflow: hidden; background: #0a0a0a;">
+  <canvas id="game-canvas" style="display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
+</div>
+
+<!-- UI Overlay -->
+<div id="ui-overlay"></div>
+
+<!-- Toutes les dépendances -->
+<script src="js/config.js"></script>
+<script src="js/classes.js"></script>
+<script src="js/items-database.js"></script>
+<script src="js/enemies-index.js"></script>
+<script src="js/economy-system.js"></script>
+<script src="js/camp.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/dice-lexicon.js"></script>
+<script src="js/destiny-cards.js"></script>
+<script src="js/card-system.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/events.js"></script>
+<script src="js/events-extended.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/dungeon-nodes.js"></script>
+<script src="js/destiny-nodes.js"></script>
+<script src="js/dungeon-linear-generator.js"></script>
+<script src="js/modal-sounds.js"></script>
+<script src="js/event-modals.js"></script>
+<script src="js/combat.js"></script>
+<script src="js/passive-buffs.js"></script>
+<script src="js/path-indicators.js"></script>
+<script src="js/health-bars-update.js"></script>
+<script src="js/player-animation.js"></script>
+<script src="js/combat-audio-system.js"></script>
+<script src="js/shop-modal-aaa.js"></script>
+<script src="js/rest-modal-aaa.js"></script>
+<script src="js/event-modal-aaa.js"></script>
+<script src="js/event-modal-corridor.js"></script>
+<script src="js/particle-system.js"></script>
+<script src="js/loot-reveal-system.js"></script>
+<script src="js/items-lore-integration.js"></script>
+<script src="js/corruption-system.js"></script>
+<script src="js/dice-visual-system.js"></script>
+<script src="js/dice-destiny-core.js"></script>
+<script src="js/narrator-system.js"></script>
+
+<!-- ✅ NOUVEAU RENDERER 2D ISO OPTIMISÉ -->
+<script src="js/isometric-renderer-2d.js"></script>
+<script src="js/game2.js"></script>
+
+</body>
+</html>

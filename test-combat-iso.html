@@ -1,0 +1,4039 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Combat Isométrique - THE LAST COVENANT</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0d0d0d;
+            color: #d4c5b0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Background avec gradient BG3 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at center, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1520 50%, #0a0a0f 100%);
+            z-index: -1;
+        }
+
+        #combatCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            background: #0a0a0f;
+        }
+        
+        #combatCanvas.grabbing {
+            cursor: grabbing;
+        }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .hud > * {
+            pointer-events: auto;
+        }
+
+        /* Stats joueur - Top Left, réduit */
+        .player-stats {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 15px;
+            min-width: 280px;
+            max-width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        .player-stats h3 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .turn-badge {
+            font-size: 0.7em;
+            padding: 4px 10px;
+            background: rgba(201, 169, 122, 0.2);
+            border: 1px solid rgba(201, 169, 122, 0.4);
+            border-radius: 3px;
+        }
+        
+        .turn-badge.enemy-turn {
+            color: #d14343;
+            background: rgba(209, 67, 67, 0.2);
+            border-color: rgba(209, 67, 67, 0.4);
+        }
+
+        .stat-bar {
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: rgba(212, 197, 176, 0.9);
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 22px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(90, 77, 58, 0.5);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .bar-fill.hp-bar {
+            background: linear-gradient(90deg, #8b1c1c 0%, #d14343 100%);
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+
+        .bar-fill.ap-bar {
+            background: linear-gradient(90deg, #1c4d8b 0%, #4387d1 100%);
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+        
+        .bar-fill.corruption-bar {
+            transition: all 0.5s ease;
+        }
+        
+        .bar-fill.corruption-bar.pure {
+            background: linear-gradient(90deg, #2d5016 0%, #4a8b1c 100%);
+            box-shadow: inset 0 2px 8px rgba(74, 139, 28, 0.4);
+        }
+        
+        .bar-fill.corruption-bar.altered {
+            background: linear-gradient(90deg, #8b5a1c 0%, #d19543 100%);
+            box-shadow: inset 0 2px 8px rgba(209, 149, 67, 0.4);
+        }
+        
+        .bar-fill.corruption-bar.profaned {
+            background: linear-gradient(90deg, #5a0a0a 0%, #8b1c1c 100%);
+            box-shadow: inset 0 2px 8px rgba(139, 28, 28, 0.6);
+            animation: corruptionPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes corruptionPulse {
+            0%, 100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.3);
+            }
+        }
+        
+        .dice-state-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.7em;
+            border-radius: 3px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .dice-state-badge.pure {
+            background: rgba(74, 139, 28, 0.3);
+            border: 1px solid rgba(74, 139, 28, 0.6);
+            color: #4a8b1c;
+        }
+        
+        .dice-state-badge.altered {
+            background: rgba(209, 149, 67, 0.3);
+            border: 1px solid rgba(209, 149, 67, 0.6);
+            color: #d19543;
+        }
+        
+        .dice-state-badge.profaned {
+            background: rgba(139, 28, 28, 0.3);
+            border: 1px solid rgba(139, 28, 28, 0.6);
+            color: #d14343;
+            animation: profanedGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes profanedGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(209, 67, 67, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(209, 67, 67, 0.6);
+            }
+        }
+
+        /* Action Bar BG3 Style - Bottom */
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(15,13,11,0.85), rgba(25,20,17,0.98));
+            border-top: 2px solid rgba(80, 70, 50, 0.8);
+            padding: 15px 20px;
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+        
+        .controls button {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, rgba(40, 35, 30, 0.9), rgba(30, 25, 20, 0.9));
+            border: 1px solid rgba(80, 70, 50, 0.6);
+            color: #c9b998;
+            font-family: 'Crimson Text', serif;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .controls button:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.95), rgba(50, 40, 30, 0.95));
+            border-color: rgba(212, 175, 55, 0.8);
+            color: #f4d03f;
+            transform: translateY(-1px);
+        }
+
+        .controls button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(100, 20, 20, 0.9), rgba(80, 0, 0, 0.9));
+            border-color: rgba(209, 67, 67, 0.6);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(140, 30, 30, 0.95), rgba(110, 10, 10, 0.95));
+            border-color: #d14343;
+            color: #fff;
+        }
+        
+        .btn-icon {
+            min-width: 42px;
+            padding: 10px 14px;
+            font-size: 1.1em;
+        }
+        
+        /* Inventory BG3 Style */
+        .inventory-section {
+            display: flex;
+            gap: 6px;
+            flex: 1 1 auto;
+            justify-content: center;
+            max-width: 600px;
+        }
+        
+        .inventory-slot {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, rgba(30,25,20,0.8), rgba(20,18,15,0.8));
+            border: 1px solid rgba(80, 70, 50, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 1.4em;
+        }
+        
+        .inventory-slot:hover {
+            background: linear-gradient(135deg, rgba(40,35,30,0.9), rgba(30,25,20,0.9));
+            border-color: rgba(212, 175, 55, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        .inventory-slot.empty {
+            opacity: 0.4;
+        }
+        
+        .inventory-slot.empty::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border: 1px dashed rgba(80, 70, 50, 0.4);
+        }
+        
+        /* Skills Quick Bar */
+        .skills-quickbar {
+            display: flex;
+            gap: 6px;
+            flex: 0 0 auto;
+        }
+        
+        .skill-slot {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(30,25,20,0.8), rgba(20,18,15,0.8));
+            border: 1px solid rgba(80, 70, 50, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 1.2em;
+        }
+        
+        .skill-slot:hover:not(.on-cooldown) {
+            background: linear-gradient(135deg, rgba(60,45,30,0.9), rgba(40,30,20,0.9));
+            border-color: #f4d03f;
+            transform: translateY(-2px);
+        }
+        
+        .skill-slot.on-cooldown {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .skill-slot .cooldown-overlay {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.8);
+            color: #ff6b6b;
+            font-size: 0.7em;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-family: 'Crimson Text', serif;
+        }
+        
+
+        /* Widget Dé Central */
+        .dice-widget {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.98), rgba(30,25,20,0.98));
+            border: 3px solid rgba(212, 175, 55, 0.6);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .dice-widget.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Dé 3D Container */
+        .dice-container-3d {
+            perspective: 1000px;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+        
+        .dice-cube {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s ease-out;
+        }
+        
+        .dice-cube.rolling {
+            animation: diceRoll3D 0.8s linear;
+        }
+        
+        @keyframes diceRoll3D {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(720deg) rotateY(720deg); }
+        }
+        
+        /* Faces du dé 3D */
+        .dice-face-3d {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #e8dcc8 0%, #d4c4a8 50%, #baa88a 100%);
+            border: 3px solid rgba(100, 80, 60, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            font-weight: bold;
+            color: #3d2817;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 
+                inset 0 4px 10px rgba(0, 0, 0, 0.4),
+                0 10px 25px rgba(0, 0, 0, 0.6);
+            backface-visibility: hidden;
+        }
+        
+        /* Positions des faces */
+        .dice-face-3d.face-1 { transform: rotateY(0deg) translateZ(75px); }
+        .dice-face-3d.face-6 { transform: rotateY(180deg) translateZ(75px); }
+        .dice-face-3d.face-2 { transform: rotateY(90deg) translateZ(75px); }
+        .dice-face-3d.face-5 { transform: rotateY(-90deg) translateZ(75px); }
+        .dice-face-3d.face-3 { transform: rotateX(90deg) translateZ(75px); }
+        .dice-face-3d.face-4 { transform: rotateX(-90deg) translateZ(75px); }
+        
+        /* Face Thalys */
+        .dice-face-3d.face-thalys {
+            background: radial-gradient(circle at center, #5a0a0a 0%, #3d1010 40%, #1a0a0a 100%);
+            border: 3px solid #8b0000;
+            color: #ff3333;
+            font-size: 5em;
+            animation: thalysGlow 2s ease-in-out infinite;
+            box-shadow: 
+                inset 0 0 30px rgba(139, 0, 0, 0.5),
+                0 0 50px rgba(139, 0, 0, 0.8);
+            position: relative;
+        }
+        
+        .dice-face-3d.face-thalys::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff6666 0%, #ff3333 30%, #8b0000 100%);
+            box-shadow: 
+                0 0 20px rgba(255, 51, 51, 0.8),
+                inset 0 0 15px rgba(0, 0, 0, 0.8);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+        
+        .dice-face-3d.face-thalys::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1a0a0a;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        
+        @keyframes thalysGlow {
+            0%, 100% { 
+                filter: brightness(1);
+                box-shadow: 
+                    inset 0 0 30px rgba(139, 0, 0, 0.5),
+                    0 0 50px rgba(139, 0, 0, 0.8);
+            }
+            50% {
+                filter: brightness(1.5);
+                box-shadow: 
+                    inset 0 0 50px rgba(139, 0, 0, 0.8),
+                    0 0 80px rgba(139, 0, 0, 1);
+            }
+        }
+        
+        .dice-label {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        /* Inventory Panel */
+        .inventory-panel {
+            position: absolute;
+            top: 620px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 12px;
+            width: 280px;
+            max-height: calc(100vh - 640px);
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .inventory-panel h4 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        
+        .equipped-items {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.3);
+        }
+        
+        .item-slot {
+            flex: 1;
+            background: rgba(10, 10, 10, 0.6);
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            padding: 8px;
+            text-align: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .item-slot:hover {
+            border-color: #f4d03f;
+            background: rgba(20, 18, 15, 0.8);
+        }
+        
+        .item-slot.empty {
+            opacity: 0.4;
+        }
+        
+        .inventory-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .inventory-item {
+            background: rgba(10, 10, 10, 0.4);
+            border: 1px solid rgba(90, 77, 58, 0.4);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .inventory-item:hover {
+            background: rgba(20, 18, 15, 0.6);
+            border-color: #f4d03f;
+        }
+        
+        .inventory-item .icon {
+            font-size: 1.3rem;
+        }
+        
+        .inventory-item .name {
+            flex: 1;
+            font-size: 0.85rem;
+            color: #d4c5b0;
+        }
+        
+        /* Pact Window */
+        .pact-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pact-overlay.visible {
+            display: flex;
+        }
+        
+        .pact-window {
+            background: linear-gradient(135deg, rgba(20,18,15,0.98), rgba(30,25,20,0.98));
+            border: 3px solid rgba(139, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 60px rgba(139, 0, 0, 0.6);
+            animation: pactAppear 0.5s ease-out;
+        }
+        
+        @keyframes pactAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .pact-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .pact-header h2 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        
+        .pact-header p {
+            color: #999;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        
+        .pact-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .pact-option {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.6), rgba(50, 40, 30, 0.6));
+            border: 2px solid rgba(139, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .pact-option:hover {
+            transform: translateX(10px);
+            border-color: #8b0000;
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);
+        }
+        
+        .pact-option-title {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+        
+        .pact-option-desc {
+            color: #bbb;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        
+        .pact-option-cost {
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .pact-refuse {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.8), rgba(40, 40, 40, 0.8));
+            border: 2px solid rgba(100, 100, 100, 0.5);
+            color: #999;
+            padding: 15px;
+            width: 100%;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .pact-refuse:hover {
+            background: linear-gradient(135deg, rgba(80, 80, 80, 0.9), rgba(60, 60, 60, 0.9));
+            border-color: #999;
+            color: #ccc;
+        }
+        
+        /* Signature Canvas */
+        .signature-section {
+            background: rgba(10, 10, 10, 0.8);
+            border: 2px solid rgba(139, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .signature-section.visible {
+            display: block;
+        }
+        
+        .signature-section h3 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .signature-canvas {
+            width: 100%;
+            height: 150px;
+            background: rgba(240, 230, 210, 0.1);
+            border: 2px dashed rgba(139, 0, 0, 0.5);
+            border-radius: 5px;
+            cursor: crosshair;
+            display: block;
+        }
+        
+        .signature-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .signature-buttons button {
+            flex: 1;
+            padding: 12px;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.8), rgba(40, 40, 40, 0.8));
+            border: 2px solid rgba(100, 100, 100, 0.5);
+            color: #999;
+        }
+        
+        .btn-clear:hover {
+            background: linear-gradient(135deg, rgba(80, 80, 80, 0.9), rgba(60, 60, 60, 0.9));
+            border-color: #999;
+        }
+        
+        .btn-sign {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.8), rgba(100, 0, 0, 0.8));
+            border: 2px solid rgba(139, 0, 0, 0.6);
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .btn-sign:hover {
+            background: linear-gradient(135deg, rgba(180, 0, 0, 0.9), rgba(140, 0, 0, 0.9));
+            border-color: #8b0000;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.6);
+        }
+        
+        .btn-sign:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════ */
+        /* THALYS CHOICE MENU */
+        /* ═══════════════════════════════════════════════════════════ */
+        
+        .thalys-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 250;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .thalys-overlay.visible {
+            display: flex;
+            animation: thalysReveal 0.8s ease-out;
+        }
+        
+        @keyframes thalysReveal {
+            0% {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            100% {
+                opacity: 1;
+                backdrop-filter: blur(15px);
+            }
+        }
+        
+        .thalys-window {
+            background: linear-gradient(135deg, rgba(30, 10, 10, 0.98), rgba(50, 15, 15, 0.98));
+            border: 4px solid #8b0000;
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 
+                0 0 100px rgba(139, 0, 0, 0.8),
+                inset 0 0 50px rgba(139, 0, 0, 0.2);
+            animation: thalysWindowAppear 0.6s ease-out;
+        }
+        
+        @keyframes thalysWindowAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.7) rotateY(180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+        
+        .thalys-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: thalysPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes thalysPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(255, 51, 51, 0.6));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 40px rgba(255, 51, 51, 1));
+            }
+        }
+        
+        .thalys-header h2 {
+            font-family: 'Cinzel', serif;
+            color: #ff3333;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 
+                0 0 30px rgba(255, 51, 51, 0.8),
+                0 0 60px rgba(255, 51, 51, 0.4);
+            letter-spacing: 0.1em;
+        }
+        
+        .thalys-header p {
+            color: #ffaaaa;
+            font-style: italic;
+            font-size: 1.3em;
+            text-shadow: 0 0 10px rgba(255, 170, 170, 0.5);
+        }
+        
+        .thalys-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .thalys-choice {
+            background: linear-gradient(135deg, rgba(60, 20, 20, 0.7), rgba(40, 10, 10, 0.7));
+            border: 3px solid rgba(139, 0, 0, 0.6);
+            padding: 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .thalys-choice::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 51, 51, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .thalys-choice:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .thalys-choice:hover {
+            transform: translateX(15px);
+            border-color: #ff3333;
+            box-shadow: 
+                0 0 40px rgba(255, 51, 51, 0.6),
+                inset 0 0 30px rgba(139, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(80, 30, 30, 0.9), rgba(60, 20, 20, 0.9));
+        }
+        
+        .thalys-choice-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(255, 51, 51, 0.5));
+        }
+        
+        .thalys-choice-title {
+            font-family: 'Cinzel', serif;
+            color: #ff6666;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(255, 102, 102, 0.5);
+        }
+        
+        .thalys-choice-desc {
+            color: #ddd;
+            font-size: 1.05em;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .thalys-choice-cost {
+            color: #ff3333;
+            font-weight: bold;
+            font-size: 1em;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.6);
+        }
+        
+        .control-group {
+            margin: 15px 0;
+            padding: 10px 0;
+            border-top: 1px solid rgba(90, 77, 58, 0.3);
+        }
+        
+        .control-group:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+        
+        .control-label {
+            display: block;
+            color: #c9a97a;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .control-input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid rgba(90, 77, 58, 0.5);
+            color: #d4c5b0;
+            font-family: 'Crimson Text', serif;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .control-input:focus {
+            outline: none;
+            border-color: #c9a97a;
+            background: rgba(20, 18, 15, 0.8);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            color: #d4c5b0;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        /* Room Settings Panel - Collapsible */
+        .room-settings {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            max-width: 280px;
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .room-settings.collapsed {
+            transform: translateX(calc(100% + 20px));
+        }
+        
+        .room-settings h4 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 12px;
+            font-size: 1em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(244, 208, 63, 0.4);
+        }
+        
+        .settings-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            color: #f4d03f;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 25;
+        }
+        
+        .settings-toggle:hover {
+            background: linear-gradient(135deg, rgba(35, 30, 25, 0.95), rgba(45, 38, 30, 0.95));
+            border-color: #f4d03f;
+            transform: scale(1.1);
+        }
+        
+        /* Zoom controls - Plus compacts */
+        .zoom-controls {
+            position: absolute;
+            bottom: 140px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(90, 77, 58, 0.6);
+            color: #d4c5b0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .zoom-btn:hover {
+            background: linear-gradient(135deg, rgba(35, 30, 25, 0.95), rgba(45, 38, 30, 0.95));
+            border-color: #f4d03f;
+            color: #f4d03f;
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(244, 208, 63, 0.3);
+        }
+        
+        .zoom-display {
+            width: 40px;
+            height: 28px;
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid rgba(90, 77, 58, 0.6);
+            color: #0f0;
+            font-family: monospace;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Combat Log - Réduit et positionné sous stats */
+        /* Combat Log - BG3 Style */
+        .combat-log {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 380px;
+            height: 280px;
+            background: linear-gradient(135deg, rgba(15,13,11,0.95), rgba(25,20,17,0.95));
+            border: 1px solid rgba(80, 70, 50, 0.8);
+            border-left: 3px solid rgba(212, 175, 55, 0.5);
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(212, 175, 55, 0.1);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .combat-log #logEntries {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .combat-log #logEntries > div {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        
+        .combat-log h4 {
+            font-family: 'Crimson Text', serif;
+            color: #c9b998;
+            margin: 0;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(80, 70, 50, 0.5);
+        }
+        
+        #logEntries {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+        
+        #logEntries::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #logEntries::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+        
+        #logEntries::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.4);
+            border-radius: 3px;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(80, 70, 50, 0.2);
+            color: #d4c5b0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-entry.move {
+            color: #9db4d4;
+        }
+        
+        .log-entry.attack {
+            color: #e8a091;
+            font-weight: 600;
+        }
+        
+        .log-entry.damage {
+            color: #d14343;
+        }
+        
+        .log-entry.heal {
+            color: #6bc46d;
+        }
+        
+        .log-entry.info {
+            color: #c9a97a;
+            opacity: 0.9;
+        }
+
+        /* Debug info - Compacte en haut à droite */
+        .debug-info {
+            position: absolute;
+            top: 75px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #0f0;
+            padding: 8px 10px;
+            font-family: monospace;
+            font-size: 11px;
+            border: 1px solid #0f0;
+            min-width: 180px;
+            max-width: 180px;
+            backdrop-filter: blur(5px);
+        }
+
+        .debug-info div {
+            margin: 1px 0;
+        }
+        
+        .debug-info .fps {
+            color: #ff0;
+            font-weight: bold;
+        }
+        
+        .debug-info .cursor {
+            color: #0ff;
+        }
+        
+        /* Compass cardinal */
+        .compass-overlay {
+            position: fixed;
+            bottom: 140px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .compass-direction {
+            position: absolute;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: rgba(212, 175, 55, 0.6);
+            text-shadow: 
+                0 0 10px rgba(212, 175, 55, 0.8),
+                0 0 20px rgba(0, 0, 0, 0.9),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            user-select: none;
+        }
+        
+        .compass-direction.north {
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .compass-direction.south {
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .compass-direction.east {
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .compass-direction.west {
+            left: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Frame/Bounds overlay */
+        .frame-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 6;
+        }
+        
+        .frame-line {
+            position: absolute;
+            background: rgba(255, 0, 0, 0.3);
+        }
+        
+        .frame-line.horizontal {
+            height: 2px;
+            width: 100%;
+        }
+        
+        .frame-line.vertical {
+            width: 2px;
+            height: 100%;
+        }
+        
+        .frame-line.top { top: 0; }
+        .frame-line.bottom { bottom: 0; }
+        .frame-line.left { left: 0; }
+        .frame-line.right { right: 0; }
+        
+        .frame-label {
+            position: absolute;
+            font-family: monospace;
+            font-size: 10px;
+            color: #f00;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 5px;
+            border: 1px solid #f00;
+        }
+        
+        .frame-label.top-left { top: 5px; left: 5px; }
+        .frame-label.top-right { top: 5px; right: 5px; }
+        .frame-label.bottom-left { bottom: 5px; left: 5px; }
+        .frame-label.bottom-right { bottom: 5px; right: 5px; }
+        
+        /* Center crosshair */
+        .center-crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 7;
+        }
+        
+        .center-crosshair::before,
+        .center-crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 0, 0.5);
+        }
+        
+        .center-crosshair::before {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .center-crosshair::after {
+            height: 2px;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* ═══ LOOT REVEAL SYSTEM ═══ */
+        .loot-roll-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        .loot-roll-window {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(20, 18, 15, 0.98), rgba(30, 25, 20, 0.98));
+            border: 4px solid rgba(212, 175, 55, 0.6);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.5);
+            backdrop-filter: blur(15px);
+        }
+        
+        .loot-roll-track {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            transition: transform 0.1s linear;
+        }
+        
+        .loot-roll-item {
+            width: 250px;
+            height: 80px;
+            margin: 10px 0;
+            background: rgba(40, 35, 30, 0.8);
+            border: 2px solid rgba(150, 150, 150, 0.4);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        
+        .loot-roll-item-icon {
+            font-size: 48px;
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .loot-roll-item-name {
+            font-size: 0.9em;
+            color: #d4c5b0;
+            font-weight: 600;
+        }
+        
+        .loot-roll-indicator {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 100px;
+            transform: translateY(-50%);
+            border-top: 3px solid #f4d03f;
+            border-bottom: 3px solid #f4d03f;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .loot-roll-glow {
+            position: absolute;
+            inset: -20px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="combatCanvas"></canvas>
+    
+    <!-- Compass cardinal directions -->
+    <div class="compass-overlay">
+        <div class="compass-direction north">⬆️ N</div>
+        <div class="compass-direction south">⬇️ S</div>
+        <div class="compass-direction east">➡️ E</div>
+        <div class="compass-direction west">⬅️ W</div>
+    </div>
+    
+    <!-- Frame overlay -->
+    <div class="frame-overlay">
+        <div class="frame-line horizontal top"></div>
+        <div class="frame-line horizontal bottom"></div>
+        <div class="frame-line vertical left"></div>
+        <div class="frame-line vertical right"></div>
+        
+        <div class="frame-label top-left">0, 0</div>
+        <div class="frame-label top-right"><span id="frameTopRight">W, 0</span></div>
+        <div class="frame-label bottom-left"><span id="frameBottomLeft">0, H</span></div>
+        <div class="frame-label bottom-right"><span id="frameBottomRight">W, H</span></div>
+    </div>
+    
+    <!-- Center crosshair -->
+    <div class="center-crosshair"></div>
+    
+    <div class="hud">
+        <!-- Stats joueur -->
+        <div class="player-stats">
+            <h3>
+                <span id="playerName">Pactisé</span>
+                <span class="turn-badge" id="turnIndicator">Votre Tour</span>
+            </h3>
+            
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>❤️ Vie</span>
+                    <span id="hpText">100/100</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill hp-bar" id="hpBar" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>⚡ PA</span>
+                    <span id="apText">6/6</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill ap-bar" id="apBar" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>🌀 Corruption</span>
+                    <span>
+                        <span id="corruptionText">0%</span>
+                        <span class="dice-state-badge pure" id="diceStateBadge">Pure</span>
+                    </span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill corruption-bar pure" id="corruptionBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Toggle Button -->
+        <button class="settings-toggle" id="btnToggleSettings" title="Toggle Settings (S)">⚙️</button>
+        
+        <!-- Debug info -->
+        <div class="debug-info">
+            <div class="fps">FPS: <span id="debugFps">60</span></div>
+            <div>Zoom: <span id="debugZoom">100%</span></div>
+            <div>Mode: <span id="debugMode">Sélection</span></div>
+            <div>Grille: <span id="debugGrid">25x25</span></div>
+            <div>Tuile: <span id="debugTileSize">64px</span></div>
+            <div>Obstacles: <span id="debugObstacles">0</span></div>
+            <div>Ennemis: <span id="debugEnemies">0</span></div>
+            <div class="cursor">Pos: <span id="debugHover">-</span></div>
+        </div>
+        
+        <!-- Action Bar BG3 Style -->
+        <div class="controls">
+            <!-- Actions de combat -->
+            <div class="action-buttons">
+                <button id="btnMove" class="btn-icon" title="Déplacer">🚶</button>
+                <button id="btnAttack" title="Attaquer (3 PA)">⚔️ Attaquer</button>
+                <button id="btnEndTurn" class="btn-primary">Fin du Tour</button>
+            </div>
+            
+            <!-- Inventaire central -->
+            <div class="inventory-section" id="inventoryBar">
+                <!-- Rempli dynamiquement -->
+            </div>
+            
+            <!-- Skills rapides -->
+            <div class="skills-quickbar" id="skillsQuickbar">
+                <!-- Rempli dynamiquement -->
+            </div>
+            
+            <!-- Boutons utilitaires -->
+            <div class="action-buttons">
+                <button id="btnCenterCamera" class="btn-icon" title="Recentrer">🎯</button>
+                <button id="btnToggleGrid" class="btn-icon" title="Grille">📐</button>
+                <button id="btnNewRoom" class="btn-icon" title="Nouvelle Salle">🎲</button>
+            </div>
+        </div>
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="btnZoomIn" title="Zoom + (Molette)">+</button>
+            <div class="zoom-display" id="zoomDisplay">100%</div>
+            <button class="zoom-btn" id="btnZoomOut" title="Zoom - (Molette)">−</button>
+            <button class="zoom-btn" id="btnZoomReset" title="Reset Zoom">🔄</button>
+        </div>
+        
+        <!-- Room Settings -->
+        <div class="room-settings" id="roomSettings">
+            <h4>🏗️ Paramètres</h4>
+            
+            <div class="control-group">
+                <label class="control-label">Taille Grille</label>
+                <select id="gridSize" class="control-input">
+                    <option value="10">10x10</option>
+                    <option value="15">15x15</option>
+                    <option value="20">20x20</option>
+                    <option value="25" selected>25x25</option>
+                    <option value="30">30x30</option>
+                    <option value="35">35x35</option>
+                    <option value="40">40x40</option>
+                    <option value="45">45x45</option>
+                    <option value="50">50x50</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">% Obstacles</label>
+                <input type="range" id="obstaclePercent" class="control-input" 
+                       min="0" max="60" value="20" step="5">
+                <div style="text-align: center; color: #c9a97a;">
+                    <span id="obstaclePercentValue">20</span>%
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Taille Tuile</label>
+                <input type="range" id="tileSize" class="control-input" 
+                       min="32" max="128" value="64" step="16">
+                <div style="text-align: center; color: #c9a97a;">
+                    <span id="tileSizeValue">64</span>px
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showGrid" checked>
+                    <label for="showGrid">Afficher Grille</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showCoords" checked>
+                    <label for="showCoords">Coordonnées</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showCompass" checked>
+                    <label for="showCompass">Boussole</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showFrame" checked>
+                    <label for="showFrame">Cadre</label>
+                </div>
+            </div>
+            
+            <button id="btnNewRoom" style="width: 100%; margin-top: 10px;">
+                🎲 Générer Nouvelle Salle
+            </button>
+            
+            <div class="control-group">
+                <label class="control-label">🧪 Test Corruption</label>
+                <button id="btnAddCorruption" style="width: 100%;">
+                    +10% Corruption
+                </button>
+            </div>
+        </div>
+        
+        <!-- Combat Log -->
+        <div class="combat-log">
+            <h4>📜 Journal</h4>
+            <div id="logEntries"></div>
+        </div>
+        
+        <!-- Inventory Panel -->
+        <div class="inventory-panel">
+            <h4>🎒 Inventaire</h4>
+            <div class="equipped-items">
+                <div class="item-slot" id="weaponSlot" title="Arme">
+                    <div class="icon">⚔️</div>
+                </div>
+                <div class="item-slot" id="armorSlot" title="Armure">
+                    <div class="icon">🛡️</div>
+                </div>
+            </div>
+            <div class="inventory-list" id="inventoryList"></div>
+        </div>
+    </div>
+    
+    <!-- Dice Widget (appears during rolls) -->
+    <div class="dice-widget" id="diceWidget">
+        <div class="dice-container-3d">
+            <div class="dice-cube" id="diceCube">
+                <div class="dice-face-3d face-1">1</div>
+                <div class="dice-face-3d face-2">2</div>
+                <div class="dice-face-3d face-3">3</div>
+                <div class="dice-face-3d face-4">4</div>
+                <div class="dice-face-3d face-5">5</div>
+                <div class="dice-face-3d face-6 face-thalys">👁️</div>
+            </div>
+        </div>
+        <div class="dice-label" id="diceLabel">En attente...</div>
+    </div>
+    
+    <!-- Pact Window -->
+    <div class="pact-overlay" id="pactOverlay">
+        <div class="pact-window">
+            <div class="pact-header">
+                <h2>🩸 Pacte avec Thalys</h2>
+                <p>"Le pouvoir a un prix... es-tu prêt à le payer?"</p>
+            </div>
+            
+            <div class="pact-options" id="pactOptions">
+                <div class="pact-option" data-pact="minor">
+                    <div class="pact-option-title">⚡ Altération Mineure</div>
+                    <div class="pact-option-desc">Relance le dé une fois</div>
+                    <div class="pact-option-cost">+1% Corruption</div>
+                </div>
+                
+                <div class="pact-option" data-pact="targeted">
+                    <div class="pact-option-title">🎯 Biais Ciblé</div>
+                    <div class="pact-option-desc">Si le dé affiche 1-2, le remplacer par Thalys</div>
+                    <div class="pact-option-cost">+2% Corruption</div>
+                </div>
+                
+                <div class="pact-option" data-pact="divine">
+                    <div class="pact-option-title">👁️ Marque Divine</div>
+                    <div class="pact-option-desc">Thalys remplace n'importe quelle face</div>
+                    <div class="pact-option-cost">+3% Corruption</div>
+                </div>
+            </div>
+            
+            <button class="pact-refuse" id="pactRefuse">❌ Refuser le Pacte</button>
+            
+            <!-- Signature Canvas (hidden by default) -->
+            <div class="signature-section" id="signatureSection">
+                <h3>✍️ Signe ton nom dans le sang...</h3>
+                <canvas class="signature-canvas" id="signatureCanvas" width="500" height="150"></canvas>
+                <div class="signature-buttons">
+                    <button class="btn-clear" id="btnClearSignature">🗑️ Effacer</button>
+                    <button class="btn-sign" id="btnConfirmSign" disabled>🩸 Signer le Pacte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thalys Choice Window -->
+    <div class="thalys-overlay" id="thalysOverlay">
+        <div class="thalys-window">
+            <div class="thalys-header">
+                <h2>👁️ THALYS</h2>
+                <p>"Je t'offre mon pouvoir... Choisis judicieusement."</p>
+            </div>
+            
+            <div class="thalys-choices" id="thalysChoices">
+                <div class="thalys-choice" data-choice="amplify">
+                    <div class="thalys-choice-icon">⚔️</div>
+                    <div class="thalys-choice-title">Amplifier la Puissance</div>
+                    <div class="thalys-choice-desc">
+                        Double les dégâts de cette attaque et ajoute +3 bonus
+                    </div>
+                    <div class="thalys-choice-cost">💀 +5% Corruption</div>
+                </div>
+                
+                <div class="thalys-choice" data-choice="defense">
+                    <div class="thalys-choice-icon">🛡️</div>
+                    <div class="thalys-choice-title">Défense Absolue</div>
+                    <div class="thalys-choice-desc">
+                        Annule toutes les attaques ennemies pour ce tour
+                    </div>
+                    <div class="thalys-choice-cost">💀 +4% Corruption</div>
+                </div>
+                
+                <div class="thalys-choice" data-choice="manipulate">
+                    <div class="thalys-choice-icon">🎭</div>
+                    <div class="thalys-choice-title">Manipuler l'Ennemi</div>
+                    <div class="thalys-choice-desc">
+                        Force le prochain roll ennemi à être un échec critique
+                    </div>
+                    <div class="thalys-choice-cost">💀 +6% Corruption</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════
+        let GRID_SIZE = 25;
+        let TILE_WIDTH = 160;
+        let TILE_HEIGHT = 80;
+        let OBSTACLE_PERCENT = 0.20;
+        let ZOOM_LEVEL = 1.0;
+        const ZOOM_MIN = 0.3;
+        const ZOOM_MAX = 3.0;
+        const ZOOM_STEP = 0.1;
+        
+        // Items Database
+        const ITEMS = {
+            'rusty_sword': {
+                id: 'rusty_sword',
+                name: 'Épée Rouillée',
+                type: 'weapon',
+                stats: { attack: 5, threshold: 3, range: 1 },
+                icon: '🗡️'
+            },
+            'iron_axe': {
+                id: 'iron_axe',
+                name: 'Hache de Fer',
+                type: 'weapon',
+                stats: { attack: 8, threshold: 4, range: 1 },
+                icon: '🪓'
+            },
+            'leather_armor': {
+                id: 'leather_armor',
+                name: 'Armure de Cuir',
+                type: 'armor',
+                stats: { defense: 3 },
+                icon: '🛡️'
+            },
+            'health_potion': {
+                id: 'health_potion',
+                name: 'Potion de Soin',
+                type: 'consumable',
+                effect: { heal: 30 },
+                icon: '🧪'
+            }
+        };
+        
+        const TILE_TYPES = {
+            EMPTY: 0,
+            FLOOR: 1,
+            OBSTACLE: 2,
+            PLAYER: 3,
+            ENEMY: 4
+        };
+        
+        const COLORS = {
+            EMPTY: '#1a1a1a',
+            FLOOR: '#6b5442',
+            FLOOR_HIGHLIGHT: '#7d6552',
+            OBSTACLE: '#f1f1f1',
+            PLAYER: '#4a90e2',
+            ENEMY: '#d14343',
+            GRID: '#333333',
+            PATH: '#4a90e2',
+            RANGE: 'rgba(74, 144, 226, 0.2)'
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        // SYSTÈME DE PACTE AVEC SIGNATURE
+        // ═══════════════════════════════════════════════════════════
+        class PactSystem {
+            constructor(game) {
+                this.game = game;
+                this.overlay = document.getElementById('pactOverlay');
+                this.signatureSection = document.getElementById('signatureSection');
+                this.canvas = document.getElementById('signatureCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.isDrawing = false;
+                this.hasDrawn = false;
+                this.selectedPact = null;
+                this.resolveCallback = null;
+                
+                this.setupSignatureCanvas();
+                this.setupEvents();
+            }
+            
+            setupSignatureCanvas() {
+                this.ctx.strokeStyle = '#8b0000';
+                this.ctx.lineWidth = 3;
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+            }
+            
+            setupEvents() {
+                // Sélection pacte
+                document.querySelectorAll('.pact-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const pactType = option.dataset.pact;
+                        this.selectPact(pactType);
+                    });
+                });
+                
+                // Refuser
+                document.getElementById('pactRefuse').addEventListener('click', () => {
+                    this.refusePact();
+                });
+                
+                // Signature canvas
+                this.canvas.addEventListener('mousedown', (e) => this.startDrawing(e));
+                this.canvas.addEventListener('mousemove', (e) => this.draw(e));
+                this.canvas.addEventListener('mouseup', () => this.stopDrawing());
+                this.canvas.addEventListener('mouseleave', () => this.stopDrawing());
+                
+                // Buttons signature
+                document.getElementById('btnClearSignature').addEventListener('click', () => {
+                    this.clearSignature();
+                });
+                
+                document.getElementById('btnConfirmSign').addEventListener('click', () => {
+                    this.confirmSign();
+                });
+            }
+            
+            async offerPact() {
+                return new Promise((resolve) => {
+                    this.resolveCallback = resolve;
+                    this.overlay.classList.add('visible');
+                    this.signatureSection.classList.remove('visible');
+                    this.selectedPact = null;
+                    this.clearSignature();
+                });
+            }
+            
+            selectPact(pactType) {
+                this.selectedPact = pactType;
+                
+                // Afficher section signature
+                this.signatureSection.classList.add('visible');
+                this.signatureSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                this.game.log.add(`📜 Pacte sélectionné : ${this.getPactName(pactType)}`, 'info');
+            }
+            
+            refusePact() {
+                this.overlay.classList.remove('visible');
+                this.game.log.add('❌ Pacte refusé', 'info');
+                if (this.resolveCallback) {
+                    this.resolveCallback({ accepted: false, pact: null });
+                }
+            }
+            
+            startDrawing(e) {
+                this.isDrawing = true;
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y);
+            }
+            
+            draw(e) {
+                if (!this.isDrawing) return;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                this.ctx.lineTo(x, y);
+                this.ctx.stroke();
+                
+                this.hasDrawn = true;
+                document.getElementById('btnConfirmSign').disabled = false;
+            }
+            
+            stopDrawing() {
+                this.isDrawing = false;
+            }
+            
+            clearSignature() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.hasDrawn = false;
+                document.getElementById('btnConfirmSign').disabled = true;
+            }
+            
+            confirmSign() {
+                if (!this.selectedPact || !this.hasDrawn) return;
+                
+                const pactData = this.getPactData(this.selectedPact);
+                
+                // Appliquer corruption
+                this.game.addCorruption(pactData.corruption);
+                
+                // Fermer overlay
+                this.overlay.classList.remove('visible');
+                
+                this.game.log.add(`🩸 Pacte signé : ${pactData.name}`, 'attack');
+                
+                if (this.resolveCallback) {
+                    this.resolveCallback({ accepted: true, pact: this.selectedPact });
+                }
+            }
+            
+            getPactData(pactType) {
+                const pacts = {
+                    'minor': { name: 'Altération Mineure', corruption: 1, effect: 'reroll' },
+                    'targeted': { name: 'Biais Ciblé', corruption: 2, effect: 'bias' },
+                    'divine': { name: 'Marque Divine', corruption: 3, effect: 'force_thalys' }
+                };
+                return pacts[pactType];
+            }
+            
+            getPactName(pactType) {
+                return this.getPactData(pactType).name;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // SYSTÈME DE CHOIX THALYS
+        // ═══════════════════════════════════════════════════════════
+        class ThalysChoiceSystem {
+            constructor(game) {
+                this.game = game;
+                this.overlay = document.getElementById('thalysOverlay');
+                this.choices = document.querySelectorAll('.thalys-choice');
+                this.currentChoice = null;
+                
+                this.setupEvents();
+            }
+            
+            setupEvents() {
+                this.choices.forEach(choice => {
+                    choice.addEventListener('click', () => {
+                        const choiceType = choice.dataset.choice;
+                        this.selectChoice(choiceType);
+                    });
+                });
+            }
+            
+            async offerChoice() {
+                return new Promise((resolve) => {
+                    this.overlay.classList.add('visible');
+                    
+                    // Stocker le callback de résolution
+                    this.resolveCallback = resolve;
+                });
+            }
+            
+            selectChoice(choiceType) {
+                this.currentChoice = choiceType;
+                const data = this.getChoiceData(choiceType);
+                
+                this.game.log.add(`👁️ ${data.name} : ${data.effect}`, 'attack');
+                this.game.addCorruption(data.corruption);
+                
+                // Fermer menu
+                this.overlay.classList.remove('visible');
+                
+                // Résoudre la promesse
+                if (this.resolveCallback) {
+                    this.resolveCallback({
+                        choice: choiceType,
+                        ...data
+                    });
+                    this.resolveCallback = null;
+                }
+            }
+            
+            getChoiceData(choiceType) {
+                const choices = {
+                    amplify: {
+                        name: 'Amplifier la Puissance',
+                        effect: 'Double les dégâts + 3 bonus',
+                        corruption: 5,
+                        apply: (damage) => (damage * 2) + 3
+                    },
+                    defense: {
+                        name: 'Défense Absolue',
+                        effect: 'Annule toutes attaques ennemies ce tour',
+                        corruption: 4,
+                        apply: null // Appliqué ailleurs
+                    },
+                    manipulate: {
+                        name: 'Manipuler l\'Ennemi',
+                        effect: 'Prochain roll ennemi = échec critique',
+                        corruption: 6,
+                        apply: null // Appliqué ailleurs
+                    }
+                };
+                
+                return choices[choiceType];
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // SYSTÈME DE DÉ D6
+        // ═══════════════════════════════════════════════════════════
+        class D6System {
+            constructor() {
+                this.currentRoll = 0;
+                this.isRolling = false;
+                this.thalysRevealed = false;
+                this.diceCube = document.getElementById('diceCube');
+                this.diceLabel = document.getElementById('diceLabel');
+            }
+            
+            roll(corruptionLevel = 0) {
+                return new Promise((resolve) => {
+                    this.isRolling = true;
+                    this.thalysRevealed = false;
+                    
+                    // Animation roll
+                    this.diceCube.classList.add('rolling');
+                    this.diceLabel.textContent = 'Lancer...';
+                    
+                    // Probabilité Thalys basée sur corruption
+                    const thalysChance = corruptionLevel * 0.01; // 1% par point de corruption
+                    
+                    setTimeout(() => {
+                        this.diceCube.classList.remove('rolling');
+                        
+                        // Roll final
+                        if (Math.random() < thalysChance) {
+                            this.currentRoll = 'Thalys';
+                            this.thalysRevealed = true;
+                            this.showFace(6); // Face Thalys
+                            this.diceLabel.textContent = '👁️ THALYS';
+                        } else {
+                            this.currentRoll = Math.floor(Math.random() * 6) + 1;
+                            this.showFace(this.currentRoll);
+                            this.diceLabel.textContent = `Résultat : ${this.currentRoll}`;
+                        }
+                        
+                        this.isRolling = false;
+                        setTimeout(() => resolve(this.currentRoll), 800);
+                    }, 800);
+                });
+            }
+            
+            showFace(faceNumber) {
+                // Rotations pour afficher chaque face
+                const rotations = {
+                    1: 'rotateY(0deg) rotateX(0deg)',
+                    2: 'rotateY(90deg) rotateX(0deg)',
+                    3: 'rotateY(0deg) rotateX(-90deg)',
+                    4: 'rotateY(0deg) rotateX(90deg)',
+                    5: 'rotateY(-90deg) rotateX(0deg)',
+                    6: 'rotateY(180deg) rotateX(0deg)' // Thalys
+                };
+                
+                this.diceCube.style.transform = rotations[faceNumber];
+            }
+            
+            renderDice() {
+                // Méthode conservée pour compatibilité
+                if (this.thalysRevealed) {
+                    this.showFace(6);
+                    this.diceLabel.textContent = '👁️ THALYS';
+                } else if (this.currentRoll > 0 && this.currentRoll !== 'Thalys') {
+                    this.showFace(this.currentRoll);
+                    this.diceLabel.textContent = `Résultat : ${this.currentRoll}`;
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // PATHFINDING A*
+        // ═══════════════════════════════════════════════════════════
+        class AStar {
+            constructor(grid) {
+                this.grid = grid;
+                this.width = grid[0].length;
+                this.height = grid.length;
+            }
+            
+            findPath(start, goal) {
+                const openSet = [start];
+                const cameFrom = new Map();
+                const gScore = new Map();
+                const fScore = new Map();
+                
+                gScore.set(this.key(start), 0);
+                fScore.set(this.key(start), this.heuristic(start, goal));
+                
+                while (openSet.length > 0) {
+                    // Trouver le nœud avec le plus petit fScore
+                    let current = openSet.reduce((min, node) => {
+                        return fScore.get(this.key(node)) < fScore.get(this.key(min)) ? node : min;
+                    });
+                    
+                    // Si on a atteint le but
+                    if (current.x === goal.x && current.y === goal.y) {
+                        return this.reconstructPath(cameFrom, current);
+                    }
+                    
+                    // Retirer current de openSet
+                    openSet.splice(openSet.indexOf(current), 1);
+                    
+                    // Explorer les voisins
+                    for (const neighbor of this.getNeighbors(current)) {
+                        const tentativeGScore = gScore.get(this.key(current)) + 1;
+                        
+                        if (!gScore.has(this.key(neighbor)) || tentativeGScore < gScore.get(this.key(neighbor))) {
+                            cameFrom.set(this.key(neighbor), current);
+                            gScore.set(this.key(neighbor), tentativeGScore);
+                            fScore.set(this.key(neighbor), tentativeGScore + this.heuristic(neighbor, goal));
+                            
+                            if (!openSet.some(n => n.x === neighbor.x && n.y === neighbor.y)) {
+                                openSet.push(neighbor);
+                            }
+                        }
+                    }
+                }
+                
+                return null; // Pas de chemin trouvé
+            }
+            
+            getNeighbors(node) {
+                const neighbors = [];
+                const directions = [
+                    { x: 0, y: -1 }, // Haut
+                    { x: 1, y: 0 },  // Droite
+                    { x: 0, y: 1 },  // Bas
+                    { x: -1, y: 0 }  // Gauche
+                ];
+                
+                for (const dir of directions) {
+                    const newX = node.x + dir.x;
+                    const newY = node.y + dir.y;
+                    
+                    if (newX >= 0 && newX < this.width && newY >= 0 && newY < this.height) {
+                        const tile = this.grid[newY][newX];
+                        if (tile === TILE_TYPES.FLOOR || tile === TILE_TYPES.PLAYER || tile === TILE_TYPES.ENEMY) {
+                            neighbors.push({ x: newX, y: newY });
+                        }
+                    }
+                }
+                
+                return neighbors;
+            }
+            
+            heuristic(a, b) {
+                // Distance de Manhattan
+                return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+            }
+            
+            key(node) {
+                return `${node.x},${node.y}`;
+            }
+            
+            reconstructPath(cameFrom, current) {
+                const path = [current];
+                while (cameFrom.has(this.key(current))) {
+                    current = cameFrom.get(this.key(current));
+                    path.unshift(current);
+                }
+                return path;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // GÉNÉRATEUR DE SALLE DE COMBAT
+        // ═══════════════════════════════════════════════════════════
+        class CombatRoomGenerator {
+            constructor() {
+                this.grid = [];
+                this.obstacles = [];
+            }
+            
+            generate() {
+                // Créer grille vide
+                this.grid = Array(GRID_SIZE).fill(null).map(() => 
+                    Array(GRID_SIZE).fill(TILE_TYPES.EMPTY)
+                );
+                
+                // Créer une salle centrale avec bordures
+                const roomStart = 2;
+                const roomEnd = GRID_SIZE - 3;
+                
+                for (let y = roomStart; y <= roomEnd; y++) {
+                    for (let x = roomStart; x <= roomEnd; x++) {
+                        this.grid[y][x] = TILE_TYPES.FLOOR;
+                    }
+                }
+                
+                // Générer obstacles aléatoires (15-25% de la salle)
+                this.generateObstacles(roomStart, roomEnd);
+                
+                return this.grid;
+            }
+            
+            generateObstacles(start, end) {
+                this.obstacles = [];
+                const areaSize = (end - start + 1) * (end - start + 1);
+                const obstacleCount = Math.floor(areaSize * OBSTACLE_PERCENT);
+                
+                // Patterns d'obstacles
+                const patterns = [
+                    // Pilier simple
+                    [[1]],
+                    // Mur 2x1
+                    [[1, 1]],
+                    // Mur 1x2
+                    [[1], [1]],
+                    // L-shape
+                    [[1, 1], [1, 0]],
+                    // T-shape
+                    [[1, 1, 1], [0, 1, 0]],
+                    // Carré 2x2
+                    [[1, 1], [1, 1]]
+                ];
+                
+                let placed = 0;
+                let attempts = 0;
+                const maxAttempts = obstacleCount * 10;
+                
+                while (placed < obstacleCount && attempts < maxAttempts) {
+                    attempts++;
+                    
+                    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+                    const x = start + Math.floor(Math.random() * (end - start - pattern[0].length + 1));
+                    const y = start + Math.floor(Math.random() * (end - start - pattern.length + 1));
+                    
+                    // Vérifier si on peut placer le pattern
+                    if (this.canPlacePattern(pattern, x, y, start, end)) {
+                        this.placePattern(pattern, x, y);
+                        placed += this.countPatternTiles(pattern);
+                    }
+                }
+                
+                document.getElementById('debugObstacles').textContent = this.obstacles.length;
+            }
+            
+            canPlacePattern(pattern, startX, startY, roomStart, roomEnd) {
+                for (let py = 0; py < pattern.length; py++) {
+                    for (let px = 0; px < pattern[py].length; px++) {
+                        if (pattern[py][px] === 1) {
+                            const x = startX + px;
+                            const y = startY + py;
+                            
+                            // Vérifier limites
+                            if (x < roomStart || x > roomEnd || y < roomStart || y > roomEnd) {
+                                return false;
+                            }
+                            
+                            // Vérifier qu'il n'y a pas déjà un obstacle
+                            if (this.grid[y][x] !== TILE_TYPES.FLOOR) {
+                                return false;
+                            }
+                            
+                            // Garder distance des bords (au moins 2 tuiles)
+                            if (x <= roomStart + 1 || x >= roomEnd - 1 || y <= roomStart + 1 || y >= roomEnd - 1) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+            
+            placePattern(pattern, startX, startY) {
+                for (let py = 0; py < pattern.length; py++) {
+                    for (let px = 0; px < pattern[py].length; px++) {
+                        if (pattern[py][px] === 1) {
+                            const x = startX + px;
+                            const y = startY + py;
+                            this.grid[y][x] = TILE_TYPES.OBSTACLE;
+                            this.obstacles.push({ x, y });
+                        }
+                    }
+                }
+            }
+            
+            countPatternTiles(pattern) {
+                let count = 0;
+                for (let row of pattern) {
+                    for (let cell of row) {
+                        if (cell === 1) count++;
+                    }
+                }
+                return count;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // RENDERER ISOMÉTRIQUE
+        // ═══════════════════════════════════════════════════════════
+        class IsometricRenderer {
+            constructor(canvas, grid) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.grid = grid;
+                
+                this.camera = {
+                    x: 0,
+                    y: 0,
+                    targetX: 0,
+                    targetY: 0,
+                    smoothing: 0.15
+                };
+                
+                this.hoveredTile = null;
+                this.selectedTile = null;
+                this.path = null;
+                this.moveRange = [];
+                
+                this.showGrid = true;
+                this.showCoords = true;
+                
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                
+                // Update frame labels
+                document.getElementById('frameTopRight').textContent = `${this.canvas.width}, 0`;
+                document.getElementById('frameBottomLeft').textContent = `0, ${this.canvas.height}`;
+                document.getElementById('frameBottomRight').textContent = `${this.canvas.width}, ${this.canvas.height}`;
+                
+                this.render();
+            }
+            
+            gridToScreen(gridX, gridY) {
+                const scaledTileWidth = TILE_WIDTH * ZOOM_LEVEL;
+                const scaledTileHeight = TILE_HEIGHT * ZOOM_LEVEL;
+                
+                const screenX = (gridX - gridY) * (scaledTileWidth / 2);
+                const screenY = (gridX + gridY) * (scaledTileHeight / 2);
+                
+                return {
+                    x: screenX - this.camera.x + this.canvas.width / 2,
+                    y: screenY - this.camera.y + this.canvas.height / 2 - 200
+                };
+            }
+            
+            screenToGrid(screenX, screenY) {
+                const scaledTileWidth = TILE_WIDTH * ZOOM_LEVEL;
+                const scaledTileHeight = TILE_HEIGHT * ZOOM_LEVEL;
+                
+                const x = screenX + this.camera.x - this.canvas.width / 2;
+                const y = screenY + this.camera.y - this.canvas.height / 2 + 200;
+                
+                const gridX = (x / (scaledTileWidth / 2) + y / (scaledTileHeight / 2)) / 2;
+                const gridY = (y / (scaledTileHeight / 2) - x / (scaledTileWidth / 2)) / 2;
+                
+                return {
+                    x: Math.floor(gridX),
+                    y: Math.floor(gridY)
+                };
+            }
+            
+            drawTile(gridX, gridY, color, borderColor = COLORS.GRID) {
+                const screen = this.gridToScreen(gridX, gridY);
+                const scaledTileWidth = TILE_WIDTH * ZOOM_LEVEL;
+                const scaledTileHeight = TILE_HEIGHT * ZOOM_LEVEL;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(screen.x, screen.y);
+                this.ctx.lineTo(screen.x + scaledTileWidth / 2, screen.y + scaledTileHeight / 2);
+                this.ctx.lineTo(screen.x, screen.y + scaledTileHeight);
+                this.ctx.lineTo(screen.x - scaledTileWidth / 2, screen.y + scaledTileHeight / 2);
+                this.ctx.closePath();
+                
+                this.ctx.fillStyle = color;
+                this.ctx.fill();
+                
+                if (this.showGrid) {
+                    this.ctx.strokeStyle = borderColor;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                }
+                
+                // Afficher coordonnées (seulement si zoom >= 0.7)
+                if (this.showCoords && ZOOM_LEVEL >= 0.7 && this.grid[gridY][gridX] !== TILE_TYPES.EMPTY) {
+                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    this.ctx.font = `${Math.max(8, 10 * ZOOM_LEVEL)}px monospace`;
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText(`${gridX},${gridY}`, screen.x, screen.y + scaledTileHeight / 2);
+                }
+            }
+            
+            drawCube(gridX, gridY) {
+                const screen = this.gridToScreen(gridX, gridY);
+                const scaledTileWidth = TILE_WIDTH * ZOOM_LEVEL;
+                const scaledTileHeight = TILE_HEIGHT * ZOOM_LEVEL;
+                const cubeHeight = scaledTileHeight * 2.2; // Hauteur du cube (mur)
+                
+                this.ctx.save();
+                
+                // Face RIGHT (côté droit visible - avant-droite)
+                this.ctx.beginPath();
+                this.ctx.moveTo(screen.x, screen.y + scaledTileHeight); // Base centre (sol)
+                this.ctx.lineTo(screen.x - scaledTileWidth / 2, screen.y + scaledTileHeight + scaledTileHeight / 2); // Base gauche
+                this.ctx.lineTo(screen.x - scaledTileWidth / 2, screen.y + scaledTileHeight + scaledTileHeight / 2 - cubeHeight); // Haut gauche
+                this.ctx.lineTo(screen.x, screen.y + scaledTileHeight - cubeHeight); // Haut centre
+                this.ctx.closePath();
+                this.ctx.fillStyle = '#a8a8a8'; // Gris foncé (ombre)
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#999999';
+                this.ctx.lineWidth = 1;
+                this.ctx.stroke();
+                
+                // Face LEFT (côté gauche visible - avant-gauche)
+                this.ctx.beginPath();
+                this.ctx.moveTo(screen.x, screen.y + scaledTileHeight); // Base centre (sol)
+                this.ctx.lineTo(screen.x + scaledTileWidth / 2, screen.y + scaledTileHeight + scaledTileHeight / 2); // Base droite
+                this.ctx.lineTo(screen.x + scaledTileWidth / 2, screen.y + scaledTileHeight + scaledTileHeight / 2 - cubeHeight); // Haut droite
+                this.ctx.lineTo(screen.x, screen.y + scaledTileHeight - cubeHeight); // Haut centre
+                this.ctx.closePath();
+                this.ctx.fillStyle = '#d0d0d0'; // Gris moyen (lumière)
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#999999';
+                this.ctx.stroke();
+                
+                // Face TOP (dessus du cube)
+                this.ctx.beginPath();
+                this.ctx.moveTo(screen.x, screen.y + scaledTileHeight - cubeHeight); // Centre haut
+                this.ctx.lineTo(screen.x + scaledTileWidth / 2, screen.y + scaledTileHeight + scaledTileHeight / 2 - cubeHeight); // Droite haut
+                this.ctx.lineTo(screen.x, screen.y + scaledTileHeight * 2 - cubeHeight); // Arrière haut
+                this.ctx.lineTo(screen.x - scaledTileWidth / 2, screen.y + scaledTileHeight + scaledTileHeight / 2 - cubeHeight); // Gauche haut
+                this.ctx.closePath();
+                this.ctx.fillStyle = '#f8f8f8'; // Blanc cassé (plus clair)
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#999999';
+                this.ctx.stroke();
+                
+                this.ctx.restore();
+            }
+            
+            drawEntity(gridX, gridY, emoji, scale = 1) {
+                const screen = this.gridToScreen(gridX, gridY);
+                const scaledTileHeight = TILE_HEIGHT * ZOOM_LEVEL;
+                const fontSize = 32 * scale * ZOOM_LEVEL;
+                
+                this.ctx.save();
+                this.ctx.font = `${fontSize}px Arial`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                // Ombre
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                this.ctx.fillText(emoji, screen.x + 2, screen.y + scaledTileHeight / 2 + 2);
+                
+                // Entité
+                this.ctx.fillStyle = '#fff';
+                this.ctx.fillText(emoji, screen.x, screen.y + scaledTileHeight / 2);
+                
+                this.ctx.restore();
+            }
+            
+            render() {
+                // Smooth camera
+                this.camera.x += (this.camera.targetX - this.camera.x) * this.camera.smoothing;
+                this.camera.y += (this.camera.targetY - this.camera.y) * this.camera.smoothing;
+                
+                // Clear
+                this.ctx.fillStyle = '#0a0a0f';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Dessiner grille
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        const tile = this.grid[y][x];
+                        let color = COLORS.EMPTY;
+                        
+                        // Les entités sont considérées comme étant SUR du FLOOR
+                        if (tile === TILE_TYPES.FLOOR || tile === TILE_TYPES.PLAYER || tile === TILE_TYPES.ENEMY) {
+                            color = COLORS.FLOOR;
+                            
+                            // Highlight hover
+                            if (this.hoveredTile && this.hoveredTile.x === x && this.hoveredTile.y === y) {
+                                color = COLORS.FLOOR_HIGHLIGHT;
+                            }
+                            
+                            // Highlight move range
+                            if (this.moveRange.some(t => t.x === x && t.y === y)) {
+                                color = COLORS.RANGE;
+                            }
+                            
+                            this.drawTile(x, y, color);
+                        } else if (tile === TILE_TYPES.OBSTACLE) {
+                            // Dessiner un cube 3D pour les murs
+                            this.drawCube(x, y);
+                        } else {
+                            // Tuiles vides
+                            this.drawTile(x, y, color);
+                        }
+                    }
+                }
+                
+                // Dessiner path
+                if (this.path && this.path.length > 1) {
+                    this.ctx.strokeStyle = COLORS.PATH;
+                    this.ctx.lineWidth = 3;
+                    this.ctx.setLineDash([5, 5]);
+                    
+                    this.ctx.beginPath();
+                    for (let i = 0; i < this.path.length; i++) {
+                        const screen = this.gridToScreen(this.path[i].x, this.path[i].y);
+                        if (i === 0) {
+                            this.ctx.moveTo(screen.x, screen.y + TILE_HEIGHT / 2);
+                        } else {
+                            this.ctx.lineTo(screen.x, screen.y + TILE_HEIGHT / 2);
+                        }
+                    }
+                    this.ctx.stroke();
+                    this.ctx.setLineDash([]);
+                }
+                
+                // Dessiner entités PAR-DESSUS les tuiles
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        const tile = this.grid[y][x];
+                        
+                        if (tile === TILE_TYPES.PLAYER) {
+                            this.drawEntity(x, y, '🛡️', 1.2);
+                        } else if (tile === TILE_TYPES.ENEMY) {
+                            this.drawEntity(x, y, '👹', 1.0);
+                        }
+                    }
+                }
+                
+                // Dessiner coffres (en accédant depuis le game)
+                if (window.game && window.game.chests) {
+                    for (const chest of window.game.chests) {
+                        const icon = chest.opened ? '📂' : '📦';
+                        this.drawEntity(chest.x, chest.y, icon, 0.9);
+                    }
+                }
+            }
+            
+            centerOnPlayer() {
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        if (this.grid[y][x] === TILE_TYPES.PLAYER) {
+                            const screen = this.gridToScreen(x, y);
+                            this.camera.targetX = screen.x - this.canvas.width / 2;
+                            this.camera.targetY = screen.y - this.canvas.height / 2;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // COMBAT LOG
+        // ═══════════════════════════════════════════════════════════
+        class CombatLog {
+            constructor() {
+                this.container = document.getElementById('logEntries');
+                this.maxEntries = 50;
+            }
+            
+            add(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = message;
+                
+                this.container.insertBefore(entry, this.container.firstChild);
+                
+                // Limiter le nombre d'entrées
+                while (this.container.children.length > this.maxEntries) {
+                    this.container.removeChild(this.container.lastChild);
+                }
+            }
+            
+            clear() {
+                this.container.innerHTML = '';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // LOOT REVEAL SYSTEM
+        // ═══════════════════════════════════════════════════════════
+        class LootRevealSystem {
+            constructor() {
+                this.isRevealing = false;
+                console.log('🎰 Loot Reveal System initialized');
+            }
+
+            async revealItem(item, onComplete) {
+                if (this.isRevealing) return;
+                this.isRevealing = true;
+
+                const rollContainer = this.createRollContainer();
+                const itemPool = this.generateItemPool(item);
+
+                await this.animateRoll(rollContainer, itemPool, item);
+                await this.revealFinal(rollContainer, item);
+
+                setTimeout(() => {
+                    if (rollContainer.parentNode) {
+                        rollContainer.parentNode.removeChild(rollContainer);
+                    }
+                    this.isRevealing = false;
+                    if (onComplete) onComplete();
+                }, 1000);
+            }
+
+            createRollContainer() {
+                const container = document.createElement('div');
+                container.className = 'loot-roll-container';
+                container.innerHTML = `
+                    <div class="loot-roll-window">
+                        <div class="loot-roll-track"></div>
+                        <div class="loot-roll-indicator"></div>
+                    </div>
+                    <div class="loot-roll-glow"></div>
+                `;
+                document.body.appendChild(container);
+                return container;
+            }
+
+            generateItemPool(targetItem) {
+                const pool = [];
+                const rarities = ['common', 'uncommon', 'rare'];
+                
+                for (let i = 0; i < 10; i++) {
+                    pool.push({
+                        icon: ['⚔️', '🛡️', '🧪', '📜', '💎'][Math.floor(Math.random() * 5)],
+                        name: 'Item',
+                        rarity: rarities[Math.floor(Math.random() * rarities.length)]
+                    });
+                }
+                
+                pool.push(targetItem);
+                
+                for (let i = 0; i < 9; i++) {
+                    pool.push({
+                        icon: ['⚔️', '🛡️', '🧪', '📜', '💎'][Math.floor(Math.random() * 5)],
+                        name: 'Item',
+                        rarity: rarities[Math.floor(Math.random() * rarities.length)]
+                    });
+                }
+                
+                return pool;
+            }
+
+            async animateRoll(container, itemPool, targetItem) {
+                const track = container.querySelector('.loot-roll-track');
+                const itemSize = 100;
+                const targetIndex = 10;
+
+                itemPool.forEach((item) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'loot-roll-item';
+                    itemEl.innerHTML = `
+                        <div class="loot-roll-item-icon">${item.icon}</div>
+                        <div class="loot-roll-item-name">${item.name}</div>
+                    `;
+                    itemEl.style.borderColor = this.getRarityColor(item.rarity);
+                    track.appendChild(itemEl);
+                });
+
+                const totalDistance = targetIndex * itemSize;
+                const duration = 3000;
+                const startTime = Date.now();
+
+                return new Promise(resolve => {
+                    const animate = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(1, elapsed / duration);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        
+                        let position = -totalDistance * eased;
+                        
+                        if (progress > 0.9) {
+                            const overshootProgress = (progress - 0.9) / 0.1;
+                            const overshoot = Math.sin(overshootProgress * Math.PI) * 10;
+                            position += overshoot;
+                        }
+
+                        track.style.transform = `translateY(${position}px)`;
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            track.style.transform = `translateY(${-totalDistance}px)`;
+                            resolve();
+                        }
+                    };
+                    animate();
+                });
+            }
+
+            async revealFinal(container, item) {
+                const glow = container.querySelector('.loot-roll-glow');
+                const flashColor = this.getRarityColor(item.rarity);
+                
+                if (glow) {
+                    glow.style.opacity = '1';
+                    glow.style.boxShadow = `0 0 60px ${flashColor}`;
+                }
+
+                await this.delay(800);
+            }
+
+            getRarityColor(rarity) {
+                const colors = {
+                    common: '#9CA3AF',
+                    uncommon: '#10B981',
+                    rare: '#3B82F6',
+                    legendary: '#F59E0B'
+                };
+                return colors[rarity] || colors.common;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // FPS COUNTER
+        // ═══════════════════════════════════════════════════════════
+        class FPSCounter {
+            constructor() {
+                this.fps = 60;
+                this.frames = [];
+                this.lastTime = performance.now();
+            }
+            
+            update() {
+                const now = performance.now();
+                while (this.frames.length > 0 && this.frames[0] <= now - 1000) {
+                    this.frames.shift();
+                }
+                this.frames.push(now);
+                this.fps = this.frames.length;
+                this.lastTime = now;
+                
+                document.getElementById('debugFps').textContent = this.fps;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // GAME MANAGER
+        // ═══════════════════════════════════════════════════════════
+        class CombatGame {
+            constructor() {
+                this.canvas = document.getElementById('combatCanvas');
+                this.generator = new CombatRoomGenerator();
+                this.grid = null;
+                this.renderer = null;
+                this.log = new CombatLog();
+                this.fpsCounter = new FPSCounter();
+                this.dice = new D6System();
+                this.pactSystem = new PactSystem(this);
+                this.thalysChoice = new ThalysChoiceSystem(this);
+                
+                this.player = {
+                    x: 0,
+                    y: 0,
+                    hp: 100,
+                    maxHp: 100,
+                    ap: 6,
+                    maxAp: 6,
+                    corruption: 0,
+                    equipped: {
+                        weapon: 'rusty_sword',
+                        armor: null
+                    },
+                    inventory: ['iron_axe', 'leather_armor', 'health_potion', 'health_potion'],
+                    thalysDefense: false // Défense absolue active
+                };
+                
+                this.enemies = [];
+                this.chests = []; // Coffres dans la salle
+                this.turn = 'player';
+                this.mode = 'select'; // select, move, attack, target_attack, target_skill, loot
+                this.enemyManipulated = false; // Manipulation ennemi active
+                this.selectedTarget = null;
+                this.selectedSkill = null; // Skill sélectionnée
+                this.statusEffects = new Map(); // Map<entityId, Array<Effect>>
+                this.skills = this.initSkills();
+                this.lootSystem = new LootRevealSystem();
+                
+                // Pan/Grab
+                this.isPanning = false;
+                this.panStart = { x: 0, y: 0 };
+                this.panOffset = { x: 0, y: 0 };
+                
+                this.init();
+                this.setupEvents();
+                this.setupControls();
+                this.renderInventory();
+                this.renderSkills();
+            }
+            
+            init() {
+                this.log.add('🎮 Combat initialisé', 'info');
+                this.generateNewRoom();
+            }
+            
+            initSkills() {
+                return {
+                    fireball: {
+                        id: 'fireball',
+                        name: '🔥 Boule de Feu',
+                        apCost: 3,
+                        cooldown: 2,
+                        currentCooldown: 0,
+                        damage: '2d6',
+                        range: 5,
+                        effect: 'burn',
+                        description: 'Lance une boule de feu. Inflige dégâts de feu et applique Brûlure (1 tour).'
+                    },
+                    heal: {
+                        id: 'heal',
+                        name: '💚 Soin',
+                        apCost: 2,
+                        cooldown: 3,
+                        currentCooldown: 0,
+                        heal: '1d6+2',
+                        range: 0,
+                        description: 'Soigne le joueur.'
+                    },
+                    poison_dart: {
+                        id: 'poison_dart',
+                        name: '☠️ Fléchette Empoisonnée',
+                        apCost: 2,
+                        cooldown: 1,
+                        currentCooldown: 0,
+                        damage: '1d6',
+                        range: 6,
+                        effect: 'poison',
+                        description: 'Tire une fléchette. Applique Poison (3 tours).'
+                    },
+                    shield: {
+                        id: 'shield',
+                        name: '🛡️ Bouclier Arcanique',
+                        apCost: 2,
+                        cooldown: 4,
+                        currentCooldown: 0,
+                        range: 0,
+                        effect: 'shield',
+                        description: 'Crée un bouclier qui absorbe 10 HP de dégâts (2 tours).'
+                    }
+                };
+            }
+            
+            generateNewRoom() {
+                this.log.clear();
+                this.log.add(`🏗️ Génération salle ${GRID_SIZE}x${GRID_SIZE} (${Math.round(OBSTACLE_PERCENT * 100)}% obstacles)`, 'info');
+                
+                // 1. Générer la salle (tuiles WALK et WALL uniquement)
+                this.grid = this.generator.generate();
+                this.log.add(`✅ Salle générée avec ${this.generator.obstacles.length} obstacles`, 'info');
+                
+                // 2. Placer le joueur sur une tuile WALK aléatoire
+                this.placePlayerRandomly();
+                this.log.add(`🛡️ Joueur placé en (${this.player.x}, ${this.player.y})`, 'info');
+                
+                // 3. Placer les ennemis sur des tuiles WALK aléatoires (loin du joueur)
+                const enemyCount = 2 + Math.floor(Math.random() * 3);
+                this.spawnEnemies(enemyCount);
+                this.log.add(`👹 ${enemyCount} ennemis placés`, 'info');
+                
+                // 4. Placer des coffres aléatoires
+                const chestCount = 1 + Math.floor(Math.random() * 3);
+                this.spawnChests(chestCount);
+                this.log.add(`📦 ${chestCount} coffres placés`, 'info');
+                
+                // 5. Créer ou mettre à jour le renderer
+                if (this.renderer) {
+                    this.renderer.grid = this.grid;
+                } else {
+                    this.renderer = new IsometricRenderer(this.canvas, this.grid);
+                }
+                
+                this.renderer.centerOnPlayer();
+                this.renderer.render();
+                
+                this.updateUI();
+                this.updateDebugInfo();
+            }
+            
+            updateDebugInfo() {
+                document.getElementById('debugGrid').textContent = `${GRID_SIZE}x${GRID_SIZE}`;
+                document.getElementById('debugTileSize').textContent = `${TILE_WIDTH}px`;
+            }
+            
+            placePlayerRandomly() {
+                // Récupérer toutes les tuiles FLOOR (walkable)
+                const floorTiles = [];
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        if (this.grid[y][x] === TILE_TYPES.FLOOR) {
+                            floorTiles.push({ x, y });
+                        }
+                    }
+                }
+                
+                if (floorTiles.length === 0) {
+                    console.error('Aucune tuile FLOOR disponible pour le joueur !');
+                    return;
+                }
+                
+                // Choisir une tuile aléatoire
+                const tile = floorTiles[Math.floor(Math.random() * floorTiles.length)];
+                this.player.x = tile.x;
+                this.player.y = tile.y;
+                this.grid[tile.y][tile.x] = TILE_TYPES.PLAYER;
+            }
+            
+            spawnEnemies(count) {
+                this.enemies = [];
+                
+                // Récupérer toutes les tuiles FLOOR disponibles
+                const floorTiles = [];
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        if (this.grid[y][x] === TILE_TYPES.FLOOR) {
+                            // Ne pas spawn trop près du joueur (distance Manhattan > 5)
+                            const dist = Math.abs(x - this.player.x) + Math.abs(y - this.player.y);
+                            if (dist > 5) {
+                                floorTiles.push({ x, y });
+                            }
+                        }
+                    }
+                }
+                
+                // Placer les ennemis
+                for (let i = 0; i < count && floorTiles.length > 0; i++) {
+                    const index = Math.floor(Math.random() * floorTiles.length);
+                    const tile = floorTiles.splice(index, 1)[0];
+                    
+                    this.enemies.push({
+                        x: tile.x,
+                        y: tile.y,
+                        hp: 50,
+                        maxHp: 50
+                    });
+                    
+                    this.grid[tile.y][tile.x] = TILE_TYPES.ENEMY;
+                }
+                
+                document.getElementById('debugEnemies').textContent = this.enemies.length;
+            }
+            
+            spawnChests(count) {
+                this.chests = [];
+                
+                // Récupérer toutes les tuiles FLOOR disponibles (pas occupées)
+                const floorTiles = [];
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        if (this.grid[y][x] === TILE_TYPES.FLOOR) {
+                            // Ne pas spawn trop près du joueur
+                            const dist = Math.abs(x - this.player.x) + Math.abs(y - this.player.y);
+                            if (dist > 3) {
+                                floorTiles.push({ x, y });
+                            }
+                        }
+                    }
+                }
+                
+                // Placer les coffres
+                for (let i = 0; i < count && floorTiles.length > 0; i++) {
+                    const index = Math.floor(Math.random() * floorTiles.length);
+                    const tile = floorTiles.splice(index, 1)[0];
+                    
+                    this.chests.push({
+                        x: tile.x,
+                        y: tile.y,
+                        opened: false,
+                        loot: this.generateChestLoot()
+                    });
+                    
+                    // Ne pas marquer la tuile, le coffre n'est pas un obstacle
+                }
+            }
+            
+            generateChestLoot() {
+                // Générer loot aléatoire avec différentes raretés
+                const lootTypes = [
+                    { type: 'weapon', rarity: 'common', icon: '⚔️', names: ['Épée Rouillée', 'Dague', 'Hache'] },
+                    { type: 'weapon', rarity: 'uncommon', icon: '⚔️', names: ['Épée en Fer', 'Hache de Guerre'] },
+                    { type: 'weapon', rarity: 'rare', icon: '⚔️', names: ['Lame Enchantée', 'Hache du Dragon'] },
+                    { type: 'armor', rarity: 'common', icon: '🛡️', names: ['Armure de Cuir', 'Bouclier en Bois'] },
+                    { type: 'armor', rarity: 'uncommon', icon: '🛡️', names: ['Armure de Mailles', 'Bouclier de Fer'] },
+                    { type: 'potion', rarity: 'common', icon: '🧪', names: ['Potion de Soin', 'Potion de Mana'] },
+                    { type: 'scroll', rarity: 'uncommon', icon: '📜', names: ['Parchemin de Feu', 'Parchemin de Glace'] },
+                    { type: 'material', rarity: 'common', icon: '⚙️', names: ['Minerai de Fer', 'Bois'] },
+                    { type: 'gold', rarity: 'common', icon: '💰', names: ['Pièces d\'or'] }
+                ];
+                
+                const selected = lootTypes[Math.floor(Math.random() * lootTypes.length)];
+                const itemName = selected.names[Math.floor(Math.random() * selected.names.length)];
+                
+                return {
+                    type: selected.type,
+                    rarity: selected.rarity,
+                    icon: selected.icon,
+                    name: itemName,
+                    amount: selected.type === 'gold' ? 10 + Math.floor(Math.random() * 50) : 1
+                };
+            }
+            
+            setupControls() {
+                // Slider obstacles
+                const obstacleSlider = document.getElementById('obstaclePercent');
+                const obstacleValue = document.getElementById('obstaclePercentValue');
+                obstacleSlider.addEventListener('input', (e) => {
+                    obstacleValue.textContent = e.target.value;
+                    OBSTACLE_PERCENT = parseInt(e.target.value) / 100;
+                });
+                
+                // Slider taille tuile
+                const tileSizeSlider = document.getElementById('tileSize');
+                const tileSizeValue = document.getElementById('tileSizeValue');
+                tileSizeSlider.addEventListener('input', (e) => {
+                    tileSizeValue.textContent = e.target.value;
+                    TILE_WIDTH = parseInt(e.target.value);
+                    TILE_HEIGHT = TILE_WIDTH / 2;
+                    if (this.renderer) {
+                        this.renderer.render();
+                    }
+                });
+                
+                // Select taille grille
+                const gridSizeSelect = document.getElementById('gridSize');
+                gridSizeSelect.addEventListener('change', (e) => {
+                    GRID_SIZE = parseInt(e.target.value);
+                });
+                
+                // Checkbox grille
+                const showGridCheckbox = document.getElementById('showGrid');
+                showGridCheckbox.addEventListener('change', (e) => {
+                    if (this.renderer) {
+                        this.renderer.showGrid = e.target.checked;
+                        this.renderer.render();
+                    }
+                });
+                
+                // Checkbox coordonnées
+                const showCoordsCheckbox = document.getElementById('showCoords');
+                showCoordsCheckbox.addEventListener('change', (e) => {
+                    if (this.renderer) {
+                        this.renderer.showCoords = e.target.checked;
+                        this.renderer.render();
+                    }
+                });
+                
+                // Checkbox boussole
+                const showCompassCheckbox = document.getElementById('showCompass');
+                showCompassCheckbox.addEventListener('change', (e) => {
+                    const compass = document.querySelector('.compass-overlay');
+                    compass.style.display = e.target.checked ? 'block' : 'none';
+                });
+                
+                // Checkbox frame
+                const showFrameCheckbox = document.getElementById('showFrame');
+                showFrameCheckbox.addEventListener('change', (e) => {
+                    const frame = document.querySelector('.frame-overlay');
+                    const crosshair = document.querySelector('.center-crosshair');
+                    frame.style.display = e.target.checked ? 'block' : 'none';
+                    crosshair.style.display = e.target.checked ? 'block' : 'none';
+                });
+                
+                // Bouton test corruption
+                document.getElementById('btnAddCorruption').addEventListener('click', () => {
+                    this.addCorruption(10);
+                });
+            }
+            
+            setupEvents() {
+                // Mouse move
+                this.canvas.addEventListener('mousemove', (e) => {
+                    if (!this.renderer) return;
+                    
+                    // Si en train de pan
+                    if (this.isPanning) {
+                        const dx = e.clientX - this.panStart.x;
+                        const dy = e.clientY - this.panStart.y;
+                        
+                        this.renderer.camera.targetX = this.panOffset.x - dx;
+                        this.renderer.camera.targetY = this.panOffset.y - dy;
+                        this.renderer.camera.x = this.renderer.camera.targetX;
+                        this.renderer.camera.y = this.renderer.camera.targetY;
+                        
+                        return;
+                    }
+                    
+                    const rect = this.canvas.getBoundingClientRect();
+                    const gridPos = this.renderer.screenToGrid(
+                        e.clientX - rect.left,
+                        e.clientY - rect.top
+                    );
+                    
+                    if (gridPos.x >= 0 && gridPos.x < GRID_SIZE && gridPos.y >= 0 && gridPos.y < GRID_SIZE) {
+                        this.renderer.hoveredTile = gridPos;
+                        document.getElementById('debugHover').textContent = `${gridPos.x}, ${gridPos.y}`;
+                        
+                        // Si en mode déplacement, calculer path
+                        if (this.mode === 'move') {
+                            const astar = new AStar(this.grid);
+                            this.renderer.path = astar.findPath(
+                                { x: this.player.x, y: this.player.y },
+                                gridPos
+                            );
+                        }
+                    } else {
+                        this.renderer.hoveredTile = null;
+                        document.getElementById('debugHover').textContent = '-';
+                    }
+                    
+                    this.renderer.render();
+                });
+                
+                // Mouse down - Start pan
+                this.canvas.addEventListener('mousedown', (e) => {
+                    if (!this.renderer) return;
+                    
+                    if (e.button === 0) { // Left click
+                        this.isPanning = true;
+                        this.panStart = { x: e.clientX, y: e.clientY };
+                        this.panOffset = { x: this.renderer.camera.x, y: this.renderer.camera.y };
+                        this.canvas.classList.add('grabbing');
+                    }
+                });
+                
+                // Mouse up - End pan or click
+                this.canvas.addEventListener('mouseup', (e) => {
+                    if (!this.renderer) return;
+                    
+                    if (this.isPanning) {
+                        this.isPanning = false;
+                        this.canvas.classList.remove('grabbing');
+                        
+                        // Si très petit déplacement, considérer comme un click
+                        const dx = Math.abs(e.clientX - this.panStart.x);
+                        const dy = Math.abs(e.clientY - this.panStart.y);
+                        
+                        if (dx < 5 && dy < 5) {
+                            // C'est un click, pas un pan
+                            this.handleCanvasClick(e);
+                        }
+                    }
+                });
+                
+                // Mouse leave - Cancel pan
+                this.canvas.addEventListener('mouseleave', () => {
+                    if (this.isPanning) {
+                        this.isPanning = false;
+                        this.canvas.classList.remove('grabbing');
+                    }
+                });
+                
+                // Mouse wheel - Zoom
+                this.canvas.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    if (!this.renderer) return;
+                    
+                    const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+                    this.setZoom(ZOOM_LEVEL + delta);
+                });
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (!this.renderer) return;
+                    
+                    // Zoom avec + et -
+                    if (e.key === '+' || e.key === '=') {
+                        e.preventDefault();
+                        this.setZoom(ZOOM_LEVEL + ZOOM_STEP);
+                    } else if (e.key === '-' || e.key === '_') {
+                        e.preventDefault();
+                        this.setZoom(ZOOM_LEVEL - ZOOM_STEP);
+                    }
+                    
+                    // Reset zoom avec 0
+                    if (e.key === '0') {
+                        e.preventDefault();
+                        this.setZoom(1.0);
+                    }
+                    
+                    // Recentrer caméra avec C ou Espace
+                    if (e.key === 'c' || e.key === 'C' || e.key === ' ') {
+                        e.preventDefault();
+                        this.centerOnPlayer();
+                    }
+                });
+                
+                // Boutons
+                document.getElementById('btnMove').addEventListener('click', () => this.enterMoveMode());
+                document.getElementById('btnAttack').addEventListener('click', () => this.enterAttackMode());
+                document.getElementById('btnEndTurn').addEventListener('click', () => this.endTurn());
+                document.getElementById('btnNewRoom').addEventListener('click', () => this.generateNewRoom());
+                document.getElementById('btnCenterCamera').addEventListener('click', () => this.centerOnPlayer());
+                document.getElementById('btnToggleGrid').addEventListener('click', () => this.toggleGrid());
+                document.getElementById('btnToggleSettings').addEventListener('click', () => this.toggleSettings());
+                
+                // Boutons zoom
+                document.getElementById('btnZoomIn').addEventListener('click', () => this.setZoom(ZOOM_LEVEL + ZOOM_STEP));
+                document.getElementById('btnZoomOut').addEventListener('click', () => this.setZoom(ZOOM_LEVEL - ZOOM_STEP));
+                document.getElementById('btnZoomReset').addEventListener('click', () => this.setZoom(1.0));
+            }
+            
+            handleCanvasClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const gridPos = this.renderer.screenToGrid(
+                    e.clientX - rect.left,
+                    e.clientY - rect.top
+                );
+                
+                // Vérifier si on a cliqué sur un coffre
+                const chest = this.chests.find(c => c.x === gridPos.x && c.y === gridPos.y);
+                if (chest && !chest.opened) {
+                    // Vérifier la distance au joueur (doit être adjacent)
+                    const dist = Math.abs(chest.x - this.player.x) + Math.abs(chest.y - this.player.y);
+                    if (dist <= 1) {
+                        this.openChest(chest);
+                        return;
+                    } else {
+                        this.log.add('📦 Trop loin du coffre (distance max: 1)', 'info');
+                        return;
+                    }
+                }
+                
+                if (this.mode === 'move' && this.renderer.path && this.renderer.path.length > 1) {
+                    this.movePlayer(this.renderer.path[this.renderer.path.length - 1]);
+                } else if (this.mode === 'target_attack') {
+                    // Vérifier si on a cliqué sur un ennemi
+                    const enemy = this.enemies.find(e => e.x === gridPos.x && e.y === gridPos.y);
+                    if (enemy) {
+                        this.performAttack(enemy);
+                    } else {
+                        this.log.add('⚠️ Aucun ennemi à cette position', 'info');
+                    }
+                } else if (this.mode === 'target_skill') {
+                    // Vérifier si on a cliqué sur un ennemi
+                    const enemy = this.enemies.find(e => e.x === gridPos.x && e.y === gridPos.y);
+                    if (enemy) {
+                        // Vérifier la portée
+                        const dist = Math.abs(enemy.x - this.player.x) + Math.abs(enemy.y - this.player.y);
+                        if (dist <= this.selectedSkill.range) {
+                            this.executeSkill(this.selectedSkill, enemy);
+                        } else {
+                            this.log.add('⚠️ Cible hors de portée', 'error');
+                        }
+                    } else {
+                        this.log.add('⚠️ Aucun ennemi à cette position', 'info');
+                        this.mode = 'select';
+                        this.selectedSkill = null;
+                        this.renderer.moveRange = null;
+                        this.renderer.render();
+                    }
+                }
+            }
+            
+            openChest(chest) {
+                chest.opened = true;
+                this.log.add(`📦 Coffre ouvert ! Vous trouvez: ${chest.loot.name}`, 'success');
+                
+                // Révélation du loot avec animation
+                this.lootSystem.revealItem(chest.loot, () => {
+                    // Ajouter à l'inventaire
+                    this.player.inventory.push(chest.loot.name.toLowerCase().replace(/\s/g, '_'));
+                    this.renderInventory();
+                    this.log.add(`✨ ${chest.loot.icon} ${chest.loot.name} ajouté à l'inventaire`, 'success');
+                });
+                
+                this.renderer.render();
+            }
+            
+            enterMoveMode() {
+                if (this.turn !== 'player') {
+                    this.log.add('⚠️ Ce n\'est pas votre tour !', 'info');
+                    return;
+                }
+                
+                if (this.player.ap < 2) {
+                    this.log.add('⚠️ Pas assez de PA (2 requis)', 'info');
+                    return;
+                }
+                
+                this.mode = 'move';
+                document.getElementById('debugMode').textContent = 'Déplacement';
+                
+                // Calculer portée de déplacement (6 tuiles)
+                this.renderer.moveRange = this.getTilesInRange(this.player, 6);
+                this.renderer.render();
+                
+                this.log.add('🚶 Mode déplacement activé', 'move');
+            }
+            
+            enterAttackMode() {
+                if (this.turn !== 'player') {
+                    this.log.add('⚠️ Ce n\'est pas votre tour !', 'info');
+                    return;
+                }
+                
+                if (this.player.ap < 3) {
+                    this.log.add('⚠️ Pas assez de PA (3 requis)', 'info');
+                    return;
+                }
+                
+                const weapon = ITEMS[this.player.equipped.weapon];
+                if (!weapon) {
+                    this.log.add('⚠️ Aucune arme équipée !', 'info');
+                    return;
+                }
+                
+                this.mode = 'target_attack';
+                document.getElementById('debugMode').textContent = 'Attaque - Cible';
+                
+                // Highlight ennemis à portée
+                const range = weapon.stats.range;
+                this.renderer.moveRange = this.getEnemiesInRange(range);
+                this.renderer.render();
+                
+                this.log.add(`⚔️ Sélectionnez une cible (portée ${range})`, 'info');
+            }
+            
+            getEnemiesInRange(range) {
+                const tiles = [];
+                this.enemies.forEach(enemy => {
+                    const dist = Math.abs(enemy.x - this.player.x) + Math.abs(enemy.y - this.player.y);
+                    if (dist <= range) {
+                        tiles.push({ x: enemy.x, y: enemy.y });
+                    }
+                });
+                return tiles;
+            }
+            
+            async performAttack(target) {
+                const weapon = ITEMS[this.player.equipped.weapon];
+                
+                // 1. OFFRIR PACTE (Phase avant roll)
+                this.log.add('📜 Proposition de pacte...', 'info');
+                const pactResult = await this.pactSystem.offerPact();
+                
+                let pactEffect = null;
+                if (pactResult.accepted) {
+                    pactEffect = this.pactSystem.getPactData(pactResult.pact).effect;
+                }
+                
+                // 2. ROLL D6
+                const diceWidget = document.getElementById('diceWidget');
+                diceWidget.classList.add('visible');
+                
+                this.log.add('🎲 Lancer le dé...', 'info');
+                let roll = await this.dice.roll(this.player.corruption);
+                
+                // Appliquer effets de pacte
+                if (pactEffect === 'reroll' && roll < weapon.stats.threshold) {
+                    this.log.add('⚡ Altération Mineure : Relance !', 'info');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    roll = await this.dice.roll(this.player.corruption);
+                } else if (pactEffect === 'bias' && (roll === 1 || roll === 2)) {
+                    this.log.add('🎯 Biais Ciblé : Thalys forcé !', 'attack');
+                    roll = 'Thalys';
+                    this.dice.currentRoll = 'Thalys';
+                    this.dice.thalysRevealed = true;
+                    this.dice.renderDice();
+                } else if (pactEffect === 'force_thalys') {
+                    this.log.add('👁️ Marque Divine : Thalys invoqué !', 'attack');
+                    roll = 'Thalys';
+                    this.dice.currentRoll = 'Thalys';
+                    this.dice.thalysRevealed = true;
+                    this.dice.renderDice();
+                }
+                
+                // 3. VÉRIFIER SUCCÈS & THALYS
+                const threshold = weapon.stats.threshold;
+                const success = roll >= threshold;
+                
+                let thalysChoice = null;
+                if (roll === 'Thalys') {
+                    this.log.add('👁️ THALYS révélé !', 'attack');
+                    this.addCorruption(5);
+                    
+                    // Offrir menu de choix Thalys
+                    this.log.add('👁️ Thalys t\'offre son pouvoir...', 'info');
+                    thalysChoice = await this.thalysChoice.offerChoice();
+                    this.log.add(`✨ Choix sélectionné : ${thalysChoice.name}`, 'attack');
+                }
+                
+                // 4. APPLIQUER DÉGÂTS
+                if (success || roll === 'Thalys') {
+                    const baseDmg = weapon.stats.attack;
+                    const rollBonus = roll === 'Thalys' ? 6 : roll;
+                    let totalDmg = baseDmg + rollBonus;
+                    
+                    // Appliquer effet Thalys si Amplify
+                    if (thalysChoice && thalysChoice.choice === 'amplify') {
+                        totalDmg = thalysChoice.apply(totalDmg);
+                        this.log.add(`⚡ Dégâts amplifiés par Thalys !`, 'attack');
+                    }
+                    
+                    // Appliquer effets défense/manipulation
+                    if (thalysChoice && thalysChoice.choice === 'defense') {
+                        this.player.thalysDefense = true;
+                        this.log.add(`🛡️ Défense absolue activée !`, 'info');
+                    }
+                    if (thalysChoice && thalysChoice.choice === 'manipulate') {
+                        this.enemyManipulated = true;
+                        this.log.add(`🎭 Prochaine attaque ennemie manipulée !`, 'info');
+                    }
+                    
+                    target.hp -= totalDmg;
+                    this.log.add(`⚔️ Touché ! ${totalDmg} dégâts (${baseDmg}+${rollBonus})`, 'attack');
+                    
+                    // Mort ennemi
+                    if (target.hp <= 0) {
+                        this.removeEnemy(target);
+                        this.log.add('💀 Ennemi vaincu !', 'attack');
+                    }
+                } else {
+                    this.log.add(`❌ Raté ! (${roll} < ${threshold})`, 'info');
+                }
+                
+                // Masquer dé
+                setTimeout(() => diceWidget.classList.remove('visible'), 1500);
+                
+                // Consommer PA
+                this.player.ap -= 3;
+                
+                // Reset mode
+                this.mode = 'select';
+                this.renderer.moveRange = [];
+                this.selectedTarget = null;
+                document.getElementById('debugMode').textContent = 'Sélection';
+                
+                this.renderer.render();
+                this.updateUI();
+                
+                // Vérifier victoire
+                if (this.enemies.length === 0) {
+                    this.log.add('🎉 VICTOIRE ! Tous les ennemis vaincus !', 'info');
+                    setTimeout(() => {
+                        alert('🎉 VICTOIRE !');
+                        this.generateNewRoom();
+                    }, 1500);
+                }
+            }
+            
+            removeEnemy(target) {
+                const index = this.enemies.indexOf(target);
+                if (index > -1) {
+                    this.enemies.splice(index, 1);
+                    this.grid[target.y][target.x] = TILE_TYPES.FLOOR;
+                    document.getElementById('debugEnemies').textContent = this.enemies.length;
+                }
+            }
+            
+            getTilesInRange(entity, range) {
+                const tiles = [];
+                const astar = new AStar(this.grid);
+                
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        if (this.grid[y][x] === TILE_TYPES.FLOOR) {
+                            const path = astar.findPath(
+                                { x: entity.x, y: entity.y },
+                                { x, y }
+                            );
+                            
+                            if (path && path.length <= range + 1) {
+                                tiles.push({ x, y });
+                            }
+                        }
+                    }
+                }
+                
+                return tiles;
+            }
+            
+            movePlayer(target) {
+                const oldX = this.player.x;
+                const oldY = this.player.y;
+                
+                // Effacer ancienne position
+                this.grid[this.player.y][this.player.x] = TILE_TYPES.FLOOR;
+                
+                // Nouvelle position
+                this.player.x = target.x;
+                this.player.y = target.y;
+                this.grid[target.y][target.x] = TILE_TYPES.PLAYER;
+                
+                // Consommer PA
+                this.player.ap -= 2;
+                
+                // Log
+                this.log.add(`🚶 Déplacement: (${oldX},${oldY}) → (${target.x},${target.y})`, 'move');
+                
+                // Reset mode
+                this.mode = 'select';
+                this.renderer.path = null;
+                this.renderer.moveRange = [];
+                document.getElementById('debugMode').textContent = 'Sélection';
+                
+                this.renderer.centerOnPlayer();
+                this.renderer.render();
+                this.updateUI();
+            }
+            
+            endTurn() {
+                if (this.turn !== 'player') {
+                    return; // Pas le tour du joueur
+                }
+                
+                // Traiter les effets de statut du joueur
+                this.processStatusEffects('player');
+                
+                // Réduire les cooldowns des compétences
+                this.reduceSkillCooldowns();
+                
+                // Reset PA et passe au tour ennemi
+                this.player.ap = this.player.maxAp;
+                this.turn = 'enemy';
+                this.log.add('⏭️ Fin du tour - Les ennemis agissent...', 'info');
+                
+                // Reset mode
+                this.mode = 'select';
+                this.renderer.path = null;
+                this.renderer.moveRange = [];
+                document.getElementById('debugMode').textContent = 'Sélection';
+                
+                this.updateUI();
+                this.renderSkills();
+                
+                // Tour des ennemis
+                setTimeout(() => this.executeEnemyTurn(), 500);
+            }
+            
+            executeEnemyTurn() {
+                this.log.add('👹 Tour des ennemis...', 'info');
+                
+                // Traiter les effets de statut des ennemis
+                this.enemies.forEach(enemy => {
+                    this.processStatusEffects(enemy.id);
+                });
+                
+                // Chaque ennemi agit à tour de rôle
+                let delay = 500;
+                
+                this.enemies.forEach((enemy, index) => {
+                    setTimeout(() => {
+                        if (enemy.hp > 0) { // Vérifier si pas mort par poison/burn
+                            this.executeEnemyAction(enemy);
+                        }
+                    }, delay * index);
+                });
+                
+                // Fin du tour ennemi après que tous aient agi
+                setTimeout(() => {
+                    this.turn = 'player';
+                    this.log.add('🎮 C\'est votre tour !', 'info');
+                    this.updateUI();
+                    this.renderSkills();
+                }, delay * this.enemies.length + 500);
+            }
+            
+            executeEnemyAction(enemy) {
+                // Calculer distance avec le joueur
+                const distToPlayer = Math.abs(enemy.x - this.player.x) + Math.abs(enemy.y - this.player.y);
+                
+                // Si à portée d'attaque (distance 1 ou 2)
+                if (distToPlayer <= 2) {
+                    this.enemyAttack(enemy);
+                } else {
+                    // Se déplacer vers le joueur
+                    this.enemyMove(enemy);
+                }
+            }
+            
+            enemyMove(enemy) {
+                const astar = new AStar(this.grid);
+                const path = astar.findPath(
+                    { x: enemy.x, y: enemy.y },
+                    { x: this.player.x, y: this.player.y }
+                );
+                
+                if (path && path.length > 1) {
+                    // Déplacer jusqu'à 3 cases max
+                    const moveSteps = Math.min(3, path.length - 1);
+                    const target = path[moveSteps];
+                    
+                    // Vérifier que la case cible n'est pas occupée par un autre ennemi
+                    const isOccupied = this.enemies.some(e => 
+                        e !== enemy && e.x === target.x && e.y === target.y
+                    );
+                    
+                    if (!isOccupied && this.grid[target.y][target.x] === TILE_TYPES.FLOOR) {
+                        // Effacer ancienne position
+                        this.grid[enemy.y][enemy.x] = TILE_TYPES.FLOOR;
+                        
+                        // Nouvelle position
+                        enemy.x = target.x;
+                        enemy.y = target.y;
+                        this.grid[target.y][target.x] = TILE_TYPES.ENEMY;
+                        
+                        this.log.add(`👹 Ennemi se déplace vers (${target.x},${target.y})`, 'info');
+                        this.renderer.render();
+                    }
+                }
+            }
+            
+            enemyAttack(enemy) {
+                // Calculer dégâts (10-20 dmg)
+                const damage = Math.floor(10 + Math.random() * 10);
+                this.player.hp = Math.max(0, this.player.hp - damage);
+                
+                this.log.add(`👹 Ennemi attaque ! -${damage} HP`, 'attack');
+                
+                // Vérifier défaite
+                if (this.player.hp <= 0) {
+                    this.log.add('💀 Vous êtes mort...', 'attack');
+                    setTimeout(() => {
+                        alert('💀 DÉFAITE ! Vous avez été vaincu...');
+                        this.generateNewRoom();
+                    }, 1000);
+                }
+                
+                this.updateUI();
+            }
+            
+            setZoom(newZoom) {
+                ZOOM_LEVEL = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newZoom));
+                const zoomPercent = Math.round(ZOOM_LEVEL * 100);
+                document.getElementById('zoomDisplay').textContent = `${zoomPercent}%`;
+                document.getElementById('debugZoom').textContent = `${zoomPercent}%`;
+                
+                if (this.renderer) {
+                    this.renderer.render();
+                }
+                
+                this.log.add(`🔍 Zoom: ${zoomPercent}%`, 'info');
+            }
+            
+            centerOnPlayer() {
+                if (this.renderer) {
+                    this.renderer.centerOnPlayer();
+                    this.log.add('🎯 Caméra centrée sur le joueur', 'info');
+                }
+            }
+            
+            toggleGrid() {
+                if (this.renderer) {
+                    this.renderer.showGrid = !this.renderer.showGrid;
+                    const state = this.renderer.showGrid ? 'activée' : 'désactivée';
+                    this.log.add(`📐 Grille ${state}`, 'info');
+                    this.renderer.render();
+                }
+            }
+            
+            toggleSettings() {
+                const panel = document.getElementById('roomSettings');
+                panel.classList.toggle('collapsed');
+            }
+            
+            renderInventory() {
+                const bar = document.getElementById('inventoryBar');
+                bar.innerHTML = '';
+                
+                const MAX_SLOTS = 10;
+                
+                // Afficher items équipés et inventaire
+                const allItems = [
+                    this.player.equipped.weapon,
+                    this.player.equipped.armor,
+                    ...this.player.inventory
+                ];
+                
+                for (let i = 0; i < MAX_SLOTS; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'inventory-slot';
+                    
+                    if (allItems[i]) {
+                        const item = ITEMS[allItems[i]] || allItems[i];
+                        slot.innerHTML = item.icon || '📦';
+                        slot.title = item.name || allItems[i];
+                        slot.classList.remove('empty');
+                    } else {
+                        slot.classList.add('empty');
+                    }
+                    
+                    bar.appendChild(slot);
+                }
+            }
+            
+            updateInventoryDisplay() {
+                // Liste inventaire
+                const list = document.getElementById('inventoryList');
+                list.innerHTML = '';
+                
+                this.player.inventory.forEach(itemId => {
+                    const item = ITEMS[itemId];
+                    if (!item) return;
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'inventory-item';
+                    itemDiv.innerHTML = `
+                        <span class="icon">${item.icon}</span>
+                        <span class="name">${item.name}</span>
+                    `;
+                    
+                    itemDiv.addEventListener('click', () => this.useItem(itemId));
+                    list.appendChild(itemDiv);
+                });
+            }
+            
+            useItem(itemId) {
+                const item = ITEMS[itemId];
+                if (!item) return;
+                
+                if (item.type === 'weapon') {
+                    // Équiper arme
+                    this.player.equipped.weapon = itemId;
+                    const index = this.player.inventory.indexOf(itemId);
+                    if (index > -1) this.player.inventory.splice(index, 1);
+                    this.log.add(`⚔️ ${item.name} équipée`, 'info');
+                } else if (item.type === 'armor') {
+                    // Équiper armure
+                    this.player.equipped.armor = itemId;
+                    const index = this.player.inventory.indexOf(itemId);
+                    if (index > -1) this.player.inventory.splice(index, 1);
+                    this.log.add(`🛡️ ${item.name} équipée`, 'info');
+                } else if (item.type === 'consumable') {
+                    // Utiliser consommable
+                    if (item.effect.heal) {
+                        this.player.hp = Math.min(this.player.maxHp, this.player.hp + item.effect.heal);
+                        this.log.add(`🧪 +${item.effect.heal} HP`, 'info');
+                    }
+                    const index = this.player.inventory.indexOf(itemId);
+                    if (index > -1) this.player.inventory.splice(index, 1);
+                }
+                
+                this.renderInventory();
+                this.updateUI();
+            }
+            
+            renderSkills() {
+                const quickbar = document.getElementById('skillsQuickbar');
+                quickbar.innerHTML = '';
+                
+                for (const skillId in this.skills) {
+                    const skill = this.skills[skillId];
+                    const isOnCooldown = skill.currentCooldown > 0;
+                    const canAfford = this.player.ap >= skill.apCost;
+                    const canUse = !isOnCooldown && canAfford && this.turn === 'player';
+                    
+                    const slot = document.createElement('div');
+                    slot.className = 'skill-slot' + (isOnCooldown ? ' on-cooldown' : '');
+                    slot.innerHTML = skill.name.split(' ')[0]; // Juste l'emoji
+                    slot.title = `${skill.name}\n${skill.description}\nCoût: ${skill.apCost} PA${isOnCooldown ? `\nCooldown: ${skill.currentCooldown}` : ''}`;
+                    
+                    if (isOnCooldown) {
+                        const overlay = document.createElement('div');
+                        overlay.className = 'cooldown-overlay';
+                        overlay.textContent = skill.currentCooldown;
+                        slot.appendChild(overlay);
+                    }
+                    
+                    if (canUse) {
+                        slot.style.cursor = 'pointer';
+                        slot.addEventListener('click', () => this.useSkill(skillId));
+                    }
+                    
+                    quickbar.appendChild(slot);
+                }
+            }
+            
+            useSkill(skillId) {
+                const skill = this.skills[skillId];
+                
+                if (this.player.ap < skill.apCost) {
+                    this.log.add('❌ PA insuffisants', 'error');
+                    return;
+                }
+                
+                if (skill.currentCooldown > 0) {
+                    this.log.add('❌ Compétence en recharge', 'error');
+                    return;
+                }
+                
+                // Si la skill a une portée > 0, entrer en mode ciblage
+                if (skill.range > 0 && skill.id !== 'heal') {
+                    this.mode = 'target_skill';
+                    this.selectedSkill = skill;
+                    this.log.add(`🎯 Sélectionnez une cible pour ${skill.name}`, 'info');
+                    return;
+                }
+                
+                // Sinon, skill sur soi
+                this.executeSkill(skill, null);
+            }
+            
+            executeSkill(skill, target) {
+                // Consommer PA
+                this.player.ap -= skill.apCost;
+                
+                // Mettre en cooldown
+                skill.currentCooldown = skill.cooldown;
+                
+                this.log.add(`✨ ${skill.name} utilisée`, 'info');
+                
+                // Effets selon le type
+                if (skill.id === 'heal') {
+                    const healRoll = this.dice.roll();
+                    const healAmount = healRoll + 2;
+                    this.player.hp = Math.min(this.player.maxHp, this.player.hp + healAmount);
+                    this.log.add(`💚 +${healAmount} HP soignés`, 'success');
+                    
+                } else if (skill.id === 'shield') {
+                    this.addStatusEffect('player', {
+                        type: 'shield',
+                        duration: 2,
+                        value: 10,
+                        icon: '🛡️'
+                    });
+                    this.log.add('🛡️ Bouclier arcanique activé (10 HP, 2 tours)', 'success');
+                    
+                } else if (target) {
+                    // Attaque avec effet
+                    const damage = this.dice.roll() + (skill.damage ? this.dice.roll() : 0);
+                    target.hp -= damage;
+                    this.log.add(`💥 ${damage} dégâts infligés`, 'attack');
+                    
+                    if (skill.effect === 'burn') {
+                        this.addStatusEffect(target.id, {
+                            type: 'burn',
+                            duration: 1,
+                            value: 3,
+                            icon: '🔥'
+                        });
+                        this.log.add('🔥 Cible brûlée', 'attack');
+                    } else if (skill.effect === 'poison') {
+                        this.addStatusEffect(target.id, {
+                            type: 'poison',
+                            duration: 3,
+                            value: 2,
+                            icon: '☠️'
+                        });
+                        this.log.add('☠️ Cible empoisonnée', 'attack');
+                    }
+                    
+                    if (target.hp <= 0) {
+                        this.log.add(`💀 Ennemi éliminé`, 'success');
+                        this.grid[target.y][target.x] = TILE_TYPES.FLOOR;
+                        const index = this.enemies.indexOf(target);
+                        if (index > -1) this.enemies.splice(index, 1);
+                    }
+                }
+                
+                this.mode = 'select';
+                this.selectedSkill = null;
+                this.updateUI();
+                this.renderSkills();
+                this.renderer.render();
+            }
+            
+            // Gestion des effets de statut
+            addStatusEffect(entityId, effect) {
+                if (!this.statusEffects.has(entityId)) {
+                    this.statusEffects.set(entityId, []);
+                }
+                this.statusEffects.get(entityId).push(effect);
+            }
+            
+            processStatusEffects(entityId) {
+                if (!this.statusEffects.has(entityId)) return;
+                
+                const effects = this.statusEffects.get(entityId);
+                const entity = entityId === 'player' ? this.player : this.enemies.find(e => e.id === entityId);
+                
+                for (let i = effects.length - 1; i >= 0; i--) {
+                    const effect = effects[i];
+                    
+                    // Appliquer l'effet
+                    if (effect.type === 'burn' || effect.type === 'poison') {
+                        entity.hp -= effect.value;
+                        this.log.add(`${effect.icon} ${entityId === 'player' ? 'Vous perdez' : 'Ennemi perd'} ${effect.value} HP`, 'damage');
+                    }
+                    
+                    // Réduire la durée
+                    effect.duration--;
+                    
+                    // Supprimer si expiré
+                    if (effect.duration <= 0) {
+                        effects.splice(i, 1);
+                        this.log.add(`${effect.icon} Effet expiré`, 'info');
+                    }
+                }
+                
+                // Nettoyer si plus d'effets
+                if (effects.length === 0) {
+                    this.statusEffects.delete(entityId);
+                }
+            }
+            
+            reduceSkillCooldowns() {
+                for (const skillId in this.skills) {
+                    if (this.skills[skillId].currentCooldown > 0) {
+                        this.skills[skillId].currentCooldown--;
+                    }
+                }
+            }
+            
+            updateUI() {
+                // HP
+                const hpPercent = (this.player.hp / this.player.maxHp) * 100;
+                document.getElementById('hpBar').style.width = hpPercent + '%';
+                document.getElementById('hpText').textContent = `${this.player.hp}/${this.player.maxHp}`;
+                
+                // AP
+                const apPercent = (this.player.ap / this.player.maxAp) * 100;
+                document.getElementById('apBar').style.width = apPercent + '%';
+                document.getElementById('apText').textContent = `${this.player.ap}/${this.player.maxAp}`;
+                
+                // Corruption
+                const corruptionPercent = this.player.corruption;
+                document.getElementById('corruptionBar').style.width = corruptionPercent + '%';
+                document.getElementById('corruptionText').textContent = `${corruptionPercent}%`;
+                
+                // État du dé selon corruption
+                const diceState = this.getDiceState();
+                const corruptionBar = document.getElementById('corruptionBar');
+                const diceStateBadge = document.getElementById('diceStateBadge');
+                
+                // Reset classes
+                corruptionBar.className = 'bar-fill corruption-bar';
+                diceStateBadge.className = 'dice-state-badge';
+                
+                // Appliquer état
+                corruptionBar.classList.add(diceState.class);
+                diceStateBadge.classList.add(diceState.class);
+                diceStateBadge.textContent = diceState.label;
+                
+                // Vérifier défaite par corruption
+                if (this.player.corruption >= 100) {
+                    this.log.add('💀 Possédé par Thalys...', 'attack');
+                    setTimeout(() => {
+                        alert('💀 DÉFAITE ! Vous avez été possédé par Thalys...');
+                        this.generateNewRoom();
+                    }, 1000);
+                }
+                
+                // Turn indicator
+                const turnBadge = document.getElementById('turnIndicator');
+                if (this.turn === 'player') {
+                    turnBadge.textContent = 'Votre Tour';
+                    turnBadge.classList.remove('enemy-turn');
+                } else {
+                    turnBadge.textContent = 'Tour Ennemi';
+                    turnBadge.classList.add('enemy-turn');
+                }
+                
+                // Disable/Enable buttons selon le tour
+                const isPlayerTurn = this.turn === 'player';
+                document.getElementById('btnMove').disabled = !isPlayerTurn || this.player.ap < 2;
+                document.getElementById('btnAttack').disabled = !isPlayerTurn || this.player.ap < 3;
+                document.getElementById('btnEndTurn').disabled = !isPlayerTurn;
+            }
+            
+            getDiceState() {
+                const corruption = this.player.corruption;
+                
+                if (corruption < 34) {
+                    return { class: 'pure', label: 'Pure' };
+                } else if (corruption < 67) {
+                    return { class: 'altered', label: 'Altered' };
+                } else {
+                    return { class: 'profaned', label: 'Profaned' };
+                }
+            }
+            
+            addCorruption(amount) {
+                this.player.corruption = Math.min(100, this.player.corruption + amount);
+                const state = this.getDiceState();
+                this.log.add(`🌀 +${amount}% Corruption (${state.label})`, 'info');
+                this.updateUI();
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DÉMARRAGE
+        // ═══════════════════════════════════════════════════════════
+        const game = new CombatGame();
+        window.game = game; // Expose globalement pour le renderer
+        
+        // Animation loop
+        function gameLoop() {
+            game.fpsCounter.update();
+            
+            if (game.renderer) {
+                game.renderer.render();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+        
+        console.log('⚔️ Combat Isométrique initialisé !');
+        console.log('🎮 Cliquez sur "Déplacer" puis sur une case pour bouger');
+        console.log('🗺️ Grille: 25x25 tiles isométriques');
+        console.log('🧱 Obstacles générés procéduralement');
+        console.log('🤖 Pathfinding A* implémenté');
+    </script>
+</body>
+</html>

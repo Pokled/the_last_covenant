@@ -1,0 +1,585 @@
+/* ═══════════════════════════════════════════════════════
+   📜 ÉVÉNEMENTS AAA+ - THE LAST COVENANT
+   Modales événementielles avec design system unifié
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   🌌 BACKGROUNDS IMMERSIFS
+   ═══════════════════════════════════════════════════════ */
+
+.event-modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.6;
+  filter: brightness(0.3) contrast(1.2) blur(2px) saturate(0.6);
+  box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.8);
+  animation: backgroundFadeIn 0.8s ease;
+}
+
+.event-modal-background.treasure {
+  background-image: url('../images/background/background_tresor.jpg');
+}
+
+.event-modal-background.puzzle {
+  background-image: url('../images/background/background_enigme.jpg');
+}
+
+.event-modal-background.trap {
+  background-image: url('../images/background/background_piege.jpg');
+}
+
+.event-modal-background.narrative {
+  background-image: url('../images/background/background_event.jpg');
+}
+
+@keyframes backgroundFadeIn {
+  from { opacity: 0; }
+  to { opacity: 0.6; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎭 MODAL OVERLAY
+   ═══════════════════════════════════════════════════════ */
+
+.event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📦 MODAL CONTAINER
+   ═══════════════════════════════════════════════════════ */
+
+.event-modal-container {
+  position: relative;
+  z-index: 10000;
+  background: linear-gradient(135deg, #0f0707 0%, #1a0f0a 100%);
+  border: 3px solid #C9A877;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 
+    0 0 60px rgba(201, 168, 119, 0.4),
+    0 10px 40px rgba(0, 0, 0, 0.9),
+    inset 0 0 40px rgba(0, 0, 0, 0.9);
+  animation: modalSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Scrollbar */
+.event-modal-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.event-modal-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+}
+
+.event-modal-container::-webkit-scrollbar-thumb {
+  background: #C9A877;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📜 MODAL HEADER
+   ═══════════════════════════════════════════════════════ */
+
+.event-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #6B4423;
+}
+
+.event-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #8B5CF6; /* Violet pour événements */
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Variations de couleur selon type */
+.event-modal-title.treasure {
+  color: #FFD700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+.event-modal-title.puzzle {
+  color: #8B5CF6;
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+}
+
+.event-modal-title.trap {
+  color: #DC2626;
+  text-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+}
+
+.event-modal-title-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
+
+.event-modal-close-btn {
+  background: transparent;
+  border: 2px solid #6B4423;
+  color: #C9A877;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-modal-close-btn:hover {
+  border-color: #C9A877;
+  background: rgba(201, 168, 119, 0.1);
+  box-shadow: 0 0 15px rgba(201, 168, 119, 0.5);
+  transform: scale(1.1);
+}
+
+/* ═══════════════════════════════════════════════════════
+   📄 MODAL CONTENT
+   ═══════════════════════════════════════════════════════ */
+
+.event-modal-content {
+  font-family: 'Crimson Text', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #C9A877;
+  margin-bottom: 20px;
+}
+
+.event-modal-content strong {
+  color: #FFD700;
+  font-weight: 700;
+}
+
+.event-modal-content em {
+  font-style: italic;
+  color: #8B5CF6;
+}
+
+/* ═══════════════════════════════════════════════════════
+   💎 COFFRE (TREASURE)
+   ═══════════════════════════════════════════════════════ */
+
+.treasure-reveal {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.treasure-chest-icon {
+  font-size: 100px;
+  margin-bottom: 20px;
+  animation: chestBounce 1s ease-in-out;
+}
+
+@keyframes chestBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.treasure-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.treasure-item {
+  background: linear-gradient(135deg, rgba(15, 7, 7, 0.8) 0%, rgba(26, 15, 10, 0.8) 100%);
+  border: 2px solid #6B4423;
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: treasureItemReveal 0.5s ease backwards;
+}
+
+@keyframes treasureItemReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.treasure-item-icon {
+  font-size: 36px;
+  margin-right: 12px;
+}
+
+.treasure-item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.treasure-item-value {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #10B981;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🧩 ÉNIGME (PUZZLE)
+   ═══════════════════════════════════════════════════════ */
+
+.puzzle-question {
+  background: rgba(139, 92, 246, 0.05);
+  border-left: 4px solid #8B5CF6;
+  padding: 20px;
+  margin: 20px 0;
+  font-family: 'Crimson Text', serif;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.8;
+  color: #C9A877;
+}
+
+.puzzle-input-container {
+  margin: 20px 0;
+}
+
+.puzzle-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #6B4423;
+  border-radius: 4px;
+  padding: 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: #FFD700;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.puzzle-input:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.puzzle-hint {
+  background: rgba(139, 92, 246, 0.1);
+  border: 2px solid #8B5CF6;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 16px 0;
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+  color: #8B5CF6;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.puzzle-hint.show {
+  opacity: 1;
+  max-height: 200px;
+  padding: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🪤 PIÈGE (TRAP)
+   ═══════════════════════════════════════════════════════ */
+
+.trap-warning {
+  background: rgba(220, 38, 38, 0.1);
+  border: 3px solid #DC2626;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+  animation: trapPulse 2s ease-in-out infinite;
+}
+
+@keyframes trapPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(220, 38, 38, 0.8);
+  }
+}
+
+.trap-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+}
+
+.trap-description {
+  font-family: 'Crimson Text', serif;
+  font-size: 16px;
+  color: #C9A877;
+  line-height: 1.6;
+}
+
+.trap-damage {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #DC2626;
+  text-shadow: 0 0 15px rgba(220, 38, 38, 0.9);
+  margin: 16px 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📖 ÉVÉNEMENT NARRATIF
+   ═══════════════════════════════════════════════════════ */
+
+.narrative-content {
+  padding: 20px 0;
+}
+
+.narrative-image {
+  text-align: center;
+  font-size: 120px;
+  margin: 20px 0;
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+}
+
+.narrative-text {
+  font-family: 'Crimson Text', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #C9A877;
+  text-align: justify;
+  margin: 20px 0;
+}
+
+.narrative-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.narrative-choice {
+  background: linear-gradient(135deg, rgba(15, 7, 7, 0.8) 0%, rgba(26, 15, 10, 0.8) 100%);
+  border: 2px solid #6B4423;
+  border-radius: 4px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.narrative-choice:hover {
+  border-color: #8B5CF6;
+  background: linear-gradient(135deg, rgba(42, 21, 16, 0.9) 0%, rgba(26, 15, 10, 0.9) 100%);
+  box-shadow: 
+    0 0 20px rgba(139, 92, 246, 0.4),
+    inset 0 2px 8px rgba(0, 0, 0, 0.6);
+  transform: translateX(4px);
+}
+
+.narrative-choice-icon {
+  font-size: 24px;
+}
+
+.narrative-choice-text {
+  font-family: 'Crimson Text', serif;
+  font-size: 15px;
+  color: #C9A877;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔘 BOUTONS
+   ═══════════════════════════════════════════════════════ */
+
+.event-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.event-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #2a1510 0%, #1a0a05 100%);
+  border: 2px solid #6B4423;
+  color: #C9A877;
+  padding: 14px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.event-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3a2520 0%, #2a1510 100%);
+  border-color: #C9A877;
+  box-shadow: 
+    0 0 20px rgba(201, 168, 119, 0.7),
+    0 3px 6px rgba(0, 0, 0, 0.7);
+  transform: translateY(-2px);
+}
+
+.event-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.event-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.event-btn-primary {
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+}
+
+.event-btn-success {
+  border-color: #10B981;
+  color: #10B981;
+}
+
+.event-btn-danger {
+  border-color: #DC2626;
+  color: #DC2626;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📱 RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .event-modal-container {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 16px;
+  }
+  
+  .event-modal-title {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+  
+  .event-btn {
+    font-size: 12px;
+    padding: 12px 16px;
+  }
+  
+  .treasure-chest-icon {
+    font-size: 60px;
+  }
+  
+  .narrative-image {
+    font-size: 80px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✨ PARTICULES (Optionnel)
+   ═══════════════════════════════════════════════════════ */
+
+.event-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.event-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #FFD700;
+  border-radius: 50%;
+  animation: particleFloat 4s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100%) rotate(360deg);
+    opacity: 0;
+  }
+}

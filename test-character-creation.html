@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭 The Last Covenant - Création de Personnage</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Crimson Text', serif;
+            --font-ui: 'Inter', sans-serif;
+            --gold-bright: #f4d03f;
+            --gold-dim: #d4af37;
+            --parchment: #f4e8d0;
+            --blood-red: #8b0000;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-body);
+            color: var(--parchment);
+            background: #0a0a0f;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* BACKGROUND */
+        /* ═══════════════════════════════════════════════════════ */
+        .creation-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(10, 10, 15, 0.8) 0%, 
+                    rgba(10, 10, 15, 0.5) 50%, 
+                    rgba(10, 10, 15, 0.8) 100%
+                ),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1520 50%, #0a0a0f 100%);
+        }
+
+        /* LUEUR CENTRALE */
+        #character-creation::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(
+                circle,
+                rgba(212, 175, 55, 0.05) 0%,
+                transparent 60%
+            );
+            pointer-events: none;
+            z-index: 2;
+            animation: centralGlow 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes centralGlow {
+            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* PARTICULES */
+        /* ═══════════════════════════════════════════════════════ */
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.6;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* LAYOUT PRINCIPAL - STYLE BG3/DIVINITY */
+        /* ═══════════════════════════════════════════════════════ */
+        .creation-container {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            animation: contentFadeIn 1s ease-out;
+        }
+
+        @keyframes contentFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ZONE GAUCHE - PREVIEW PERSONNAGE */
+        .character-preview {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 60px 40px;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* EFFET POUSSIÈRES SUR LA ZONE PREVIEW */
+        .character-preview::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.15), transparent),
+                radial-gradient(1px 1px at 60% 70%, rgba(212, 175, 55, 0.2), transparent),
+                radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.1), transparent),
+                radial-gradient(2px 2px at 80% 10%, rgba(212, 175, 55, 0.15), transparent),
+                radial-gradient(1px 1px at 90% 60%, rgba(255, 255, 255, 0.12), transparent),
+                radial-gradient(1px 1px at 30% 80%, rgba(212, 175, 55, 0.18), transparent);
+            background-size: 300% 300%;
+            background-position: 
+                0% 0%,
+                40% 60%,
+                80% 20%,
+                20% 80%,
+                60% 40%,
+                10% 90%;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 4;
+            animation: dustFloat 25s ease-in-out infinite;
+        }
+
+        @keyframes dustFloat {
+            0%, 100% { 
+                background-position: 
+                    0% 0%,
+                    40% 60%,
+                    80% 20%,
+                    20% 80%,
+                    60% 40%,
+                    10% 90%;
+            }
+            50% { 
+                background-position: 
+                    100% 100%,
+                    60% 40%,
+                    20% 80%,
+                    80% 20%,
+                    40% 60%,
+                    90% 10%;
+            }
+        }
+
+        /* PIÉDESTAL / PLATEFORME */
+        .character-pedestal {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg,
+                    rgba(10, 10, 15, 0.95) 0%,
+                    rgba(10, 10, 15, 0.4) 25%,
+                    rgba(10, 10, 15, 0) 50%
+                ),
+                url('assets/images/background/Backround_character_creation.png');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            filter: brightness(0.85) contrast(1.1);
+        }
+
+        .character-display {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 550px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(212, 175, 55, 0.08) 0%,
+                rgba(212, 175, 55, 0.03) 40%,
+                transparent 70%
+            );
+            z-index: 2;
+            margin-bottom: 0;
+            padding-bottom: 180px;
+        }
+
+        /* CONTENEUR IMAGE/ILLUSTRATION */
+        .character-portrait-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .character-portrait {
+            font-size: 12rem;
+            line-height: 1;
+            filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.95));
+            animation: portraitFloat 4s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+
+        /* Pour les images (quand tu les auras) */
+        .character-portrait-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            object-position: bottom;
+            filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.95));
+            animation: portraitFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes portraitFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .character-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                rgba(10, 10, 15, 0.85) 20%,
+                rgba(10, 10, 15, 0.95) 100%
+            );
+            padding: 20px 40px 20px;
+        }
+
+        .character-name-display {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            margin-bottom: 8px;
+            text-shadow: 
+                0 0 25px rgba(212, 175, 55, 0.7),
+                0 3px 6px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.12em;
+            text-align: center;
+        }
+
+        .character-class-display {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: rgba(244, 232, 208, 0.8);
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .character-race-display {
+            font-family: var(--font-ui);
+            font-size: 0.85rem;
+            color: rgba(212, 175, 55, 0.7);
+            letter-spacing: 0.1em;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        /* STATS PREVIEW */
+        .character-stats-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(90, 77, 58, 0.3);
+        }
+
+        .stat-item {
+            text-align: center;
+            position: relative;
+            overflow: visible;
+        }
+
+        .stat-label {
+            font-family: var(--font-ui);
+            font-size: 0.7rem;
+            color: rgba(244, 232, 208, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+            cursor: help;
+            position: relative;
+        }
+
+        .stat-label::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            right: 0;
+            background: rgba(20, 18, 15, 0.98);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            color: var(--parchment);
+            padding: 8px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .stat-item:first-child .stat-label::after {
+            right: auto;
+            left: 0;
+        }
+
+        .stat-item:nth-child(2) .stat-label::after {
+            right: auto;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .stat-label:hover::after {
+            opacity: 1;
+        }
+
+        .stat-value {
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gold-dim);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ZONE DROITE - MENU DE SÉLECTION */
+        .creation-panel {
+            position: relative;
+            background: linear-gradient(90deg, 
+                rgba(10, 10, 15, 0.95) 0%, 
+                rgba(15, 13, 18, 0.98) 100%
+            );
+            border-left: 1px solid rgba(90, 77, 58, 0.3);
+            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .panel-header {
+            padding: 40px 30px 20px;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.2);
+        }
+
+        .creation-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.12em;
+        }
+
+        .creation-subtitle {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-style: italic;
+            color: rgba(244, 232, 208, 0.5);
+            letter-spacing: 0.05em;
+        }
+
+        /* INDICATEUR D'ÉTAPE (dans le panel) */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.2);
+        }
+
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(90, 77, 58, 0.3);
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: var(--gold-bright);
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+            transform: scale(1.2);
+        }
+
+        .step-dot.completed {
+            background: rgba(212, 175, 55, 0.5);
+            border-color: rgba(212, 175, 55, 0.7);
+        }
+
+        /* TRANSITION ENTRE ÉTAPES */
+        .creation-step {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .creation-step:not(.hidden) {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* SYSTÈME DE POINTS */
+        .points-system {
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.8) 0%,
+                rgba(30, 25, 20, 0.8) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.4);
+            border-left: 3px solid rgba(212, 175, 55, 0.5);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.3);
+        }
+
+        .points-title {
+            font-family: var(--font-title);
+            font-size: 1rem;
+            color: var(--parchment);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .points-remaining {
+            font-family: var(--font-ui);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .attribute-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .attribute-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attribute-name {
+            flex: 1;
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
+            color: var(--parchment);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: help;
+            position: relative;
+        }
+
+        .attribute-name::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(20, 18, 15, 0.98);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            color: var(--parchment);
+            padding: 8px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            margin-left: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .attribute-name:hover::after {
+            opacity: 1;
+        }
+
+        .attribute-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-attribute {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: rgba(20, 18, 15, 0.8);
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            color: var(--parchment);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-attribute:hover:not(:disabled) {
+            border-color: var(--gold-dim);
+            background: rgba(35, 30, 25, 0.9);
+            color: var(--gold-bright);
+        }
+
+        .btn-attribute:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .attribute-value {
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold-dim);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .attribute-bonus {
+            font-size: 0.75rem;
+            color: rgba(76, 175, 80, 0.8);
+            margin-left: 5px;
+        }
+
+        .step-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            margin-bottom: 30px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 15px;
+            text-align: center;
+            text-shadow: 
+                0 0 20px rgba(212, 175, 55, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* LISTE VERTICALE - CLASSES & RACES */
+        /* ═══════════════════════════════════════════════════════ */
+        .class-list, .race-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .class-item, .race-item {
+            position: relative;
+            background: linear-gradient(90deg, 
+                rgba(20, 18, 15, 0.6) 0%, 
+                rgba(30, 25, 20, 0.6) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.3);
+            border-left: 3px solid rgba(90, 77, 58, 0.4);
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .class-item:hover, .race-item:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            border-left-color: rgba(212, 175, 55, 0.8);
+            background: linear-gradient(90deg, 
+                rgba(35, 30, 25, 0.8) 0%, 
+                rgba(45, 38, 30, 0.8) 100%
+            );
+            transform: translateX(5px);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(212, 175, 55, 0.05);
+        }
+
+        .class-item.selected, .race-item.selected {
+            border-color: var(--gold-bright);
+            border-left-color: var(--gold-bright);
+            background: linear-gradient(90deg, 
+                rgba(45, 40, 30, 0.9) 0%, 
+                rgba(55, 48, 35, 0.9) 100%
+            );
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.8),
+                inset 0 0 30px rgba(212, 175, 55, 0.15),
+                0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .item-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+        }
+
+        .item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--parchment);
+            margin-bottom: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .class-item.selected .item-name,
+        .race-item.selected .item-name {
+            color: var(--gold-bright);
+        }
+
+        .item-description {
+            font-size: 0.85rem;
+            color: rgba(244, 232, 208, 0.6);
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .item-stats {
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(212, 175, 55, 0.7);
+            letter-spacing: 0.05em;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* ÉTAPE NOM */
+        /* ═══════════════════════════════════════════════════════ */
+        .name-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .name-input {
+            font-family: var(--font-title);
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, 
+                rgba(20, 18, 15, 0.95) 0%, 
+                rgba(30, 25, 20, 0.95) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            border-left: 3px solid rgba(90, 77, 58, 0.6);
+            color: var(--gold-bright);
+            padding: 16px 20px;
+            width: 100%;
+            outline: none;
+            transition: all 0.3s ease;
+            letter-spacing: 0.08em;
+        }
+
+        .name-input::placeholder {
+            color: rgba(212, 175, 55, 0.25);
+        }
+
+        .name-input:focus {
+            border-color: var(--gold-bright);
+            border-left-color: var(--gold-bright);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(212, 175, 55, 0.1),
+                0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .name-hint {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: rgba(244, 232, 208, 0.5);
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* NAVIGATION - FOOTER PANEL */
+        /* ═══════════════════════════════════════════════════════ */
+        .panel-footer {
+            padding: 20px 30px;
+            border-top: 1px solid rgba(90, 77, 58, 0.2);
+            background: linear-gradient(180deg,
+                transparent 0%,
+                rgba(0, 0, 0, 0.3) 100%
+            );
+        }
+
+        .creation-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .btn {
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, 
+                rgba(20, 18, 15, 0.90) 0%, 
+                rgba(30, 25, 20, 0.90) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            border-left: 3px solid rgba(90, 77, 58, 0.6);
+            color: rgba(244, 232, 208, 0.95);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: rgba(212, 175, 55, 0.7);
+            border-left-color: rgba(212, 175, 55, 0.9);
+            background: linear-gradient(135deg, 
+                rgba(35, 30, 25, 0.95) 0%, 
+                rgba(45, 38, 30, 0.95) 100%
+            );
+            color: var(--gold-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            flex-shrink: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* SCROLLBAR CUSTOM POUR PANEL */
+        /* ═══════════════════════════════════════════════════════ */
+        .creation-panel::-webkit-scrollbar,
+        .panel-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .creation-panel::-webkit-scrollbar-track,
+        .panel-content::-webkit-scrollbar-track {
+            background: rgba(10, 10, 15, 0.8);
+        }
+
+        .creation-panel::-webkit-scrollbar-thumb,
+        .panel-content::-webkit-scrollbar-thumb {
+            background: rgba(90, 77, 58, 0.5);
+            border-radius: 4px;
+        }
+
+        .creation-panel::-webkit-scrollbar-thumb:hover,
+        .panel-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(212, 175, 55, 0.6);
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* VIGNETTE */
+        /* ═══════════════════════════════════════════════════════ */
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(
+                ellipse at center, 
+                transparent 20%, 
+                rgba(10, 10, 15, 0.5) 70%, 
+                rgba(10, 10, 15, 0.9) 100%
+            );
+            z-index: 100;
+        }
+
+        /* INDICATEUR D'ÉTAPE */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(90, 77, 58, 0.4);
+            border: 2px solid rgba(90, 77, 58, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: var(--gold-bright);
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+        }
+
+        .step-dot.completed {
+            background: rgba(212, 175, 55, 0.6);
+            border-color: rgba(212, 175, 55, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="character-creation">
+        <div class="creation-background"></div>
+        
+        <canvas id="particles"></canvas>
+        
+        <div class="creation-container">
+            <!-- ZONE GAUCHE - PREVIEW PERSONNAGE -->
+            <div class="character-preview">
+                <!-- PIÉDESTAL -->
+                <div class="character-pedestal"></div>
+                
+                <div class="character-display">
+                    <div class="character-portrait-wrapper">
+                        <div class="character-portrait" id="characterPortrait">
+                            ⚔️
+                        </div>
+                        <!-- Pour plus tard avec images -->
+                        <!-- <img src="assets/characters/paladin.png" class="character-portrait-img" id="characterPortraitImg"> -->
+                    </div>
+                </div>
+                
+                <div class="character-info">
+                    <h2 class="character-name-display" id="characterNameDisplay">---</h2>
+                    <p class="character-class-display" id="characterClassDisplay">Choisis ta classe</p>
+                    <p class="character-race-display" id="characterRaceDisplay"></p>
+                    
+                    <!-- STATS PREVIEW -->
+                    <div class="character-stats-preview" id="statsPreview" style="display: none;">
+                        <div class="stat-item">
+                            <div class="stat-label" data-tooltip="Points de vie totaux">Vie</div>
+                            <div class="stat-value" id="statHP">100</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label" data-tooltip="Dégâts infligés par attaque">Attaque</div>
+                            <div class="stat-value" id="statATK">12</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label" data-tooltip="Réduction des dégâts reçus">Défense</div>
+                            <div class="stat-value" id="statDEF">10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ZONE DROITE - PANNEAU DE SÉLECTION -->
+            <div class="creation-panel">
+                <div class="panel-header">
+                    <h1 class="creation-title">CRÉATION</h1>
+                    <p class="creation-subtitle">Les Sept Dieux sont morts</p>
+                    
+                    <!-- INDICATEUR D'ÉTAPE -->
+                    <div class="step-indicator">
+                        <div class="step-dot active" id="dot-1"></div>
+                        <div class="step-dot" id="dot-2"></div>
+                        <div class="step-dot" id="dot-3"></div>
+                        <div class="step-dot" id="dot-4"></div>
+                    </div>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- ÉTAPE 1 : CLASSE -->
+                    <div class="creation-step" id="step-class">
+                        <h2 class="step-title">Classe</h2>
+                        <div class="class-list" id="classList"></div>
+                    </div>
+                    
+                    <!-- ÉTAPE 2 : RACE -->
+                    <div class="creation-step hidden" id="step-race">
+                        <h2 class="step-title">Race</h2>
+                        <div class="race-list" id="raceList"></div>
+                    </div>
+                    
+                    <!-- ÉTAPE 3 : ATTRIBUTS -->
+                    <div class="creation-step hidden" id="step-attributes">
+                        <h2 class="step-title">Attributs</h2>
+                        
+                        <div class="points-system">
+                            <div class="points-header">
+                                <span class="points-title">Points restants</span>
+                                <span class="points-remaining" id="pointsRemaining">10</span>
+                            </div>
+                            
+                            <div class="attribute-list" id="attributeList">
+                                <!-- Généré en JS -->
+                            </div>
+                        </div>
+                        
+                        <p class="name-hint">
+                            Répartis 10 points entre tes attributs.<br>
+                            Ces choix impacteront ton style de jeu.
+                        </p>
+                    </div>
+                    
+                    <!-- ÉTAPE 4 : NOM -->
+                    <div class="creation-step hidden" id="step-name">
+                        <h2 class="step-title">Identité</h2>
+                        <div class="name-input-container">
+                            <input 
+                                type="text" 
+                                id="playerNameInput" 
+                                class="name-input"
+                                placeholder="Nom du Pactisé..."
+                                maxlength="20"
+                            />
+                            <p class="name-hint">
+                                Ce nom sera gravé dans l'histoire d'Aethermoor.<br>
+                                Choisis avec sagesse.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-footer">
+                    <div class="creation-nav">
+                        <button class="btn btn-secondary" id="btnBack">← Retour</button>
+                        <button class="btn btn-primary" id="btnNext" disabled>Suivant →</button>
+                        <button class="btn btn-primary hidden" id="btnConfirm">Confirmer ✓</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="vignette"></div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // DATA - CLASSES & RACES
+        // ═══════════════════════════════════════════════════════════
+        const CLASSES = [
+            {
+                id: 'PALADIN',
+                name: 'Paladin Déchu',
+                description: 'Ancien défenseur des dieux, maintenant lié au Dé du Destin.',
+                stats: 'HP: 120 • ATK: 12 • DEF: 15',
+                icon: '⚔️',
+                baseStats: { hp: 120, atk: 12, def: 15 },
+                corruption: 0.9
+            },
+            {
+                id: 'BERSERKER',
+                name: 'Berserker Sanglant',
+                description: 'La rage comme carburant, la douleur comme force motrice.',
+                stats: 'HP: 140 • ATK: 18 • DEF: 5',
+                icon: '🪓',
+                baseStats: { hp: 140, atk: 18, def: 5 },
+                corruption: 1.2
+            },
+            {
+                id: 'NECROMANCER',
+                name: 'Nécromancien',
+                description: 'Murmure aux morts et sacrifie son essence pour le pouvoir.',
+                stats: 'HP: 80 • ATK: 20 • DEF: 8',
+                icon: '💀',
+                baseStats: { hp: 80, atk: 20, def: 8 },
+                corruption: 1.3
+            },
+            {
+                id: 'ROGUE',
+                name: 'Rôdeur Maudit',
+                description: 'Vitesse et précision mortelles, au prix d\'une corruption rapide.',
+                stats: 'HP: 100 • ATK: 16 • DEF: 10',
+                icon: '🗡️',
+                baseStats: { hp: 100, atk: 16, def: 10 },
+                corruption: 1.1
+            },
+            {
+                id: 'MAGE',
+                name: 'Mage du Vide',
+                description: 'Maîtrise le chaos primordial au prix de sa santé mentale.',
+                stats: 'HP: 70 • ATK: 25 • DEF: 5',
+                icon: '🔮',
+                baseStats: { hp: 70, atk: 25, def: 5 },
+                corruption: 1.4
+            }
+        ];
+
+        const RACES = [
+            {
+                id: 'HUMAN',
+                name: 'Humain',
+                description: 'Adaptable et résilient. Bonus : +10% XP gagné.',
+                icon: '👤',
+                bonuses: { xp: 0.1 }
+            },
+            {
+                id: 'ELF',
+                name: 'Elfe Corrompu',
+                description: 'Agile et mystique. Bonus : +2 SPD, -5% corruption.',
+                icon: '🧝',
+                bonuses: { spd: 2, corruption: -0.05 }
+            },
+            {
+                id: 'DWARF',
+                name: 'Nain de Fer',
+                description: 'Robuste et endurant. Bonus : +20 HP, +3 DEF.',
+                icon: '⚒️',
+                bonuses: { hp: 20, def: 3 }
+            },
+            {
+                id: 'DEMON',
+                name: 'Mi-Démon',
+                description: 'Puissant mais damné. Bonus : +5 ATK, +10% corruption.',
+                icon: '😈',
+                bonuses: { atk: 5, corruption: 0.1 }
+            }
+        ];
+
+        // ATTRIBUTS
+        const ATTRIBUTES = [
+            { id: 'STR', name: 'Force', description: 'Augmente les dégâts physiques (+0.5 ATK/point)', base: 10 },
+            { id: 'VIT', name: 'Vitalité', description: 'Augmente les points de vie (+5 HP/point)', base: 10 },
+            { id: 'DEX', name: 'Dextérité', description: 'Augmente les chances de coup critique', base: 10 },
+            { id: 'INT', name: 'Intelligence', description: 'Augmente les dégâts magiques', base: 10 },
+            { id: 'WIS', name: 'Sagesse', description: 'Réduit la corruption gagnée', base: 10 }
+        ];
+
+        // ═══════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════
+        let currentStep = 1;
+        let selectedClass = null;
+        let selectedRace = null;
+        let playerName = '';
+        let attributes = {
+            STR: 10,
+            VIT: 10,
+            DEX: 10,
+            INT: 10,
+            WIS: 10
+        };
+        let pointsRemaining = 10;
+
+        // ═══════════════════════════════════════════════════════════
+        // GENERATE LISTS (VERTICAL)
+        // ═══════════════════════════════════════════════════════════
+        function generateClassList() {
+            const list = document.getElementById('classList');
+            list.innerHTML = CLASSES.map(cls => `
+                <div class="class-item" data-class="${cls.id}">
+                    <div class="item-icon">${cls.icon}</div>
+                    <div class="item-content">
+                        <div class="item-name">${cls.name}</div>
+                        <div class="item-description">${cls.description}</div>
+                        <div class="item-stats">${cls.stats}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click listeners
+            list.querySelectorAll('.class-item').forEach(item => {
+                item.addEventListener('click', () => selectClass(item.dataset.class));
+            });
+        }
+
+        function generateRaceList() {
+            const list = document.getElementById('raceList');
+            list.innerHTML = RACES.map(race => `
+                <div class="race-item" data-race="${race.id}">
+                    <div class="item-icon">${race.icon}</div>
+                    <div class="item-content">
+                        <div class="item-name">${race.name}</div>
+                        <div class="item-description">${race.description}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click listeners
+            list.querySelectorAll('.race-item').forEach(item => {
+                item.addEventListener('click', () => selectRace(item.dataset.race));
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // GENERATE ATTRIBUTES SYSTEM
+        // ═══════════════════════════════════════════════════════════
+        function generateAttributeList() {
+            const list = document.getElementById('attributeList');
+            list.innerHTML = ATTRIBUTES.map(attr => `
+                <div class="attribute-row">
+                    <span class="attribute-name" data-tooltip="${attr.description}">${attr.name}</span>
+                    <div class="attribute-controls">
+                        <button class="btn-attribute" data-attr="${attr.id}" data-action="decrease">−</button>
+                        <span class="attribute-value" id="attr-${attr.id}">${attributes[attr.id]}</span>
+                        <button class="btn-attribute" data-attr="${attr.id}" data-action="increase">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add listeners
+            list.querySelectorAll('.btn-attribute').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const attr = btn.dataset.attr;
+                    const action = btn.dataset.action;
+                    modifyAttribute(attr, action);
+                });
+            });
+        }
+
+        function modifyAttribute(attrId, action) {
+            if (action === 'increase' && pointsRemaining > 0 && attributes[attrId] < 20) {
+                attributes[attrId]++;
+                pointsRemaining--;
+            } else if (action === 'decrease' && attributes[attrId] > 5) {
+                attributes[attrId]--;
+                pointsRemaining++;
+            }
+            
+            updateAttributesDisplay();
+            updateStatsPreview();
+        }
+
+        function updateAttributesDisplay() {
+            // Update values
+            Object.keys(attributes).forEach(attr => {
+                const el = document.getElementById(`attr-${attr}`);
+                if (el) el.textContent = attributes[attr];
+            });
+            
+            // Update remaining points
+            document.getElementById('pointsRemaining').textContent = pointsRemaining;
+            
+            // Enable/disable buttons
+            document.querySelectorAll('.btn-attribute').forEach(btn => {
+                const attr = btn.dataset.attr;
+                const action = btn.dataset.action;
+                
+                if (action === 'increase') {
+                    btn.disabled = pointsRemaining === 0 || attributes[attr] >= 20;
+                } else {
+                    btn.disabled = attributes[attr] <= 5;
+                }
+            });
+            
+            // Enable next button if no points left
+            document.getElementById('btnNext').disabled = pointsRemaining > 0;
+        }
+        function selectClass(classId) {
+            document.querySelectorAll('.class-item').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`[data-class="${classId}"]`).classList.add('selected');
+            selectedClass = classId;
+            document.getElementById('btnNext').disabled = false;
+            
+            // Update preview
+            const classData = CLASSES.find(c => c.id === classId);
+            document.getElementById('characterPortrait').textContent = classData.icon;
+            document.getElementById('characterClassDisplay').textContent = classData.name;
+            
+            // Update stats preview
+            updateStatsPreview();
+            
+            console.log('Classe sélectionnée:', classId);
+        }
+
+        function selectRace(raceId) {
+            document.querySelectorAll('.race-item').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`[data-race="${raceId}"]`).classList.add('selected');
+            selectedRace = raceId;
+            document.getElementById('btnNext').disabled = false;
+            
+            // Update preview
+            const raceData = RACES.find(r => r.id === raceId);
+            document.getElementById('characterRaceDisplay').textContent = raceData.name;
+            
+            // Update stats preview
+            updateStatsPreview();
+            
+            console.log('Race sélectionnée:', raceId);
+        }
+
+        // Fonction pour mettre à jour les stats
+        function updateStatsPreview() {
+            if (!selectedClass) return;
+            
+            const classData = CLASSES.find(c => c.id === selectedClass);
+            const raceData = selectedRace ? RACES.find(r => r.id === selectedRace) : null;
+            
+            let hp = classData.baseStats.hp;
+            let atk = classData.baseStats.atk;
+            let def = classData.baseStats.def;
+            
+            // Apply race bonuses
+            if (raceData && raceData.bonuses) {
+                hp += raceData.bonuses.hp || 0;
+                atk += raceData.bonuses.atk || 0;
+                def += raceData.bonuses.def || 0;
+            }
+            
+            // Apply attribute bonuses
+            hp += (attributes.VIT - 10) * 5;
+            atk += Math.floor((attributes.STR - 10) * 0.5);
+            def += Math.floor((attributes.VIT - 10) * 0.3);
+            
+            document.getElementById('statHP').textContent = hp;
+            document.getElementById('statATK').textContent = atk;
+            document.getElementById('statDEF').textContent = def;
+            document.getElementById('statsPreview').style.display = 'grid';
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // NAVIGATION
+        // ═══════════════════════════════════════════════════════════
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.creation-step').forEach(s => s.classList.add('hidden'));
+            
+            // Show current step
+            const stepMap = { 1: 'class', 2: 'race', 3: 'attributes', 4: 'name' };
+            document.getElementById(`step-${stepMap[step]}`).classList.remove('hidden');
+            
+            // Update step indicator
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.classList.remove('active', 'completed');
+                if (i < step) dot.classList.add('completed');
+                if (i === step) dot.classList.add('active');
+            }
+            
+            // Update buttons
+            const btnNext = document.getElementById('btnNext');
+            const btnConfirm = document.getElementById('btnConfirm');
+            
+            if (step === 4) {
+                btnNext.classList.add('hidden');
+                btnConfirm.classList.remove('hidden');
+                document.getElementById('playerNameInput').focus();
+                
+                // Update preview title if name not set
+                if (!playerName) {
+                    document.getElementById('characterNameDisplay').textContent = 'Entre ton nom';
+                }
+            } else {
+                btnNext.classList.remove('hidden');
+                btnConfirm.classList.add('hidden');
+                
+                if (step === 1) {
+                    btnNext.disabled = !selectedClass;
+                } else if (step === 2) {
+                    btnNext.disabled = !selectedRace;
+                } else if (step === 3) {
+                    btnNext.disabled = pointsRemaining > 0;
+                }
+            }
+            
+            currentStep = step;
+        }
+
+        document.getElementById('btnNext').addEventListener('click', () => {
+            if (currentStep < 4) {
+                showStep(currentStep + 1);
+            }
+        });
+
+        document.getElementById('btnBack').addEventListener('click', () => {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            } else {
+                if (confirm('Retour au menu principal ?')) {
+                    window.location.href = 'test-main-menu.html';
+                }
+            }
+        });
+
+        document.getElementById('btnConfirm').addEventListener('click', () => {
+            playerName = document.getElementById('playerNameInput').value.trim();
+            
+            if (!playerName || playerName.length < 2) {
+                alert('⚠️ Entre un nom valide (minimum 2 caractères)');
+                return;
+            }
+            
+            // Update preview
+            document.getElementById('characterNameDisplay').textContent = playerName;
+            
+            console.log('✅ PERSONNAGE CRÉÉ:');
+            console.log('- Classe:', selectedClass);
+            console.log('- Race:', selectedRace);
+            console.log('- Nom:', playerName);
+            console.log('- Attributs:', attributes);
+            
+            const classData = CLASSES.find(c => c.id === selectedClass);
+            const raceData = RACES.find(r => r.id === selectedRace);
+            
+            // Transition vers le Camp
+            window.location.href = 'test-camp.html';
+        });
+
+        // Update name preview on input
+        document.getElementById('playerNameInput').addEventListener('input', (e) => {
+            const name = e.target.value.trim();
+            if (name.length >= 2) {
+                document.getElementById('characterNameDisplay').textContent = name;
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // PARTICULES
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+
+        class Particle {
+            constructor() {
+                const rand = Math.random();
+                this.x = Math.random() * canvas.width;
+                
+                if (rand < 0.6) {
+                    // Poussière dorée (monte)
+                    this.y = canvas.height + 10;
+                    this.vx = (Math.random() - 0.5) * 0.15;
+                    this.vy = -Math.random() * 0.25 - 0.1;
+                    this.size = 1 + Math.random() * 2;
+                    this.color = [212, 175, 55];
+                    this.alpha = 0.4 + Math.random() * 0.3;
+                    this.gravity = -0.0025;
+                } else {
+                    // Cendres (tombent)
+                    this.y = -10;
+                    this.vx = (Math.random() - 0.5) * 0.13;
+                    this.vy = Math.random() * 0.2 + 0.07;
+                    this.size = 1.5 + Math.random() * 2;
+                    this.color = [120, 110, 100];
+                    this.alpha = 0.3 + Math.random() * 0.2;
+                    this.gravity = 0.0067;
+                }
+                
+                this.life = 1.0;
+                this.decay = 0.002;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.life -= this.decay;
+                this.vx += (Math.random() - 0.5) * 0.01;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                const alpha = this.alpha * this.life;
+                ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            isDead() {
+                return this.life <= 0 || this.y > canvas.height + 20 || this.y < -20 || this.x < -20 || this.x > canvas.width + 20;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (Math.random() < 0.3) {
+                particles.push(new Particle());
+            }
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.isDead()) particles.splice(i, 1);
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        generateClassList();
+        generateRaceList();
+        generateAttributeList();
+        animate();
+
+        console.log('✅ Création de Personnage - Layout BG3/Divinity COMPLET');
+        console.log('🎨 Preview gauche + Menu droit + Piédestal');
+        console.log('💫 Particules + Stats détaillées + Système d\'attributs');
+        console.log('📊 4 étapes: Classe → Race → Attributs → Nom');
+    </script>
+</body>
+</html>

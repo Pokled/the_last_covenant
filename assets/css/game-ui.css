@@ -1,0 +1,387 @@
+/**
+ * 🎨 THE LAST COVENANT - DESIGN SYSTEM
+ * Style inspiré Diablo 4 / Baldur's Gate 3
+ * 
+ * Réutilisable sur :
+ * - HUD de jeu
+ * - Menus
+ * - Hub du camp
+ * - Création personnage
+ * - Inventaire
+ * - Combat UI
+ * 
+ * @version 1.0.0
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   FONTS
+   ═══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+
+:root {
+    /* COULEURS PRINCIPALES */
+    --color-bg-dark: #0d0d0d;
+    --color-bg-panel: rgba(20,18,15,0.95);
+    --color-bg-panel-alt: rgba(30,25,20,0.95);
+    
+    --color-border-main: #3d3426;
+    --color-border-light: #5a4d3a;
+    --color-border-dark: #2a2419;
+    
+    --color-text-primary: #d4c5b0;
+    --color-text-secondary: #8a7d6a;
+    --color-text-accent: #c9a97a;
+    
+    /* CORRUPTION - VIOLET/POURPRE (pas rouge pour éviter confusion avec HP) */
+    --color-corruption-dark: #2a1a2a;
+    --color-corruption-mid: #4a2a4a;
+    --color-corruption-light: #6a3a6a;
+    
+    /* STATES */
+    --color-success: #2a4d2a;
+    --color-danger: #4d2a2a;
+    --color-warning: #4d4d2a;
+    
+    /* SPACING */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 20px;
+    --spacing-xl: 30px;
+    
+    /* FONTS */
+    --font-title: 'Cinzel', serif;
+    --font-body: 'Crimson Text', serif;
+    
+    /* SHADOWS */
+    --shadow-panel: 0 4px 12px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.8);
+    --shadow-button: 0 2px 6px rgba(0,0,0,0.5);
+    --shadow-button-hover: 0 3px 10px rgba(0,0,0,0.6);
+    --shadow-inset: inset 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--color-bg-dark) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════ */
+.title-main {
+    font-family: var(--font-title);
+    font-size: 2.5em;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--color-text-accent);
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(201, 169, 122, 0.3);
+}
+
+.title-section {
+    font-family: var(--font-title);
+    font-size: 1.1em;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--color-text-accent);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--color-border-main);
+    padding-bottom: var(--spacing-sm);
+}
+
+.text-body {
+    font-size: 1em;
+    color: var(--color-text-primary);
+}
+
+.text-small {
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PANELS
+   ═══════════════════════════════════════════════════════════════ */
+.panel {
+    background: 
+        linear-gradient(135deg, var(--color-bg-panel) 0%, var(--color-bg-panel-alt) 100%),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="paper"><feTurbulence baseFrequency="0.04" numOctaves="5" /></filter><rect width="200" height="200" filter="url(%23paper)" opacity="0.08"/></svg>');
+    border: 2px solid var(--color-border-main);
+    border-top: 1px solid var(--color-border-light);
+    border-left: 1px solid var(--color-border-light);
+    box-shadow: 
+        inset 0 1px 0 rgba(90,77,58,0.3),
+        var(--shadow-panel);
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,169,122,0.2), transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+.btn {
+    padding: 12px 16px;
+    background: 
+        linear-gradient(180deg, #2d1f15 0%, #1d1208 100%),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.1"/></svg>');
+    border: 2px solid #3d2a1a;
+    border-top: 1px solid #4d3a2a;
+    border-left: 1px solid #4d3a2a;
+    box-shadow: 
+        inset 0 1px 0 rgba(77,58,42,0.3),
+        var(--shadow-button);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: all 0.15s ease;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.btn:hover {
+    background: linear-gradient(180deg, #3d2f25 0%, #2d1f18 100%);
+    border-color: #5d4a3a;
+    box-shadow: 
+        inset 0 1px 0 rgba(93,74,58,0.4),
+        var(--shadow-button-hover);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.6),
+        0 1px 2px rgba(0,0,0,0.4);
+}
+
+.btn-primary {
+    /* Bouton par défaut */
+}
+
+.btn-success {
+    background: linear-gradient(180deg, #1a2d1f 0%, #0a1d12 100%);
+    border-color: #2a3d2a;
+}
+
+.btn-success:hover {
+    background: linear-gradient(180deg, #2a3d2f 0%, #1a2d1f 100%);
+    border-color: #3a4d3a;
+}
+
+.btn-danger {
+    background: linear-gradient(180deg, #2d1a1f 0%, #1d0a12 100%);
+    border-color: #3d2a2a;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(180deg, #3d2a2f 0%, #2d1a1f 100%);
+    border-color: #4d3a3a;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BARS (HP, Corruption, etc.)
+   ═══════════════════════════════════════════════════════════════ */
+.bar-container {
+    width: 100%;
+    height: 32px;
+    background: 
+        linear-gradient(180deg, #1a1612 0%, #0d0a08 100%),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.1"/></svg>');
+    border: 2px solid var(--color-border-dark);
+    border-top: 1px solid #1a1612;
+    box-shadow: 
+        var(--shadow-inset),
+        0 1px 0 rgba(90,77,58,0.2);
+    overflow: hidden;
+    position: relative;
+}
+
+.bar-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.5), transparent);
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width 0.8s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-family: var(--font-title);
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent);
+}
+
+/* Barre HP (verte) */
+.bar-fill.hp {
+    background: linear-gradient(90deg, #1a4a1a 0%, #206a20 50%, #308a30 100%);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+}
+
+/* Barre Corruption (violet/pourpre) */
+.bar-fill.corruption {
+    background: linear-gradient(90deg, 
+        var(--color-corruption-dark) 0%, 
+        var(--color-corruption-mid) 50%, 
+        var(--color-corruption-light) 100%
+    );
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+    animation: corruptionPulse 4s ease-in-out infinite;
+}
+
+@keyframes corruptionPulse {
+    0%, 100% { 
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.4), inset 0 0 10px rgba(106,58,106,0.2);
+    }
+    50% { 
+        box-shadow: inset 0 0 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(106,58,106,0.4);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STAT DISPLAY
+   ═══════════════════════════════════════════════════════════════ */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--color-border-dark);
+    border-left: 2px solid #4a3d2a;
+    transition: all 0.2s ease;
+}
+
+.stat-row:hover {
+    background: rgba(0,0,0,0.4);
+    border-left-color: #6a5d4a;
+}
+
+.stat-label {
+    color: var(--color-text-secondary);
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    color: var(--color-text-accent);
+    font-weight: 600;
+    font-family: var(--font-title);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-3px, 2px); }
+    20% { transform: translate(3px, -2px); }
+    30% { transform: translate(-2px, 3px); }
+    40% { transform: translate(2px, -3px); }
+    50% { transform: translate(-3px, -2px); }
+    60% { transform: translate(3px, 2px); }
+    70% { transform: translate(-2px, -3px); }
+    80% { transform: translate(2px, 3px); }
+    90% { transform: translate(-1px, -1px); }
+}
+
+.shake {
+    animation: screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR (style custom)
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1612;
+    border: 1px solid var(--color-border-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border-main);
+    border: 1px solid var(--color-border-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4d4436;
+}

@@ -1,0 +1,547 @@
+/* ═══════════════════════════════════════════════════════
+   🏃 MODALES ÉVÉNEMENTS CORRIDOR - AAA+ STYLE
+   Modales compactes et rapides pour événements de corridor
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   🌌 FOND ET OVERLAY
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(20, 20, 30, 0.85) 0%, rgba(10, 10, 15, 0.95) 100%);
+  backdrop-filter: blur(8px);
+  z-index: 9998;
+  animation: corridorFadeIn 0.3s ease;
+}
+
+.corridor-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: corridorFadeIn 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📦 CONTENEUR PRINCIPAL (Plus compact que les salles)
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-modal-container {
+  background: linear-gradient(135deg, rgba(25, 25, 35, 0.95) 0%, rgba(15, 15, 25, 0.98) 100%);
+  border: 2px solid rgba(212, 175, 55, 0.5);
+  border-radius: 12px;
+  padding: 25px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8),
+              0 0 30px rgba(212, 175, 55, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  animation: corridorSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 HEADER
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.corridor-modal-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+  animation: corridorIconPulse 2s ease-in-out infinite;
+}
+
+.corridor-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #D4AF37;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5),
+               0 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📝 CONTENU
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-modal-content {
+  font-family: 'Crimson Text', serif;
+  font-size: 16px;
+  color: #E8E8E8;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.corridor-modal-description {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #D4AF37;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ⚔️ COMBAT SIMPLE
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-combat-vs {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 0, 0, 0.5);
+}
+
+.corridor-combat-fighter {
+  text-align: center;
+  flex: 1;
+}
+
+.corridor-combat-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.corridor-combat-name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFD700;
+  margin-bottom: 8px;
+}
+
+.corridor-combat-stats {
+  font-size: 14px;
+  color: #CCC;
+}
+
+.corridor-combat-vs-text {
+  font-family: 'Cinzel', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #8B0000;
+  text-shadow: 0 0 10px rgba(139, 0, 0, 0.8);
+  animation: corridorVsPulse 1s ease-in-out infinite;
+}
+
+.corridor-combat-result {
+  text-align: center;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.corridor-combat-result.victory {
+  background: rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(16, 185, 129, 0.5);
+  color: #10B981;
+}
+
+.corridor-combat-result.defeat {
+  background: rgba(220, 38, 38, 0.2);
+  border: 2px solid rgba(220, 38, 38, 0.5);
+  color: #DC2626;
+}
+
+/* ═══════════════════════════════════════════════════════
+   💎 COFFRE / TRÉSOR
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-treasure-list {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+}
+
+.corridor-treasure-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 6px;
+  animation: corridorItemSlideIn 0.4s ease;
+  animation-fill-mode: both;
+}
+
+.corridor-treasure-item:nth-child(1) { animation-delay: 0.1s; }
+.corridor-treasure-item:nth-child(2) { animation-delay: 0.2s; }
+.corridor-treasure-item:nth-child(3) { animation-delay: 0.3s; }
+
+.corridor-treasure-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.corridor-treasure-item-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.corridor-treasure-item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: #D4AF37;
+}
+
+.corridor-treasure-item-value {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🪤 PIÈGE
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-trap-warning {
+  text-align: center;
+  padding: 20px;
+  margin: 15px 0;
+  background: rgba(220, 38, 38, 0.2);
+  border: 2px solid rgba(220, 38, 38, 0.5);
+  border-radius: 8px;
+  animation: corridorTrapShake 0.5s ease;
+}
+
+.corridor-trap-icon {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 10px;
+  animation: corridorTrapBounce 0.6s ease infinite;
+}
+
+.corridor-trap-text {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #DC2626;
+  margin-bottom: 10px;
+}
+
+.corridor-trap-damage {
+  font-size: 24px;
+  font-weight: 700;
+  color: #EF4444;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🛒 MARCHAND RAPIDE
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-merchant-offer {
+  padding: 15px;
+  background: rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(139, 69, 19, 0.5);
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.corridor-merchant-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.corridor-merchant-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.corridor-merchant-icon {
+  font-size: 32px;
+}
+
+.corridor-merchant-details {
+  text-align: left;
+}
+
+.corridor-merchant-name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: #D4AF37;
+  margin-bottom: 4px;
+}
+
+.corridor-merchant-desc {
+  font-size: 13px;
+  color: #AAA;
+}
+
+.corridor-merchant-price {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 BOUTONS
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.corridor-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border: 2px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.corridor-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.corridor-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.corridor-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+.corridor-btn:active {
+  transform: translateY(0);
+}
+
+.corridor-btn-primary {
+  background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+  border-color: #FFD700;
+  color: #FFF;
+}
+
+.corridor-btn-primary:hover {
+  background: linear-gradient(135deg, #A00000 0%, #F01848 100%);
+  border-color: #FFF;
+}
+
+.corridor-btn-success {
+  background: linear-gradient(135deg, #047857 0%, #10B981 100%);
+  border-color: #6EE7B7;
+  color: #FFF;
+}
+
+.corridor-btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #34D399 100%);
+  border-color: #FFF;
+}
+
+.corridor-btn-secondary {
+  background: linear-gradient(135deg, #4B5563 0%, #6B7280 100%);
+  border-color: #9CA3AF;
+  color: #FFF;
+}
+
+.corridor-btn-secondary:hover {
+  background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  border-color: #FFF;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✨ PARTICULES
+   ═══════════════════════════════════════════════════════ */
+
+.corridor-modal-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.corridor-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #FFD700;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: corridorParticleFloat 4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes corridorFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes corridorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes corridorIconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes corridorVsPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes corridorItemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes corridorTrapShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes corridorTrapBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes corridorParticleFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(50px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📱 RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  .corridor-modal-container {
+    padding: 20px;
+    max-width: 95%;
+  }
+
+  .corridor-modal-title {
+    font-size: 20px;
+  }
+
+  .corridor-modal-icon {
+    font-size: 40px;
+  }
+
+  .corridor-btn {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+
+  .corridor-combat-vs {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .corridor-combat-vs-text {
+    transform: rotate(90deg);
+  }
+}

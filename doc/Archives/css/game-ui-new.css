@@ -1,0 +1,747 @@
+/* 🎨 UI REFONTE - SPACIEUSE ET ÉLÉGANTE */
+
+.game-container {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  padding: 10px;
+  height: calc(100vh - 60px);
+}
+
+/* ⚔️ PANNEAU HÉROS - REFONTE TOTALE */
+.panel.stone-panel {
+  background: linear-gradient(135deg, rgba(42,42,42,0.95), rgba(20,20,20,0.95));
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1em;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px black;
+  border-bottom: 2px solid rgba(212,175,55,0.3);
+  padding-bottom: 6px;
+}
+
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Portrait plus petit */
+.hero-portrait {
+  width: 80px;
+  height: 68px;
+  margin: 0 auto;
+  background: radial-gradient(circle, rgba(212,175,55,0.2), transparent);
+  border: 3px solid var(--gold);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(212,175,55,0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ✅ BADGE NIVEAU CENTRÉ (sous l'image) */
+.level-badge-center {
+  text-align: center;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  border: 2px solid #66BB6A;
+  border-radius: 8px;
+  padding: 4px 12px;
+  margin: 8px auto;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9em;
+  font-weight: 700;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  display: inline-block;
+  width: fit-content;
+}
+
+.portrait-icon {
+  font-size: 2em;
+  filter: drop-shadow(2px 2px 4px black);
+}
+
+/* ✅ IMAGE DE CLASSE (si présente) */
+.portrait-icon img,
+.hero-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Fallback si pas d'image : gradient selon classe */
+.hero-portrait[data-class="warrior"] {
+  background: radial-gradient(circle, rgba(255,69,0,0.3), transparent);
+  border-color: #FF4500;
+}
+
+.hero-portrait[data-class="mage"] {
+  background: radial-gradient(circle, rgba(138,43,226,0.3), transparent);
+  border-color: #8A2BE2;
+}
+
+.hero-portrait[data-class="rogue"] {
+  background: radial-gradient(circle, rgba(50,205,50,0.3), transparent);
+  border-color: #32CD32;
+}
+
+.hero-portrait[data-class="cleric"] {
+  background: radial-gradient(circle, rgba(255,215,0,0.3), transparent);
+  border-color: #FFD700;
+}
+
+/* Nom du héros */
+.hero-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1em;
+  color: var(--gold);
+  text-align: center;
+  font-weight: 600;
+  text-shadow: 2px 2px 3px black;
+  margin-bottom: 5px;
+}
+
+/* BARRES - GRANDES ET LISIBLES */
+.stat-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+/* Conteneur spécial pour XP avec niveau à côté */
+.stat-bar.xp-stat-bar {
+  position: relative;
+}
+
+.level-badge {
+  position: absolute;
+  right: -45px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  border: 2px solid #66BB6A;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  white-space: nowrap;
+  z-index: 5;
+}
+
+.stat-icon {
+  font-size: 1.4em;
+  min-width: 28px;
+  text-align: center;
+  filter: drop-shadow(1px 1px 2px black);
+}
+
+.bar-container {
+  flex: 1;
+  height: 28px; /* ✅ PLUS GRANDE */
+  background: rgba(0,0,0,0.8);
+  border: 2px solid #666;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.bar-fill.hp-bar {
+  background: linear-gradient(90deg, #c41e3a 0%, #e74c3c 100%);
+  box-shadow: inset 0 2px 10px rgba(255,255,255,0.3);
+}
+
+.bar-fill.xp-bar {
+  background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
+  box-shadow: inset 0 2px 10px rgba(255,255,255,0.3);
+}
+
+.bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9em; /* ✅ Légèrement plus petit car plus de texte */
+  font-weight: 700;
+  color: white;
+  text-shadow: 
+    2px 2px 4px black,
+    -1px -1px 3px black,
+    1px -1px 3px black,
+    -1px 1px 3px black;
+  z-index: 3;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* Stats en grille compacte */
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.stat-item {
+  background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.95em;
+  border: 1px solid rgba(212,175,55,0.3);
+  font-weight: 600;
+  color: #ddd;
+}
+
+.stat-item span {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-left: 4px;
+}
+
+.btn-skill-compact {
+  margin-top: 10px;
+  padding: 10px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border: 2px solid #66BB6A;
+  border-radius: 6px;
+  color: white;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-skill-compact:hover {
+  background: linear-gradient(135deg, #66BB6A, #4CAF50);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+.btn-skill-compact #skillPoints {
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.panel-inventory-compact {
+  background: linear-gradient(135deg, rgba(42,42,42,0.95), rgba(20,20,20,0.95));
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.panel-title-small {
+  font-family: 'Cinzel', serif;
+  font-size: 1em;
+  color: var(--gold);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.inventory-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+/* ZONE CENTRALE */
+.game-area {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible; /* ✅ Permet aux cartes de dépasser */
+}
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background: #1a1a1a;
+  border: 3px solid var(--gold);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 10px; /* Espace pour la barre de deck */
+}
+
+.game-main {
+  position: relative;
+  overflow: visible; /* ✅ Important pour les cartes */
+}
+
+/* BOUTON DÉ DANS LA SIDEBAR GAUCHE */
+.btn-dice-sidebar {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #8B0000, #6B0000);
+  border: 4px solid var(--gold);
+  border-radius: 12px;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 1.2em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 30px rgba(212,175,55,0.3);
+  margin-top: 10px;
+  /* 💀 CRITIQUE pour le cube 3D */
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  position: relative;
+  overflow: visible;
+}
+
+/* 💀 EFFET CREUSÉ - Zone d'ombre autour du dé */
+.btn-dice-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 100px;
+  background:
+    radial-gradient(circle at center,
+      rgba(0,0,0,0.95) 0%,
+      rgba(0,0,0,0.7) 30%,
+      rgba(0,0,0,0.3) 60%,
+      transparent 100%
+    );
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+.btn-dice-sidebar:hover {
+  /* ✅ Pas de transform ici car ça casse la 3D du cube */
+  background:
+    radial-gradient(ellipse at center, #6B0000 0%, #7B0000 40%, #9B0000 100%);
+  box-shadow:
+    /* Ombre externe plus intense */
+    0 10px 28px rgba(0,0,0,0.8),
+    0 0 50px rgba(212,175,55,0.5),
+    /* Ombres INTERNES conservées */
+    inset 0 8px 15px rgba(0,0,0,0.8),
+    inset 0 -4px 10px rgba(0,0,0,0.5),
+    inset 8px 0 15px rgba(0,0,0,0.6),
+    inset -8px 0 15px rgba(0,0,0,0.6);
+}
+
+.btn-dice-sidebar:active {
+  /* ✅ Pas de transform */
+  background:
+    radial-gradient(ellipse at center, #4B0000 0%, #5B0000 40%, #7B0000 100%);
+  box-shadow:
+    /* Ombre externe réduite */
+    0 4px 12px rgba(0,0,0,0.6),
+    /* Ombres INTERNES plus fortes au clic */
+    inset 0 10px 20px rgba(0,0,0,0.9),
+    inset 0 -4px 10px rgba(0,0,0,0.6),
+    inset 10px 0 20px rgba(0,0,0,0.7),
+    inset -10px 0 20px rgba(0,0,0,0.7);
+}
+
+.btn-dice-sidebar .dice-icon {
+  font-size: 2.5em;
+  animation: float 3s ease-in-out infinite;
+}
+
+.btn-dice-sidebar .dice-label {
+  letter-spacing: 2px;
+  font-size: 0.9em;
+  position: relative;
+  z-index: 10;  /* Au-dessus de l'ombre du ::before */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   💀 CUBE 3D OSSEUX - BOUTON DÉ (LUGUBRE)
+   ═══════════════════════════════════════════════════════════ */
+
+.dice-3d-button-container {
+  width: 70px;
+  height: 70px;
+  /* ✅ Pas de perspective ici, elle est sur le parent .btn-dice-sidebar */
+  transform-style: preserve-3d;
+  animation: floatBone 2.5s ease-in-out infinite;
+  /* Pousse le cube vers l'avant pour qu'il ne rentre pas dans le bouton */
+  position: relative;
+  z-index: 10;  /* Au-dessus de l'ombre du ::before */
+}
+
+/* Animation FLOATING plus voyante */
+@keyframes floatBone {
+  0%, 100% {
+    transform: translateY(0) translateZ(50px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-12px) translateZ(50px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(0) translateZ(50px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-8px) translateZ(50px) rotate(-2deg);
+  }
+}
+
+.dice-3d-button {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: slowSpin 8s linear infinite;
+}
+
+/* Rotation constante lente */
+@keyframes slowSpin {
+  0% {
+    transform: rotateX(20deg) rotateY(0deg) rotateZ(10deg);
+  }
+  100% {
+    transform: rotateX(20deg) rotateY(360deg) rotateZ(10deg);
+  }
+}
+
+/* FACES du cube OSSEUX 💀 */
+.dice-face-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 70px;
+  /* Couleur OS CRAQUELÉ avec taches */
+  background: linear-gradient(135deg, #d4c5a9 0%, #a89968 50%, #8b7355 100%);
+  /* ✅ PAS de border pour éviter les gaps entre faces */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #3d2817;
+  text-shadow:
+    0 1px 0 #fff,
+    0 2px 2px rgba(0,0,0,0.5);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(107, 86, 56, 0.5);  /* Bordure interne subtile */
+  /* TEXTURE CRAQUELÉE - Avec pseudo-élément */
+  overflow: hidden;
+  backface-visibility: hidden;  /* Cache les faces arrières */
+  transform-origin: center center;
+}
+
+/* EFFET CRAQUELÉ / TACHETÉ sur chaque face */
+.dice-face-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Texture de cracks/taches avec repeating gradients */
+  background:
+    /* Craquelures verticales */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(61, 40, 23, 0.15) 8px,
+      rgba(61, 40, 23, 0.15) 9px
+    ),
+    /* Craquelures diagonales */
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 12px,
+      rgba(61, 40, 23, 0.1) 12px,
+      rgba(61, 40, 23, 0.1) 13px
+    ),
+    /* Taches sombres aléatoires */
+    radial-gradient(ellipse at 20% 30%, rgba(61, 40, 23, 0.3) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 60%, rgba(61, 40, 23, 0.2) 0%, transparent 30%),
+    radial-gradient(ellipse at 40% 80%, rgba(61, 40, 23, 0.25) 0%, transparent 35%);
+  pointer-events: none;
+}
+
+/* EFFET DE VIEILLISSEMENT sur les bords */
+.dice-face-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Vignette sombre sur les bords */
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(61, 40, 23, 0.4) 100%);
+  pointer-events: none;
+}
+
+/* Positionnement 3D des faces */
+.dice-face-btn.front { transform: rotateY(0deg) translateZ(35px); }
+.dice-face-btn.back { transform: rotateY(180deg) translateZ(35px); }
+.dice-face-btn.right { transform: rotateY(90deg) translateZ(35px); }
+.dice-face-btn.left { transform: rotateY(-90deg) translateZ(35px); }
+.dice-face-btn.top { transform: rotateX(90deg) translateZ(35px); }
+.dice-face-btn.bottom { transform: rotateX(-90deg) translateZ(35px); }
+
+/* Hover sur le bouton = Cube pulse + rotation plus rapide */
+.btn-dice-sidebar:hover .dice-3d-button {
+  animation: fastSpin 3s linear infinite, dicePulse 0.8s ease-in-out infinite;
+}
+
+@keyframes fastSpin {
+  0% {
+    transform: rotateX(20deg) rotateY(0deg) rotateZ(10deg);
+  }
+  100% {
+    transform: rotateX(20deg) rotateY(360deg) rotateZ(10deg);
+  }
+}
+
+@keyframes dicePulse {
+  0%, 100% {
+    transform: rotateX(20deg) rotateY(0deg) rotateZ(10deg) scale(1);
+  }
+  50% {
+    transform: rotateX(20deg) rotateY(180deg) rotateZ(10deg) scale(1.1);
+  }
+}
+
+/* DECK DE CARTES - CARTES AU-DESSUS DU TITRE */
+.deck-bar {
+  grid-column: 2;
+  grid-row: 2;
+  height: 220px; /* ✅ Plus haut pour laisser place aux cartes */
+  background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(10,10,10,0.98));
+  border: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 15px 15px 10px 15px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* CARTES EN PREMIER (haut) */
+.deck-cards-horizontal {
+  order: 1; /* ✅ Ordre 1 = en haut */
+  flex: 1;
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 10px 5px 5px 5px;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  z-index: 10; /* ✅ Au-dessus du titre */
+  margin-bottom: -10px; /* ✅ Remonte légèrement */
+}
+
+/* TITRE EN SECOND (bas) */
+.deck-header {
+  order: 2; /* ✅ Ordre 2 = en bas */
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 2px solid rgba(212,175,55,0.3);
+  z-index: 1; /* ✅ Derrière les cartes */
+}
+
+.deck-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1em;
+  color: var(--gold);
+  text-align: center;
+  text-shadow: 2px 2px 4px black;
+}
+
+.deck-empty {
+  width: 100%;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 1.1em;
+  padding: 30px;
+}
+
+/* CARTE STYLE MAGIC */
+.card-magic {
+  min-width: 140px;
+  width: 140px;
+  height: 180px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border: 3px solid #444;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  transform-origin: bottom center;
+  flex-shrink: 0; /* ✅ Ne pas rétrécir */
+}
+
+/* SURVOL - MONTE ET GROSSIT */
+.card-magic:hover {
+  transform: translateY(-100px) scale(1.25); /* ✅ Monte de 100px + grossit */
+  border-color: var(--gold);
+  box-shadow: 
+    0 25px 60px rgba(0,0,0,0.95), 
+    0 0 50px var(--gold),
+    inset 0 0 30px rgba(212,175,55,0.2);
+  z-index: 1000; /* ✅ TOUJOURS au-dessus */
+  filter: brightness(1.3);
+}
+
+/* Bordures par rareté */
+.card-magic.common { border-color: #9e9e9e; }
+.card-magic.uncommon { border-color: #4CAF50; }
+.card-magic.rare { border-color: #2196F3; }
+.card-magic.legendary { border-color: #FF9800; box-shadow: 0 0 15px rgba(255,152,0,0.5); }
+
+/* En-tête de carte */
+.card-magic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #555;
+}
+
+.card-magic-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--gold);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 2px 2px 3px black;
+  letter-spacing: 0.5px;
+}
+
+.card-magic-icon {
+  font-size: 1.6em;
+  margin-left: 8px;
+  filter: drop-shadow(2px 2px 3px black);
+}
+
+/* Zone d'image (pour futurs visuels) */
+.card-magic-image {
+  flex: 1;
+  background: radial-gradient(circle, rgba(212,175,55,0.2), transparent);
+  border: 2px solid #444;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3em;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));
+}
+
+/* Description - PLUS GRANDE au survol */
+.card-magic-desc {
+  font-size: 0.8em;
+  line-height: 1.5;
+  color: #eee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 2px black;
+  font-weight: 500;
+  padding: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 6px;
+  border: 1px solid #333;
+}
+
+/* Au survol : description complète visible */
+.card-magic:hover .card-magic-desc {
+  font-size: 0.9em;
+  overflow: visible;
+  max-height: none;
+  background: rgba(0,0,0,0.8);
+  border-color: var(--gold);
+}
+
+/* Badge rareté */
+.card-magic-rarity {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.95);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border: 2px solid #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.card-magic.common .card-magic-rarity { color: #9e9e9e; }
+.card-magic.uncommon .card-magic-rarity { color: #4CAF50; }
+.card-magic.rare .card-magic-rarity { color: #2196F3; }
+.card-magic.legendary .card-magic-rarity { color: #FF9800; }
+
+/* PANNEAU DROIT */
+.sidebar-right {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}

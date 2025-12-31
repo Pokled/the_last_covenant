@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏰 THE LAST COVENANT - Donjon Isométrique (Nœuds)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      background: #000;
+    }
+
+    .ui {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #d4af37;
+      padding: 15px;
+      border-radius: 5px;
+      max-width: 350px;
+    }
+
+    .ui h2 {
+      color: #d4af37;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .ui p {
+      margin: 5px 0;
+      font-size: 13px;
+    }
+
+    .ui .value {
+      color: #4af;
+      font-weight: bold;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #d4af37;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    button {
+      background: #d4af37;
+      border: none;
+      color: #000;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #ffcc44;
+    }
+
+    button:disabled {
+      background: #555;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    #btnDice {
+      background: #d43;
+      font-size: 18px;
+      padding: 15px 30px;
+    }
+
+    #btnDice:hover:not(:disabled) {
+      background: #f55;
+    }
+
+    #diceResult {
+      font-size: 24px;
+      color: #d4af37;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div class="ui">
+  <h2>🏰 DONJON ISOMÉTRIQUE (NŒUDS)</h2>
+  <p>Case: <span class="value" id="caseIndex">0</span> / <span class="value" id="totalCases">25</span></p>
+  <p>Position: <span class="value" id="pos">50, 50</span></p>
+  <p>Décisions: <span class="value" id="decisions">0 nœuds</span></p>
+  <p>État Joueur:</p>
+  <p style="font-size: 11px;">  HP: <span class="value" id="hp">80/100</span></p>
+  <p style="font-size: 11px;">  Corruption: <span class="value" id="corruption">15%</span></p>
+  <p>Zoom: <span class="value" id="zoom">1.0x</span></p>
+  <p>FPS: <span class="value" id="fps">60</span></p>
+</div>
+
+<div class="controls">
+  <div id="diceResult">🎲</div>
+  <button id="btnDice">🎲 LANCER LE DÉ</button>
+  <br>
+  <button id="btnRegen">🔄 Nouveau Donjon</button>
+  <button id="btnZoomIn">🔍+</button>
+  <button id="btnZoomOut">🔍-</button>
+  <button id="btnFocus">📍 Focus</button>
+</div>
+
+<!-- Scripts -->
+<script src="js/dungeon-nodes.js"></script>
+<script src="js/grid-dungeon-system-clean.js"></script>
+
+<script>
+console.log('🏰 THE LAST COVENANT - Donjon Isométrique (Nœuds)');
+
+// ═══════════════════════════════════════════════════════════════
+// GAME MANAGER
+// ═══════════════════════════════════════════════════════════════
+
+class NodeIsoGame {
+  constructor() {
+    // Système de Nœuds
+    this.nodeSystem = new NodeBasedDungeon();
+    
+    // Générateur ISO basé sur les nœuds
+    this.generator = new NodeBasedIsoDungeon(this.nodeSystem);
+    
+    // Renderer
+    this.renderer = new GridIsometricRenderer('gameCanvas');
+    
+    // Donjon actuel
+    this.dungeon = null;
+    
+    // État du joueur (pour les décisions des nœuds)
+    this.playerState = {
+      hp: 80,
+      maxHp: 100,
+      corruption: 15,
+      momentum: 0,
+      pactsSigned: 0,
+      diceStage: 3,
+      inventory: {
+        items: [],
+        gold: 100
+      }
+    };
+    
+    // Joueur
+    this.player = {
+      x: 50,
+      y: 50,
+      pathIndex: 0, // Index sur le chemin linéaire
+      isMoving: false
+    };
+    
+    // Animation de déplacement
+    this.moveAnimation = {
+      active: false,
+      startX: 0,
+      startY: 0,
+      targetX: 0,
+      targetY: 0,
+      progress: 0,
+      duration: 0.5 // secondes
+    };
+    
+    // Dé
+    this.diceRolling = false;
+    this.lastDiceResult = null;
+    
+    // Input
+    this.keys = {};
+    this.isDragging = false;
+    this.dragStart = { x: 0, y: 0 };
+    this.cameraFollowPlayer = true;
+    
+    // FPS
+    this.lastTime = performance.now();
+    this.fps = 60;
+    
+    this.init();
+  }
+
+  init() {
+    console.log('🎮 Initialisation...');
+    this.regenerate();
+    this.setupInput();
+    this.gameLoop();
+    console.log('✅ Prêt !');
+  }
+
+  regenerate() {
+    console.log('🔄 Génération...');
+    console.log('État du joueur:', this.playerState);
+    
+    this.dungeon = this.generator.generate(this.playerState);
+    
+    // Placer joueur au début du path
+    const startPos = this.dungeon.path[0];
+    this.player.x = startPos.x;
+    this.player.y = startPos.y;
+    this.player.pathIndex = 0;
+    this.player.isMoving = false;
+    
+    this.updateUI();
+  }
+
+  setupInput() {
+    // Zoom
+    this.renderer.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      this.renderer.camera.zoom = Math.max(0.3, Math.min(2.5, this.renderer.camera.zoom + delta));
+      this.updateUI();
+    });
+
+    // Drag caméra
+    this.renderer.canvas.addEventListener('mousedown', (e) => {
+      if (e.button === 2 || e.button === 1) {
+        e.preventDefault();
+        this.isDragging = true;
+        this.cameraFollowPlayer = false;
+        this.dragStart = { x: e.clientX, y: e.clientY };
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (this.isDragging) {
+        const dx = e.clientX - this.dragStart.x;
+        const dy = e.clientY - this.dragStart.y;
+        this.renderer.camera.x -= dx / this.renderer.camera.zoom;
+        this.renderer.camera.y -= dy / this.renderer.camera.zoom;
+        this.dragStart = { x: e.clientX, y: e.clientY };
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (e.button === 2 || e.button === 1) {
+        this.isDragging = false;
+      }
+    });
+
+    this.renderer.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    // Boutons
+    document.getElementById('btnDice').onclick = () => this.rollDice();
+    document.getElementById('btnRegen').onclick = () => this.regenerate();
+    document.getElementById('btnZoomIn').onclick = () => {
+      this.renderer.camera.zoom = Math.min(2.5, this.renderer.camera.zoom + 0.2);
+      this.updateUI();
+    };
+    document.getElementById('btnZoomOut').onclick = () => {
+      this.renderer.camera.zoom = Math.max(0.3, this.renderer.camera.zoom - 0.2);
+      this.updateUI();
+    };
+    document.getElementById('btnFocus').onclick = () => {
+      this.cameraFollowPlayer = true;
+    };
+    
+    // Espace = lancer le dé
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && !this.diceRolling && !this.player.isMoving) {
+        e.preventDefault();
+        this.rollDice();
+      }
+    });
+  }
+
+  rollDice() {
+    if (this.diceRolling || this.player.isMoving) return;
+    if (this.player.pathIndex >= this.dungeon.path.length - 1) {
+      console.log('🏁 Fin du donjon !');
+      return;
+    }
+
+    this.diceRolling = true;
+    document.getElementById('btnDice').disabled = true;
+    document.getElementById('diceResult').textContent = '🎲...';
+
+    // Animation de lancer de dé
+    let rolls = 0;
+    const rollInterval = setInterval(() => {
+      document.getElementById('diceResult').textContent = `🎲 ${Math.floor(Math.random() * 6) + 1}`;
+      rolls++;
+      
+      if (rolls >= 10) {
+        clearInterval(rollInterval);
+        const result = Math.floor(Math.random() * 6) + 1;
+        this.lastDiceResult = result;
+        document.getElementById('diceResult').textContent = `🎲 ${result}`;
+        
+        // Avancer du nombre de cases
+        setTimeout(() => {
+          this.movePlayerByDice(result);
+          this.diceRolling = false;
+          document.getElementById('btnDice').disabled = false;
+        }, 500);
+      }
+    }, 100);
+  }
+
+  movePlayerByDice(steps) {
+    const targetIndex = Math.min(this.player.pathIndex + steps, this.dungeon.path.length - 1);
+    console.log(`Déplacement de ${steps} cases: ${this.player.pathIndex} → ${targetIndex}`);
+    
+    this.movePlayerToIndex(targetIndex);
+  }
+
+  movePlayerToIndex(targetIndex) {
+    if (targetIndex === this.player.pathIndex) return;
+    
+    this.player.isMoving = true;
+    const targetPos = this.dungeon.path[targetIndex];
+    
+    this.moveAnimation.active = true;
+    this.moveAnimation.startX = this.player.x;
+    this.moveAnimation.startY = this.player.y;
+    this.moveAnimation.targetX = targetPos.x;
+    this.moveAnimation.targetY = targetPos.y;
+    this.moveAnimation.progress = 0;
+    
+    this.player.pathIndex = targetIndex;
+    
+    // GÉNÉRATION DU CHUNK SUIVANT SI NÉCESSAIRE
+    this.dungeon.updatePlayerPosition(this.player.pathIndex);
+    
+    // Révéler la zone autour
+    this.dungeon.revealArea(targetPos.x, targetPos.y, 5);
+  }
+
+  update(dt) {
+    // Animation de déplacement
+    if (this.moveAnimation.active) {
+      this.moveAnimation.progress += dt / (this.moveAnimation.duration * 60);
+      
+      if (this.moveAnimation.progress >= 1) {
+        this.moveAnimation.progress = 1;
+        this.moveAnimation.active = false;
+        this.player.isMoving = false;
+      }
+      
+      // Lerp
+      const t = this.moveAnimation.progress;
+      this.player.x = this.moveAnimation.startX + (this.moveAnimation.targetX - this.moveAnimation.startX) * t;
+      this.player.y = this.moveAnimation.startY + (this.moveAnimation.targetY - this.moveAnimation.startY) * t;
+    }
+  }
+
+  getTileAt(x, y) {
+    return this.generator.getTile(x, y);
+  }
+
+  gameLoop() {
+    requestAnimationFrame(() => this.gameLoop());
+
+    const now = performance.now();
+    const dt = (now - this.lastTime) / 16.67;
+    this.lastTime = now;
+
+    this.fps = Math.round(1000 / (now - this.lastTime + 0.001));
+
+    this.update(dt);
+    this.render();
+    
+    // Update FPS
+    if (Math.random() < 0.1) {
+      document.getElementById('fps').textContent = this.fps;
+    }
+  }
+
+  render() {
+    this.renderer.render(this.dungeon, this.player, this.cameraFollowPlayer);
+  }
+
+  updateUI() {
+    document.getElementById('caseIndex').textContent = this.player.pathIndex;
+    document.getElementById('totalCases').textContent = this.dungeon.path.length;
+    document.getElementById('pos').textContent = 
+      `${Math.round(this.player.x)}, ${Math.round(this.player.y)}`;
+    document.getElementById('decisions').textContent = 
+      `${this.dungeon.decisions.length} nœuds`;
+    document.getElementById('hp').textContent = 
+      `${this.playerState.hp}/${this.playerState.maxHp}`;
+    document.getElementById('corruption').textContent = 
+      `${this.playerState.corruption}%`;
+    document.getElementById('zoom').textContent = 
+      `${this.renderer.camera.zoom.toFixed(1)}x`;
+  }
+}
+
+// Démarrer le jeu
+const game = new NodeIsoGame();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>Dungeon Generation with Binary Space Partitioning</title>
+<meta name="description" content="Dungeon Generation with Binary Space Partitioning">
+<link href="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/style.css" rel="stylesheet" type="text/css">
+<link href="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/css_004.css" rel="stylesheet" type="text/css">
+<link href="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/css_002.css" rel="stylesheet" type="text/css">
+<link href="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/css_003.css" rel="stylesheet" type="text/css">
+<link href="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/css.css" rel="stylesheet" type="text/css">
+<link rel="icon" type="image/x-icon" href="https://backdrifting.net/favicon.ico">
+<link rel="icon" type="image/png" sizes="246x246" href="https://backdrifting.net/images/qr.png">
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "Organization",
+	"url": "https://backdrifting.net",
+	"logo": "/images/qr.png"
+}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
+
+<body cz-shortcut-listen="true">
+<a rel="me" href="https://kolektiva.social/@illegaldaydream"></a>
+<div id="container">
+	<div id="stage">
+		<div id="header">
+			<object data="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/backdrifting_header.svg" alt="Backdrifting" type="image/svg+xml"></object>
+			<div class="header_wrapper">
+				<a href="https://backdrifting.net/">Home</a> - <a href="https://backdrifting.net/archive">Archive</a> - <a href="https://backdrifting.net/about">About</a> - <a href="https://backdrifting.net/publications">Publications</a> - <a href="https://backdrifting.net/contact">Contact</a>
+			</div>
+		</div>
+		<a href="https://backdrifting.net/rss"><img src="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/rss.png" width="32px" title="RSS" id="rss"></a>
+		<div id="stage-data">
+			<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage": {
+	"@type": "WebPage",
+	"@id": "https://google.com/article"
+  },
+  "headline": "Dungeon Generation with Binary Space Partitioning",
+  "datePublished": "2025-05-11 00:00:00 +0000",
+  "author": {
+	"@type": "Person",
+	"name": "Milo Trujillo",
+	"url": "https://backdrifting.net"
+  }
+}
+</script>
+<link href="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/markdown.css" rel="stylesheet" type="text/css">
+<div class="markdown">
+<div id="blogpost">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@illegaldaydream">
+<meta name="twitter:title" content="Dungeon Generation with Binary Space Partitioning">
+<meta name="twitter:image" content="https://backdrifting.net/images/qr.png">
+<h2 id="dungeon-generation-with-binary-space-partitioning">Dungeon Generation with Binary Space Partitioning</h2>
+
+<p><strong>Posted 5/11/2025</strong></p>
+
+<p>It’s a lazy Sunday afternoon, and I’ve been thinking about procedural
+ dungeon generation. This is a challenge where we build algorithms to 
+create maps suitable for video- or tabletop-games, such that the maps 
+are random enough to provide some surprise and variety, and constrained 
+enough to produce playable maps with coherent structure. There are many,
+ many approaches to this problem, and today I’m going to write about one
+ of the simplest.</p>
+
+<h3 id="the-setting">The Setting</h3>
+
+<p>Rather than generating forests, caves, or towns, we’re going to generate a traditional <em>dungeon</em> in the style of <a href="https://en.wikipedia.org/wiki/Rogue_(video_game)">Rogue</a>: a series of underground rooms, connected by passageways. Here’s one such example from <a href="https://en.wikipedia.org/wiki/NetHack">Nethack</a> rendered as traditional ASCII-art, featuring eight rooms, staircases up and down (<code>&lt;</code> and <code>&gt;</code>), our hero (<code>@</code>), and our trusty cat (<code>f</code>):</p>
+
+<pre><code>          -----         
+          |...|         -------                           -----
+          |...|        #.......########################  #.....##
+          |...|        #|.....|                       #  #|...| #
+          |....#####   #|.....-###     ------------   ## #|...| #
+          |...|    #####-&lt;....|  ###   |...........   ####|...| #
+          ---.-      #  |.....|    ### ...........|    ###----- ###-----------
+             #      ##  -------     ## |..........-###   ######   #-.........|
+             #      #             #####...........|  #      #      |.........|
+             #      #      #     ##    ------------  ##     #      |.........|
+             #      #  #######   #                   #####  #      |.........|
+           ###      #  #---.---- #                    #-|-.-#      |.........|
+         --.------  #  #|&gt;...f.|##                    #.....#      |.........|
+         |.......|###  #|...@..| #                     |...|       -----------
+         |........######|.......##                     |...|
+         |.......|#     ------.-                       |...|
+         |........#           #                        -----
+         ---------
+</code></pre>
+
+<p>So, we need a series of non-overlapping rectangles of a variety of 
+sizes, and paths between the rectangles so as to guarantee any room can 
+be reached from any other. We’d also like some <em>locality:</em> rooms 
+should typically link to other nearby rooms, only rarely producing long 
+corridors that stretch across the map. Other details, like giving 
+corridors twists and dead-ends, we’ll leave off for now in the name of 
+simplicity.</p>
+
+<h3 id="the-algorithm">The Algorithm</h3>
+
+<p>Today we’ll be using <a href="https://en.wikipedia.org/wiki/Binary_space_partitioning">Binary Space Partitioning</a>,
+ a general purpose technique often used in computer graphics, 
+collision-prediction in robotics, and other scenarios where diving up a 
+physical space is useful. Here’s the approach, described in terms of our
+ problem:</p>
+
+<ol>
+  <li>
+    <p>Begin with a rectangle the size of the entire map</p>
+  </li>
+  <li>
+    <p>Choose whether to cut the rectangle vertically or horizontally</p>
+  </li>
+  <li>
+    <p>Choose a random cut-position along the x- or y-axis (according to
+ step 2) such that the two child-rectangles are both above a minimum 
+size - if no such cut is possible, stop</p>
+  </li>
+  <li>
+    <p>Repeat step two on each child-rectangle</p>
+  </li>
+</ol>
+
+<p>This recursive algorithm lets us break up one big rectangle into 
+several smaller adjoining rectangles. For an arbitrary visualization, 
+here’s a 100x100 rectangle, broken into smaller pieces so long as those 
+pieces are at least 10x10:</p>
+
+<object data="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/bsp.svg" alt="A rectangle fully sub-divided by Binary Space Partitioning" type="image/svg+xml"></object>
+
+<p>We can visualize this rectangle cutting algorithm using a tree, which traces our recursive function calls:</p>
+
+<object data="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/bsp_tree.svg" alt="A tree showing the cut decisions at each step to sub-divide the rectangles" type="image/svg+xml"></object>
+
+<h3 id="converting-the-graph-to-a-dungeon">Converting the Graph to a Dungeon</h3>
+
+<p>We have adjoining and non-overlapping rectangles, but these don’t 
+look like rooms yet. To generate rooms we want to shrink our rectangles 
+and add some buffer space between neighbors. For each leaf on the 
+original graph, r1 through r12, let’s generate a rectangle with random 
+dimensions between a minimum width and height of 10, and a maximum width
+ and height of its parent rectangle minus two (for the borders). Then 
+we’ll place the new rectangle randomly within the confines of its 
+parent:</p>
+
+<object data="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/bsp_no_edges.svg" alt="Sub-rectangles placed in each leaf" type="image/svg+xml"></object>
+
+<p>Okay, we have rooms! How about corridors? Here we’ll make use of our 
+tree structure: once we’ve reached the bottom of the tree and placed a 
+room in our rectangle, we’ll start returning back up the recursive tree.
+ At each parent node we’ll randomly select a room from each child 
+branch, and add an edge between them.</p>
+
+<p>Here’s an example process for the dungeon we’ve been illustrating:</p>
+
+<ul>
+  <li>
+    <p>r3 and r4 are sibling rooms at the bottom of a branch, so at the cut node above them we will add an edge between r3 and r4</p>
+  </li>
+  <li>
+    <p>At the parent cut node we’ll select a random room from the left 
+branch (r3 or r4) and a random room from the right branch (only r2 is 
+available) and add an edge between them - we’ve connected r2 and r3</p>
+  </li>
+  <li>
+    <p>At the parent cut node we’ll select a random room from the left 
+(r2, r3, or r4) and a random room from the right (r1) and add an edge 
+between them - we’ve connected r1 and r3</p>
+  </li>
+  <li>
+    <p>At the parent cut node we’ll select a random room from the left 
+(r1 through r4) and a random room from the right (r5 through r12) and 
+add an edge between them - we’ve connected r1 and r7</p>
+  </li>
+</ul>
+
+<p>The result looks like:</p>
+
+<object data="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/bsp_finished.svg" alt="Edges drawn between sub-rectangles" type="image/svg+xml"></object>
+
+<p>Note that a few paths overlap: r6 and r7 are connected, but the path 
+is obscured by r1-r7 and r6-r10. The path from r1 to r7 intersects both 
+r3 and r5. These collisions are desirable in our application, because 
+they increase the diversity of room configurations - r3 has five doors, 
+despite only being explicitly connected to three neighboring rooms.</p>
+
+<h3 id="adding-some-frills">Adding some Frills</h3>
+
+<p>We have a minimum-viable dungeon! Rooms of variable size, in a fully 
+connected graph, mostly connecting nearby rooms to one another. Pretty 
+bare-bones, but not bad for under 70 lines of Python. There’s lots more 
+we could do from here: we could add some turbulence to paths, so that 
+they sometimes zig-zag or move more diagonally between rooms. We could 
+delete a room or two and part of its edges to introduce dead-ends - but 
+we’d need to be careful to delete only rooms with a maximum degree of 
+one to avoid disconnecting parts of the dungeon. We could introduce some
+ shapes besides rectangles - perhaps one room represents a theater or 
+Colosseum and should be elliptical. Until now we have only considered 
+the <em>structure</em> of the map, but we can now add constraints to assign the purpose and contents of each room. Some example rules might include:</p>
+
+<ul>
+  <li>
+    <p>Rooms of a large size have a chance to be merchant halls or city centers</p>
+  </li>
+  <li>
+    <p>Rooms of moderate size, a skewed width to height ratio, and a maximum of two exits may be barracks</p>
+  </li>
+  <li>
+    <p>Small rooms adjoining a barracks may be an armory</p>
+  </li>
+  <li>
+    <p>Small rooms with only one doorway may be storehouses</p>
+  </li>
+  <li>
+    <p>Moderately sized single-exit rooms rooms may be shops</p>
+  </li>
+  <li>
+    <p>Distant rooms may be goblin dens, and have tunnels rather than corridors</p>
+  </li>
+</ul>
+
+<p>Coloring rooms by their assigned purpose, swapping out r5 for an 
+elliptical town center, and indicating that the path from r3 to r4 
+should be a roughly hewn tunnel yields a map with slightly more life in 
+it:</p>
+
+<object data="Dungeon%20Generation%20with%20Binary%20Space%20Partitioning_fichiers/bsp_frilled.svg" alt="Rooms assigned to purposes, reshaped, some paths have different styles" type="image/svg+xml"></object>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Not much in the way of conclusion! This was fun to play with, and my <a href="https://gist.github.com/milo-trujillo/1d85257544318ea19e5416adbad161d5">main code is here</a> if anyone wants to take a look.</p>
+</div><ul class="share-buttons">
+  <li><a href="https://backdrifting.net/post/074_bsp_dungeons" target="_blank" title="Permalink">Permalink</a></li>
+</ul>
+</div>
+
+		</div>
+	</div>
+	<div id="footer"><footer>© 2025 Milo Trujillo<br>This site available through <a href="https://torproject.org/">Tor</a> at: <a href="http://bkdrftngi6lyto7ha6uws44vgcdaqpjortunur2fnxf7mwyswciv4gyd.onion/">bkdrftngi6lyto7ha6uws44vgcdaqpjortunur2fnxf7mwyswciv4gyd.onion</a></footer></div>
+</div>
+
+
+</body></html>

@@ -1,0 +1,497 @@
+/* ═══════════════════════════════════════════════════════
+   🛏️ ZONE DE REPOS AAA+ - THE LAST COVENANT
+   Modale de repos avec design system unifié
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   🌌 BACKGROUND IMMERSIF
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background-image: url('../images/background/background_repos.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.6;
+  
+  /* Effets immersifs */
+  filter: brightness(0.3) contrast(1.2) blur(2px) saturate(0.6);
+  
+  /* Vignette */
+  box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.8);
+  
+  /* Transition douce */
+  animation: backgroundFadeIn 0.8s ease;
+}
+
+@keyframes backgroundFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎭 MODAL OVERLAY
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📦 MODAL CONTAINER
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-container {
+  position: relative;
+  z-index: 10000;
+  background: linear-gradient(135deg, #0f0707 0%, #1a0f0a 100%);
+  border: 3px solid #C9A877;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  
+  /* Ombres profondes */
+  box-shadow: 
+    0 0 60px rgba(201, 168, 119, 0.4),
+    0 10px 40px rgba(0, 0, 0, 0.9),
+    inset 0 0 40px rgba(0, 0, 0, 0.9);
+  
+  /* Animation d'entrée */
+  animation: modalSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Scrollbar personnalisée */
+.rest-modal-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rest-modal-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+}
+
+.rest-modal-container::-webkit-scrollbar-thumb {
+  background: #C9A877;
+  border-radius: 4px;
+}
+
+.rest-modal-container::-webkit-scrollbar-thumb:hover {
+  background: #FFD700;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📜 MODAL HEADER
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #6B4423;
+}
+
+.rest-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #F59E0B; /* Ambre doux pour repos */
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rest-modal-title-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
+
+.rest-modal-close-btn {
+  background: transparent;
+  border: 2px solid #6B4423;
+  color: #C9A877;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rest-modal-close-btn:hover {
+  border-color: #C9A877;
+  background: rgba(201, 168, 119, 0.1);
+  box-shadow: 0 0 15px rgba(201, 168, 119, 0.5);
+  transform: scale(1.1);
+}
+
+/* ═══════════════════════════════════════════════════════
+   📄 MODAL CONTENT
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-content {
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #C9A877;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 SECTIONS
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-section {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(15, 7, 7, 0.6) 0%, rgba(26, 15, 10, 0.6) 100%);
+  border: 2px solid #6B4423;
+  border-radius: 6px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+.rest-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #C9A877;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rest-section-icon {
+  font-size: 16px;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+/* ═══════════════════════════════════════════════════════
+   💬 MESSAGE DESCRIPTION
+   ═══════════════════════════════════════════════════════ */
+
+.rest-description {
+  background: rgba(245, 158, 11, 0.05);
+  border-left: 4px solid #F59E0B;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  color: #C9A877;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📊 ÉTAT DU JOUEUR
+   ═══════════════════════════════════════════════════════ */
+
+.rest-player-status {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rest-status-item {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #4a3020;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rest-status-label {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: #C9A877;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rest-status-value {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: #FFD700;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.rest-status-value.danger {
+  color: #DC2626;
+  text-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+}
+
+.rest-status-value.warning {
+  color: #F59E0B;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+}
+
+.rest-status-value.safe {
+  color: #10B981;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+}
+
+/* ═══════════════════════════════════════════════════════
+   📋 LISTE D'ACTIONS
+   ═══════════════════════════════════════════════════════ */
+
+.rest-actions-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rest-action {
+  background: linear-gradient(135deg, rgba(15, 7, 7, 0.8) 0%, rgba(26, 15, 10, 0.8) 100%);
+  border: 2px solid #6B4423;
+  border-radius: 4px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rest-action:hover:not(.rest-action-disabled) {
+  border-color: #F59E0B;
+  background: linear-gradient(135deg, rgba(42, 21, 16, 0.9) 0%, rgba(26, 15, 10, 0.9) 100%);
+  box-shadow: 
+    0 0 20px rgba(245, 158, 11, 0.4),
+    inset 0 2px 8px rgba(0, 0, 0, 0.6);
+  transform: translateX(4px);
+}
+
+.rest-action-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rest-action-icon {
+  font-size: 40px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #4a3020;
+  border-radius: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.rest-action-content {
+  flex: 1;
+}
+
+.rest-action-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #FFD700;
+  margin-bottom: 4px;
+}
+
+.rest-action-description {
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+  color: #8B7355;
+  line-height: 1.4;
+}
+
+.rest-action-cost {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: #DC2626;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
+}
+
+.rest-action-benefit {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: #10B981;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔘 BOUTONS
+   ═══════════════════════════════════════════════════════ */
+
+.rest-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.rest-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #2a1510 0%, #1a0a05 100%);
+  border: 2px solid #6B4423;
+  color: #C9A877;
+  padding: 14px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rest-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3a2520 0%, #2a1510 100%);
+  border-color: #C9A877;
+  box-shadow: 
+    0 0 20px rgba(201, 168, 119, 0.7),
+    0 3px 6px rgba(0, 0, 0, 0.7);
+  transform: translateY(-2px);
+}
+
+.rest-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.rest-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rest-btn-primary {
+  border-color: #F59E0B;
+  color: #F59E0B;
+}
+
+.rest-btn-primary:hover:not(:disabled) {
+  box-shadow: 
+    0 0 20px rgba(245, 158, 11, 0.6),
+    0 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════
+   📱 RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .rest-modal-container {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 16px;
+  }
+  
+  .rest-modal-title {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+  
+  .rest-btn {
+    font-size: 12px;
+    padding: 12px 16px;
+  }
+  
+  .rest-player-status {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ✨ ANIMATIONS SPÉCIALES
+   ═══════════════════════════════════════════════════════ */
+
+/* Lueur du feu de camp */
+@keyframes fireSway {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(245, 158, 11, 1);
+    filter: brightness(1.2);
+  }
+}
+
+.rest-modal-title {
+  animation: fireSway 3s ease-in-out infinite;
+}
+
+/* Effet repos effectué */
+@keyframes restComplete {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.rest-action-completed {
+  animation: restComplete 0.6s ease;
+}

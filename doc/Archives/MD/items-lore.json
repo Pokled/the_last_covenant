@@ -1,0 +1,638 @@
+{
+  "WEAPONS": {
+    "BROKEN_OATH": {
+      "id": "BROKEN_OATH",
+      "name": "Serment Brisé",
+      "type": "Épée longue",
+      "rarity": "legendary",
+      "icon": "⚔️",
+      "stats": {
+        "damage": 45,
+        "critChance": 15,
+        "attackSpeed": 1.2,
+        "special": "10% chance de briser buff ennemi"
+      },
+      "lore": {
+        "short": "L'épée qui pleure les serments brisés.",
+        "full": "Forgée par le dernier forgeron de Morwyn, le Scelleur de l'Ordre.\n\nLe chevalier qui la portait a brisé son serment pour sauver un enfant innocent d'une exécution injuste. L'Ordre Sacré, inflexible dans ses lois, l'a condamné à mort pour trahison.\n\nQuand la hache du bourreau est tombée, l'épée s'est brisée en deux. Cette moitié pleure encore.\n\nQuand tu la tiens, tu entends un murmure : 'J'ai choisi. Et je le referais.'",
+        "secretLore": "La seconde moitié existe quelque part dans les Abysses. Celui qui réunira les deux moitiés forgera 'Serment Réparé', l'arme légendaire capable de tuer un dieu."
+      },
+      "godAffinity": "MORWYN",
+      "corruptionEffects": {
+        "pure": {
+          "trigger": "corruption < 30%",
+          "effect": "+10% damage vs corrupted enemies",
+          "visual": "Lame brille d'une lueur blanche"
+        },
+        "corrupted": {
+          "trigger": "corruption > 70%",
+          "effect": "Lame pleure du sang noir, -5% damage, mais +15% vs holy enemies",
+          "audio": "Gémissements faibles audibles"
+        }
+      },
+      "specialInteraction": {
+        "class": "SHATTERED_KNIGHT",
+        "quest": {
+          "name": "Réparer le Serment",
+          "condition": "Compléter tous les serments parfaitement pendant 7 étages consécutifs",
+          "reward": {
+            "item": "REPAIRED_OATH",
+            "stats": { "damage": 80, "special": "Immunité totale aux debuffs" },
+            "lore": "Les deux moitiés réunies. Le serment tenu. Morwyn sourit, où qu'il soit."
+          }
+        }
+      },
+      "drop": {
+        "source": "Boss 'The Keeper of Bones' (Étage 3)",
+        "chance": 15
+      }
+    },
+
+    "VILLAGE_FLAME": {
+      "id": "VILLAGE_FLAME",
+      "name": "Flamme du Village",
+      "type": "Bâton de feu",
+      "rarity": "rare",
+      "icon": "🔥",
+      "stats": {
+        "magicDamage": 38,
+        "manaCost": -15,
+        "special": "Sorts de feu infligent +20% dégâts mais coûtent 5% PV"
+      },
+      "lore": {
+        "short": "Le feu qui a tout consumé.",
+        "full": "Ce bâton fut taillé dans la poutre maîtresse de l'église du village de Cendres.\n\nC'était le dernier bâtiment à brûler. La Sorcière des Cendres l'a regardé s'effondrer, puis a ramassé ce morceau de bois encore fumant.\n\n400 âmes. Hommes, femmes, enfants. Tous pestiférés. Tous condamnés à devenir des Hybrids. Elle les a 'sauvés' en les tuant.\n\nLe bois murmure encore leurs noms. Chaque nuit.",
+        "secretLore": "Si tu écoutes assez longtemps, tu entendras : 'Nous comprenons. Nous pardonnons. Mais oublieras-tu jamais?'"
+      },
+      "godAffinity": "VYR",
+      "corruptionEffects": {
+        "passive": {
+          "effect": "+1% corruption par combat où l'arme est équipée",
+          "reason": "Les voix des 400 morts ne se taisent jamais"
+        },
+        "high": {
+          "trigger": "corruption > 60%",
+          "effect": "Les flammes deviennent noires, +30% dmg mais brûle aussi les alliés proches",
+          "dialogue": "Tu ne sauves plus. Tu détruis. Comme elle."
+        }
+      },
+      "specialInteraction": {
+        "class": "WITCH_OF_ASHES",
+        "dialogue": [
+          "Je reconnais ce bois. C'était... l'église.",
+          "Père Aldrin priait quand j'ai allumé le feu. Il n'a pas crié.",
+          "Ils me pardonnent, dis-tu? Les voix... Elles ne semblent pas me haïr.",
+          "Peut-être que... Non. Je ne mérite pas le pardon."
+        ],
+        "unlockEnding": {
+          "condition": "Porter cette arme au boss final avec corruption < 25%",
+          "variant": "ENDING_A_REDEMPTION - Les 400 apparaissent, te bénissent, finale alternative"
+        }
+      },
+      "drop": {
+        "source": "Hidden chest in 'Burned Chapel' (Étage 4, secret room)",
+        "chance": 100
+      }
+    },
+
+    "HOLLOW_EDGE": {
+      "id": "HOLLOW_EDGE",
+      "name": "Lame Creuse",
+      "type": "Dague",
+      "rarity": "uncommon",
+      "icon": "🗡️",
+      "stats": {
+        "damage": 28,
+        "critChance": 25,
+        "critDamage": 180,
+        "special": "Attaques critiques volent 15% PV (lifesteal)"
+      },
+      "lore": {
+        "short": "L'arme qui a volé la Mort.",
+        "full": "Cette dague n'a pas de poids. Littéralement. Si tu la lâches, elle flotte.\n\nC'est l'arme que le Voleur Creux a utilisée pour trancher le fil de sa propre destinée dans les Abysses de Sylthara.\n\nDepuis, il ne peut ni mourir ni vraiment vivre. Creux. Vide. Éternellement entre deux états.\n\nLa dague cherche encore ce qu'elle a volé : l'âme de son porteur.",
+        "secretLore": "Sylthara, Scelleuse des Destinées, a tissé tous les fils. Mais certains fils... elle les a coupés elle-même. Pourquoi?"
+      },
+      "godAffinity": "SYLTHARA",
+      "corruptionEffects": {
+        "pure": {
+          "trigger": "corruption < 20%",
+          "effect": "La dague 'refuse' de voler la vie, lifesteal réduit à 5%",
+          "dialogue": "Tu sens la lame hésiter. Elle se souvient d'avoir été... vivante?"
+        },
+        "corrupted": {
+          "trigger": "corruption > 60%",
+          "effect": "Lifesteal augmente à 30% mais vole aussi 1% corruption de l'ennemi",
+          "danger": "Absorber corruption = devenir comme eux"
+        }
+      },
+      "specialInteraction": {
+        "class": "HOLLOW_ROGUE",
+        "effect": {
+          "name": "Reconnaissance",
+          "trigger": "Équiper pour la première fois",
+          "dialogue": [
+            "...Cette lame. C'est ELLE.",
+            "Celle qui m'a pris... tout.",
+            "Je la hais. Je la comprends. Je suis elle."
+          ],
+          "bonus": "+10 critChance permanent si équipée par Hollow Rogue"
+        }
+      },
+      "drop": {
+        "source": "Rare drop from 'Shadow Thief' enemy (5%)",
+        "shopPrice": 350
+      }
+    },
+
+    "KINGS_LAST_BREATH": {
+      "id": "KINGS_LAST_BREATH",
+      "name": "Dernier Souffle du Roi",
+      "type": "Arc long",
+      "rarity": "legendary",
+      "icon": "🏹",
+      "stats": {
+        "damage": 55,
+        "range": "Infinie (ligne de vue)",
+        "special": "1 flèche parfaite par étage : instant kill non-boss, 80% PV dmg boss"
+      },
+      "lore": {
+        "short": "La flèche qui a tué un tyran.",
+        "full": "L'Archer Silencieuse se tenait sur le toit de la cathédrale. 300 mètres. Vent d'ouest. Pluie fine.\n\nLe Roi Malachai levait son verre, célébrant la victoire sur les rebelles. 10 000 morts. Hommes, femmes, enfants.\n\nElle a tiré.\n\nLa flèche a traversé la pluie, le vent, le temps. Elle a trouvé son cœur.\n\nPuis elle s'est arraché la langue avec ses propres mains. Pour ne jamais révéler pourquoi.\n\nCertains secrets méritent le silence éternel.",
+        "secretLore": "Le Roi était son père. Elle l'aimait. Mais l'amour ne suffit pas quand 10 000 innocents meurent."
+      },
+      "godAffinity": "KROVAX",
+      "corruptionEffects": {
+        "passive": "Aucun effet corruption - la justice n'est ni pure ni corrompue",
+        "special": {
+          "trigger": "Utiliser la flèche parfaite sur un innocent",
+          "effect": "+50% corruption, l'arc se brise, dialogue : 'Tu as tué un innocent. Comme lui.'"
+        }
+      },
+      "specialInteraction": {
+        "class": "SILENT_ARCHER",
+        "quest": {
+          "name": "Le Pardon Impossible",
+          "trigger": "Équiper l'arc dans la 'Throne Room' (Étage 6)",
+          "event": "Vision du Roi mourant, te pardonne avec son dernier souffle",
+          "choice": {
+            "accept": "Pleurer, -25% corruption, unlock ending variant 'Forgiveness'",
+            "refuse": "Refuser le pardon, +15% corruption, +20% crit dmg permanent (guilt = power)"
+          }
+        }
+      },
+      "drop": {
+        "source": "Boss 'The Betrayer King' (Étage 6) - 100% drop si Silent Archer, 20% sinon",
+        "unique": true
+      }
+    }
+  },
+
+  "ARMOR": {
+    "VILLAGE_ASHES_CLOAK": {
+      "id": "VILLAGE_ASHES_CLOAK",
+      "name": "Manteau des 400",
+      "type": "Cloak",
+      "rarity": "rare",
+      "icon": "🧥",
+      "stats": {
+        "defense": 25,
+        "fireResist": 50,
+        "special": "Quand PV < 30%, explosion de flammes autour (heal 20% PV, dmg zone), 1/combat"
+      },
+      "lore": {
+        "short": "Tissé avec les cendres de 400 âmes.",
+        "full": "Chaque fil de ce manteau est une vie.\n\n400 âmes. Tous pestiférés. Condamnés à devenir des monstres.\n\nLa Sorcière des Cendres a brûlé son village pour les sauver. 19 ans. Une nuit. 400 morts.\n\nLe manteau murmure leurs noms : Aldrin, Mira, Thomas, Elena, Sarah...\n\nElle les connaît tous. Chaque nuit, elle les entend. Chaque nuit, elle pleure.",
+        "secretLore": "Au 400e nom, une voix différente : 'Nous te pardonnons. Mais pardonneras-tu jamais toi-même?'"
+      },
+      "godAffinity": "VYR",
+      "corruptionEffects": {
+        "passive": {
+          "effect": "+1% corruption par combat équipé",
+          "reason": "Les voix des morts hantent. Toujours."
+        },
+        "pure": {
+          "trigger": "corruption < 20%",
+          "effect": "Les voix chantent (apaisant), +10% fire resist supplémentaire"
+        },
+        "corrupted": {
+          "trigger": "corruption > 70%",
+          "effect": "Les voix hurlent (accusent), fire resist → 0%, mais fire dmg +100%"
+        }
+      },
+      "specialInteraction": {
+        "class": "WITCH_OF_ASHES",
+        "effect": {
+          "name": "Les 400 Parlent",
+          "dialogue": [
+            "Aldrin : 'Tu nous as sauvés, petite.'",
+            "Mira : 'Maman dit que tu es une héroïne.'",
+            "Père Thomas : 'Nous comprenons. La peste... nous l'avons sentie. Nous nous transformions.'",
+            "Tous ensemble : 'Merci. Et pardon pour ton fardeau.'"
+          ],
+          "unlockEnding": {
+            "condition": "Porter ce manteau au boss final + corruption < 30%",
+            "variant": "ENDING_A_ABSOLUTION - Les 400 apparaissent, t'enlacent, finale de pardon"
+          }
+        },
+        "mechanical": "Si équipé par Witch of Ashes, explosion heal aussi alliés dans zone"
+      },
+      "drop": {
+        "source": "Hidden in 'Burned Village' (Étage 4, explorer toutes les maisons)",
+        "unique": true
+      }
+    },
+
+    "PENITENT_CHAINS": {
+      "id": "PENITENT_CHAINS",
+      "name": "Chaînes du Pénitent",
+      "type": "Armure légère",
+      "rarity": "uncommon",
+      "icon": "⛓️",
+      "stats": {
+        "defense": 15,
+        "special": "Chaque coup reçu génère +1 stack Foi (max 10). 10 stacks = next heal +100%"
+      },
+      "lore": {
+        "short": "Porter sa douleur comme prière.",
+        "full": "Ces chaînes étaient portées par la Pénitente pendant ses 40 jours de prière.\n\nChaque jour, elle ajoutait un maillon. Chaque jour, les dieux restaient silencieux.\n\nLe 40e jour, elle ne pouvait plus se lever. Le poids était trop grand.\n\nLe 41e jour, elle a compris : les dieux ne répondaient pas parce qu'ils étaient morts.\n\nAlors elle s'est répondu elle-même.",
+        "secretLore": "Ael'mora l'observait. Silencieuse. Fière. 'Enfin, quelqu'un qui comprend.'"
+      },
+      "godAffinity": "AEL_MORA",
+      "corruptionEffects": {
+        "pure": {
+          "trigger": "corruption < 25%",
+          "effect": "Chaînes brillent faiblement, +5 def supplémentaire, poids semble léger"
+        },
+        "balanced": {
+          "trigger": "corruption 45-55%",
+          "effect": "Chaînes résonnent harmonieusement, unlock skill 'Perfect Balance'"
+        },
+        "corrupted": {
+          "trigger": "corruption > 75%",
+          "effect": "Chaînes deviennent lourdes, -10% move speed, mais +30% def"
+        }
+      },
+      "specialInteraction": {
+        "class": "PENITENT",
+        "effect": {
+          "name": "L'Équilibre Parfait",
+          "condition": "Porter chaînes + atteindre exactement 50% corruption",
+          "unlock": "Dialogue avec Ael'mora, révélation True Ending path",
+          "dialogue": "Ni trop pure, ni trop corrompue. Tu as trouvé ce que je cherchais : l'équilibre."
+        }
+      },
+      "drop": {
+        "source": "Reward from 'Prayer Shrine' event (random étages 2-5)",
+        "shopPrice": 280
+      }
+    }
+  },
+
+  "ACCESSORIES": {
+    "THALYS_BROKEN_TOOTH": {
+      "id": "THALYS_BROKEN_TOOTH",
+      "name": "Dent de Thalys",
+      "type": "Amulette",
+      "rarity": "legendary",
+      "icon": "🦷",
+      "stats": {
+        "luck": 5,
+        "special": "1/jour : forcer un reroll sur n'importe quel RNG (loot, damage, dice...)"
+      },
+      "lore": {
+        "short": "Une dent du dieu des Hasards.",
+        "full": "Quand Noxar a dévoré Thalys, le Scelleur des Hasards a ri.\n\nUne de ses dents est tombée. Elle a roulé. Roulé. Roulé.\n\nElle roule encore. Sur un 6 éternel.\n\nSi tu la portes contre ton cœur, tu entends les Dés rire. Ils savent quelque chose que tu ignores.\n\nPeut-être que Thalys a laissé tomber cette dent... exprès?",
+        "secretLore": "Les Dés te parlent quand tu touches la dent : 'Un jour, tu la rendras. Quand tu comprendras.'"
+      },
+      "godAffinity": "THALYS",
+      "corruptionEffects": {
+        "none": "La chance n'a pas de morale. Thalys le savait."
+      },
+      "specialInteraction": {
+        "boss": {
+          "name": "Les Dés du Destin (Final Boss)",
+          "trigger": "Équiper la dent pendant le boss fight",
+          "dialogue": [
+            "Thalys (Les Dés) : '...Tu portes moi?'",
+            "'Une partie de moi. Tombée. Perdue. Retrouvée.'",
+            "'Ironique, non? Le hasard lui-même... oublié.'"
+          ],
+          "choice": {
+            "return": {
+              "action": "Rendre la dent à Thalys",
+              "effect": "Les Dés pleurent (si les dés peuvent pleurer). Secret ending path unlock.",
+              "reward": "Blessing of Thalys - Permanent +10 luck, RNG bias slightly in your favor"
+            },
+            "keep": {
+              "action": "Garder la dent",
+              "effect": "Thalys comprend. 'Garde-la. Souviens-toi de moi.' +15% corruption.",
+              "reward": "Item upgraded: peut reroll 3/jour au lieu de 1/jour"
+            }
+          }
+        },
+        "class": {
+          "DEMONIST": "Reroll fonctionne aussi sur invocations (table de summon)",
+          "HOLLOW_ROGUE": "Reroll fonctionne sur Stolen Fates (regagner charge)"
+        }
+      },
+      "drop": {
+        "source": "Ultra rare drop from 'Dice Mimic' enemy (0.5% chance)",
+        "alternative": "Reward from secret quest 'Find All 6 God Relics'",
+        "unique": true
+      }
+    },
+
+    "LOVERS_LOCKET": {
+      "id": "LOVERS_LOCKET",
+      "name": "Médaillon des Amants",
+      "type": "Pendentif",
+      "rarity": "rare",
+      "icon": "💕",
+      "stats": {
+        "special": "Si companion vivant : +20% stats pour les deux. Si companion meurt : rage +50% dmg pendant 5 tours"
+      },
+      "lore": {
+        "short": "L'amour qui transcende la mort.",
+        "full": "Ce médaillon appartenait à un soldat. Il aimait une femme. Elle l'aimait.\n\nIl est mort à la guerre. Elle est devenue une Succube Corrompue, cherchant son visage parmi les ombres depuis 300 ans.\n\nLe médaillon contient leurs portraits. Jeunes. Souriants. Vivants.\n\nSi tu le lui montres... elle se souviendra.\n\nEt peut-être, enfin, trouvera-t-elle la paix.",
+        "secretLore": "Lui est au Paradis. Elle en Enfer. L'amour ne suffit pas à briser les mondes. Ou... si?"
+      },
+      "godAffinity": "Aucun - l'amour précède les dieux",
+      "corruptionEffects": {
+        "resistance": "Porter ce médaillon ralentit corruption : -50% gain corruption"
+      },
+      "specialInteraction": {
+        "enemy": {
+          "name": "Corrupted Succubus",
+          "trigger": "Montrer le médaillon pendant combat",
+          "effect": {
+            "immediate": "Succubus arrête de combattre, pleure, se souvient",
+            "dialogue": [
+              "'C'est... lui. Mon... je me souviens de son nom.'",
+              "'Kaelen. Il s'appelait Kaelen.'",
+              "'Est-il... est-il en paix?'"
+            ],
+            "choice": {
+              "truth": {
+                "say": "'Il est mort en héros. Il t'aimait.'",
+                "effect": "Succubus se dissout pacifiquement, drop 'Eternal Love Ring' (legendary)",
+                "corruption": "-10%"
+              },
+              "lie": {
+                "say": "'Il t'a oubliée. Il est avec une autre.'",
+                "effect": "Succubus enrage, boss variant +200% stats, mais meilleur loot",
+                "corruption": "+20% (cruauté)"
+              }
+            }
+          }
+        },
+        "quest": {
+          "name": "Réunir les Amants",
+          "steps": [
+            "1. Obtenir médaillon (drop Étage 2)",
+            "2. Montrer à Succubus, choisir vérité",
+            "3. Obtenir 'Eternal Love Ring'",
+            "4. Porter ring au 'Tomb of Heroes' (Étage 7)",
+            "5. Rituel de réunion (cutscene)"
+          ],
+          "reward": "Secret ending variant 'Love Transcends' - prouver que l'amour existe encore"
+        }
+      },
+      "drop": {
+        "source": "Chest in 'Lovers' Bridge' (Étage 2, secret area)",
+        "chance": 100
+      }
+    },
+
+    "DEMON_HEART_PRESERVED": {
+      "id": "DEMON_HEART_PRESERVED",
+      "name": "Cœur de Démon Préservé",
+      "type": "Relique vivante",
+      "rarity": "uncommon",
+      "icon": "❤️",
+      "stats": {
+        "maxHP": -20,
+        "regen": "+5 HP/sec",
+        "special": "Immunité poison, maladie, peste. Vulnérabilité holy +50%"
+      },
+      "lore": {
+        "short": "Il bat encore. Pour toi.",
+        "full": "Tu as mangé un Cœur de Démon.\n\nIl ne s'est pas dissous. Il s'est intégré.\n\nMaintenant, il bat à côté du tien. Deux cœurs. Deux rythmes. Parfois synchronisés.\n\nTu te sens... différent. Plus fort. Plus sombre. Plus vivant?\n\nLes démons n'ont pas d'âme, disait-on. Mais ils ont un cœur. Et maintenant... il est tien.",
+        "secretLore": "Si tu manges 7 Cœurs de Démon, tu deviendras un Hybrid. Est-ce une évolution? Ou une malédiction?"
+      },
+      "godAffinity": "Void",
+      "corruptionEffects": {
+        "passive": "+2% corruption par jour équipé",
+        "stacking": "Si tu possèdes plusieurs cœurs démoniaques, ils communiquent entre eux (whispers)"
+      },
+      "specialInteraction": {
+        "class": {
+          "BLOODBOUND": {
+            "effect": "Ancêtre démon reconnaît le cœur : 'Famille', duration +2 tours",
+            "bonus": "Regen doublée (+10 HP/sec)"
+          },
+          "DEMONIST": {
+            "effect": "Démons invoqués ont +30% loyauté (reconnaissent le cœur)"
+          }
+        },
+        "evolution": {
+          "trigger": "Manger 7 Demon Hearts",
+          "transformation": "Devenir un Hybrid (semi-boss fight contre toi-même)",
+          "outcome": {
+            "win": "Contrôler le pouvoir, unlock 'Hybrid Form' skill (+100% stats, 3 tours, cooldown 10min)",
+            "lose": "Game over - tu deviens un boss pour les autres joueurs (New Game+ mechanic)"
+          }
+        }
+      },
+      "drop": {
+        "source": "Consommer 'Demon Heart' (consumable) 3 fois → devient permanent accessory",
+        "craft": "Alchemist NPC au village peut préserver hearts"
+      }
+    }
+  },
+
+  "CONSUMABLES": {
+    "DEMON_HEART": {
+      "id": "DEMON_HEART",
+      "name": "Cœur de Démon Mineur",
+      "type": "Consumable (one-time use)",
+      "rarity": "uncommon",
+      "icon": "💔",
+      "effect": {
+        "immediate": "Heal 100% PV",
+        "cost": "+10% corruption permanente"
+      },
+      "lore": {
+        "short": "Le goût de la damnation.",
+        "full": "Il bat encore. Faiblement. Chaudement.\n\nLes démons n'ont pas de cœur, disait-on. Mensonge.\n\nIls en ont un. Noir. Vivant. Éternel.\n\nSi tu le manges, il deviendra toi. Ou tu deviendras lui.\n\nLe goût est... familier. Comme si tu te souvenais d'avant. D'un temps où tu n'étais pas encore humain.\n\nOu peut-être que tu ne l'as jamais été?",
+        "secretLore": "Les Hybrids naissent quand un humain mange trop de cœurs démoniaques. 7 cœurs = transformation."
+      },
+      "dialogue": {
+        "beforeEat": "Tu le sens pulser dans ta main. Chaud. Tentant. Vivant.",
+        "onEat": {
+          "first": "Le goût est... sucré? Non. Métallique. Non. C'est... chez moi.",
+          "third": "Ton troisième. Tu commences à... aimer ça. C'est inquiétant.",
+          "seventh": "Le septième. Quelque chose en toi... se réveille. Ou meurt?"
+        },
+        "after": {
+          "corruption": "+10% corruption",
+          "feeling": "Quelque chose a changé. En profondeur. Irréversiblement."
+        }
+      },
+      "warnings": {
+        "npc": {
+          "Priest": "'Ne mange jamais ça. C'est un péché contre nature.'",
+          "Scholar": "'3 cœurs max recommandés. Au-delà... des cas de transformation ont été rapportés.'",
+          "Demonist": "'J'en ai mangé 5. Je sens... leur présence. En moi. Constante.'"
+        }
+      },
+      "drop": {
+        "source": "Drop from any Demon enemy (30% chance)",
+        "shopPrice": 150
+      }
+    },
+
+    "AEL_MORA_TEAR": {
+      "id": "AEL_MORA_TEAR",
+      "name": "Larme de Ael'mora",
+      "type": "Consumable (one-time use)",
+      "rarity": "legendary",
+      "icon": "💧",
+      "effect": {
+        "corruption": "-25% corruption",
+        "heal": "50% max HP",
+        "special": "Retire 1 malédiction permanente"
+      },
+      "lore": {
+        "short": "La seule chose qu'elle a laissée.",
+        "full": "Ael'mora, la Scelleuse de la Fin Douce, n'a pas dévoré ni été dévorée.\n\nElle a choisi de disparaître. Simplement. Totalement.\n\nAvant de partir, elle a pleuré. Une seule larme.\n\nPour l'humanité. Pour ses frères et sœurs dieux. Pour le monde qu'elle abandonnait.\n\nCette larme est pure. Plus pure que la lumière. Plus douce que le silence.\n\nC'est le dernier cadeau d'un dieu à un monde sans dieux.",
+        "secretLore": "Si tu bois cette larme à exactement 50% corruption, Ael'mora te parle. Une fois. 'Tu as compris.'"
+      },
+      "dialogue": {
+        "beforeDrink": "Tu tiens une larme de dieu. La dernière trace d'Ael'mora. La boire semble... sacrilège. Mais nécessaire.",
+        "onDrink": {
+          "default": "Une douceur absolue. Comme si quelqu'un te pardonnait pour tout. Tout.",
+          "at50percent": {
+            "voice": "Ael'mora elle-même",
+            "words": [
+              "'Tu as trouvé l'équilibre. Ni pur ni corrompu. Juste... humain.'",
+              "'C'est ce que mes frères n'ont jamais compris. L'humanité n'est pas perfection.'",
+              "'C'est fragilité. Doute. Choix. Et c'est... magnifique.'",
+              "'Continue. Montre-leur ce qu'un humain peut être.'"
+            ]
+          }
+        },
+        "after": "-25% corruption. Tu te sens... léger. Comme si un poids millénaire s'était envolé."
+      },
+      "drop": {
+        "source": "Ultra rare - Hidden in 'Ael'mora's Last Shrine' (Étage 8, secret)",
+        "quantity": "Only 3 exist per playthrough",
+        "unique": true
+      }
+    },
+
+    "MORWYN_OATH_SCROLL": {
+      "id": "MORWYN_OATH_SCROLL",
+      "name": "Parchemin de Serment",
+      "type": "Consumable (one-time use)",
+      "rarity": "rare",
+      "icon": "📜",
+      "effect": {
+        "immediate": "Choisir 1 buff permanent parmi 3 serments",
+        "duration": "Permanent (jusqu'à mort ou brisé volontairement)"
+      },
+      "lore": {
+        "short": "Les lois de Morwyn survivent encore.",
+        "full": "Morwyn, le Scelleur de l'Ordre, a gravé ses lois dans la réalité même.\n\nQuand il est mort, les lois... ont persisté. Autonomes. Vivantes.\n\nCe parchemin contient l'un de ses Serments Sacrés. Si tu le lis à voix haute, l'univers t'écoute.\n\nEt l'univers se souvient.\n\nBriser un serment de Morwyn a un coût. L'ordre exige un prix.",
+        "secretLore": "Morwyn a été dévoré en premier parce qu'il refusait de briser ses propres lois. Rigide jusqu'à la mort."
+      },
+      "oathChoices": {
+        "OATH_OF_PROTECTION": {
+          "effect": "Allies +30% def, toi -20% atk",
+          "break": "Si un allié meurt sous ta protection : +15% corruption, lose oath"
+        },
+        "OATH_OF_VENGEANCE": {
+          "effect": "Enemies killed <3 tours : +50% dmg sur prochain ennemi (stack)",
+          "break": "Si tu laisses un ennemi fuir : -10% dmg permanent, lose oath"
+        },
+        "OATH_OF_SACRIFICE": {
+          "effect": "Ne pas heal pendant 10 combats : unlock Morwyn's Blessing (+100 max HP)",
+          "break": "Si tu heal : lose tous stacks, recommencer"
+        }
+      },
+      "drop": {
+        "source": "Reward from 'Morwyn's Trials' event (random étages 3-6)",
+        "shopPrice": 400
+      }
+    }
+  },
+
+  "ITEM_SETS": {
+    "MORWYN_LEGACY": {
+      "name": "L'Héritage de Morwyn",
+      "pieces": ["BROKEN_OATH", "SHATTERED_SHIELD", "OATH_CROWN"],
+      "bonuses": {
+        "2pieces": {
+          "effect": "Serments +50% effet",
+          "lore": "L'ordre résonne à travers les artefacts."
+        },
+        "3pieces": {
+          "effect": "Unlock skill 'Morwyn's Last Stand' : Cheat death 1/run, revive 50% PV",
+          "lore": "Morwyn protège ses champions. Même mort.",
+          "visual": "Spectral armor of Morwyn appears when triggered"
+        }
+      },
+      "setLore": "Morwyn, premier dévoré, dernier oublié. Porter son héritage complet, c'est porter le souvenir de l'Ordre lui-même."
+    },
+
+    "VYR_FLAMES": {
+      "name": "Les Flammes de Vyr",
+      "pieces": ["VILLAGE_FLAME", "VILLAGE_ASHES_CLOAK", "PHOENIX_FEATHER"],
+      "bonuses": {
+        "2pieces": {
+          "effect": "Fire damage +30%",
+          "lore": "Le feu de Vyr brûle encore. Plus fort. Plus sombre."
+        },
+        "3pieces": {
+          "effect": "Mourir par feu : Resurrect as Phoenix (1/run, +50% corruption)",
+          "lore": "Vyr s'est consumée. Toi aussi. Mais tu renais.",
+          "visual": "Phoenix wings of flame on resurrection",
+          "cost": "+50% corruption (resurrection is not free)"
+        }
+      },
+      "setLore": "Vyr, la Scelleuse du Feu Primordial, s'est immolée pour ne pas dévorer ses enfants. Son feu est sacrifice. Son feu est renaissance."
+    },
+
+    "SYLTHARA_FATE": {
+      "name": "Le Destin Tissé",
+      "pieces": ["HOLLOW_EDGE", "THREAD_RING", "FATE_CLOAK"],
+      "bonuses": {
+        "2pieces": {
+          "effect": "Critique = steal 1 buff from enemy",
+          "lore": "Sylthara tissait les destins. Tu les voles."
+        },
+        "3pieces": {
+          "effect": "Unlock skill 'Cut All Threads' : AOE qui coupe destins (50% instant kill sur enemies <40% PV)",
+          "lore": "Sylthara coupait avec certitude. Toi, avec espoir.",
+          "cost": "Consume all 'Stolen Fates' charges",
+          "cooldown": "1 per floor"
+        }
+      },
+      "setLore": "Sylthara s'est effilochée en tentant de tisser l'impossible : un destin sans fin. Ses fils pendent encore, attendant des mains mortelles."
+    }
+  },
+
+  "META": {
+    "totalItems": 73,
+    "rarityDistribution": {
+      "common": 20,
+      "uncommon": 28,
+      "rare": 18,
+      "legendary": 7
+    },
+    "lorePhilosophy": "Chaque item est un fragment d'histoire. Pas de 'Épée +5'. Seulement des artefacts avec âme, passé, et conséquences.",
+    "godAffinitySystem": "Items liés à un dieu donnent bonus si class matching, ou malus si corruption conflictuelle",
+    "secretItems": 12,
+    "uniqueItems": 8,
+    "setItems": 9
+  }
+}
