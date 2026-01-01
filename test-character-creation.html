@@ -872,6 +872,35 @@
             border-color: rgba(212, 175, 55, 0.8);
         }
     </style>
+    <style>
+        /* Documentation Hub Button */
+        .docs-hub-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(180, 140, 40, 0.9) 100%);
+            border: 2px solid rgba(244, 208, 63, 0.6);
+            border-radius: 8px;
+            color: #0a0a0f;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .docs-hub-btn:hover {
+            background: linear-gradient(135deg, rgba(244, 208, 63, 1) 0%, rgba(212, 175, 55, 1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+        }
+    </style>
 </head>
 <body>
     <div id="character-creation">
@@ -1465,5 +1494,11 @@
         console.log('💫 Particules + Stats détaillées + Système d\'attributs');
         console.log('📊 4 étapes: Classe → Race → Attributs → Nom');
     </script>
+
+    <!-- Documentation Hub Button -->
+    <a href="docs-hub.html" class="docs-hub-btn" target="_blank">
+        📚 Documentation
+    </a>
+
 </body>
 </html>
