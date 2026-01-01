@@ -1,0 +1,516 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "defaultLanguage": "fr",
+    "supportedLanguages": ["fr", "en", "de", "it", "es", "ru"],
+    "description": "Narratives du Cortège des Ombres - Village Nomade - Fil rouge chapitres 1-3"
+  },
+
+  "zones": {
+    "hub": {
+      "fr": {
+        "name": "Le Cortège des Ombres",
+        "description": "Douze chariots. Quinze tentes en voiles de navires déchirées et cuir de monstres tannés. Des feux de graisse qui puent l'os brûlé. C'est ton village maintenant.",
+        "corruptionVariants": {
+          "0-25": "Des lanternes oscillent. Des voix murmurent. Presque... humaines.",
+          "25-50": "Les ombres bougent sans raison. Les feux crépitent des mots que tu ne devrais pas comprendre.",
+          "50-75": "Les tentes saignent. Non, elles transpirent. Du sang ? De la sève noire ? Les deux ?",
+          "75-100": "Le Cortège te reconnaît. Les chariots s'écartent quand tu passes. Les feux s'inclinent."
+        }
+      },
+      "en": {
+        "name": "The Shadow Convoy",
+        "description": "Twelve wagons. Fifteen tents of torn ship sails and tanned monster leather. Grease fires stinking of burnt bone. This is your village now.",
+        "corruptionVariants": {
+          "0-25": "Lanterns sway. Voices whisper. Almost... human.",
+          "25-50": "Shadows move without reason. Fires crackle words you shouldn't understand.",
+          "50-75": "The tents bleed. No, they sweat. Blood? Black sap? Both?",
+          "75-100": "The Convoy recognizes you. Wagons part when you pass. Fires bow."
+        }
+      }
+    },
+
+    "forge": {
+      "fr": {
+        "name": "L'Écorcheur de Fer",
+        "description": "Une forge mobile. Enclume rivée sur un chariot blindé. Drenvar tape le métal comme s'il lui devait de l'argent.",
+        "firstVisit": "Le nain ne lève même pas les yeux. « Encore mort ? » Il crache dans les braises. « Un jour, tu resteras couché. »",
+        "corruptionVariants": {
+          "0-25": "« Tes mains tremblent pas encore. Bien. Les lames pardonnent pas. »",
+          "25-50": "« Cette tache sur ton cou... » Il fronce les sourcils. « Paie d'avance. Au cas où. »",
+          "50-75": "« Approche pas des Larmes de Krovax avec cette puanteur. Elles vont exploser. »",
+          "75-100": "Il recule d'un pas. « On forge encore. Mais je touche plus ta peau. Compris ? »"
+        }
+      },
+      "en": {
+        "name": "The Iron Flayer",
+        "description": "A mobile forge. Anvil riveted on an armored wagon. Drenvar hammers metal like it owes him money.",
+        "firstVisit": "The dwarf doesn't even look up. 'Dead again?' He spits in the embers. 'One day, you'll stay down.'",
+        "corruptionVariants": {
+          "0-25": "'Your hands don't shake yet. Good. Blades don't forgive.'",
+          "25-50": "'That stain on your neck...' He frowns. 'Pay upfront. Just in case.'",
+          "50-75": "'Don't bring that stench near Krovax's Tears. They'll explode.'",
+          "75-100": "He steps back. 'We still forge. But I don't touch your skin anymore. Clear?'"
+        }
+      }
+    },
+
+    "altar": {
+      "fr": {
+        "name": "Le Jardin des Regrets",
+        "description": "Pas un jardin. Trois pots de terre noire. Des lys blancs qui ne devraient pas exister ici. Un aveugle qui les arrose avec... de l'eau ? Du sang ? Les deux ?",
+        "firstVisit": "« Assieds-toi. » Le Jardinier ne te regarde pas. Il ne peut pas. Ses yeux sont des cratères vides. « Les Lys du Pardon écoutent. Toi, tu choisis de parler. »",
+        "corruptionVariants": {
+          "0-25": "Les lys sont blancs. Presque lumineux. « Tu portes peu de noirceur. Pour l'instant. »",
+          "25-50": "Quelques pétales grisent. « Elles prennent ce que tu leur donnes. Ni plus. Ni moins. »",
+          "50-75": "Les lys sont gris anthracite. Leurs tiges suintent. « Elles souffrent. Comme toi. »",
+          "75-100": "Un lys est mort. Noir. Ratatiné. « Même elles ont des limites. Désolé. »"
+        },
+        "purificationSuccess": "Le lys absorbe. Ses pétales deviennent gris, puis noirs. Il meurt. Mais toi... toi, tu respires mieux.",
+        "purificationFailure": "« Trop. C'est trop. » Le Jardinier recule. « Reviens quand tu seras... moins. »"
+      },
+      "en": {
+        "name": "The Garden of Regrets",
+        "description": "Not a garden. Three pots of black earth. White lilies that shouldn't exist here. A blind man watering them with... water? Blood? Both?",
+        "firstVisit": "'Sit.' The Gardener doesn't look at you. He can't. His eyes are empty craters. 'The Lilies of Forgiveness listen. You choose to speak.'",
+        "corruptionVariants": {
+          "0-25": "The lilies are white. Almost glowing. 'You carry little darkness. For now.'",
+          "25-50": "Some petals gray. 'They take what you give them. No more. No less.'",
+          "50-75": "The lilies are charcoal gray. Their stems ooze. 'They suffer. Like you.'",
+          "75-100": "One lily is dead. Black. Shriveled. 'Even they have limits. Sorry.'"
+        },
+        "purificationSuccess": "The lily absorbs. Its petals turn gray, then black. It dies. But you... you breathe easier.",
+        "purificationFailure": "'Too much. It's too much.' The Gardener steps back. 'Come back when you're... less.'"
+      }
+    },
+
+    "market": {
+      "fr": {
+        "name": "Le Bazar des Ruines",
+        "description": "Trois tables. Des artefacts volés sur des cadavres. Des reliques divines craquelées. Un marchand qui sourit trop.",
+        "corruptionVariants": {
+          "0-25": "« Prix standard. Argent standard. Tout est simple quand t'es propre. »",
+          "25-50": "« Les prix fluctuent. Comme toi. » Il tapote la balance. « Offre et demande, mon ami. »",
+          "50-75": "« Pour toi ? Remise spéciale. » Son sourire se fend. Trop large. « Les corrompus paient moins. On est solidaires. »",
+          "75-100": "Il se prosterne. « Prenez. Servez-vous. Je... je vous dois tout. » Ses mains tremblent."
+        }
+      },
+      "en": {
+        "name": "The Ruin Bazaar",
+        "description": "Three tables. Artifacts stolen from corpses. Cracked divine relics. A merchant who smiles too much.",
+        "corruptionVariants": {
+          "0-25": "'Standard prices. Standard coin. Everything's simple when you're clean.'",
+          "25-50": "'Prices fluctuate. Like you.' He taps the scale. 'Supply and demand, friend.'",
+          "50-75": "'For you? Special discount.' His smile splits. Too wide. 'The corrupted pay less. Solidarity.'",
+          "75-100": "He prostrates. 'Take. Help yourself. I... I owe you everything.' His hands tremble."
+        }
+      }
+    },
+
+    "recruitment": {
+      "fr": {
+        "name": "Le Cercle des Volontaires",
+        "description": "Un feu de camp. Des visages marqués. Certains humains. D'autres... en transition. Tous cherchent une raison de descendre avec toi.",
+        "corruptionVariants": {
+          "0-25": "Ils te regardent avec espoir. « Tu peux nous sauver. Dis-nous comment. »",
+          "25-50": "Les regards sont méfiants. « Tu changes. On le voit. Mais... on te suit quand même. »",
+          "50-75": "Ils reculent quand tu approches. Sauf les mi-démons. Eux sourient. « Tu deviens des nôtres. »",
+          "75-100": "Les humains fuient. Les démons s'agenouillent. « Maître. Nous sommes prêts. »"
+        }
+      },
+      "en": {
+        "name": "The Circle of Volunteers",
+        "description": "A campfire. Scarred faces. Some human. Others... transitioning. All seek a reason to descend with you.",
+        "corruptionVariants": {
+          "0-25": "They look at you with hope. 'You can save us. Tell us how.'",
+          "25-50": "Eyes are wary. 'You're changing. We see it. But... we still follow.'",
+          "50-75": "They back away when you approach. Except the half-demons. They smile. 'You're becoming one of us.'",
+          "75-100": "Humans flee. Demons kneel. 'Master. We are ready.'"
+        }
+      }
+    },
+
+    "library": {
+      "fr": {
+        "name": "L'Enlumineur d'Âmes",
+        "description": "Pas de livres. Juste un homme couvert de tatouages vivants. Chaque ligne bouge. Raconte. Souffre.",
+        "firstVisit": "« Approche. » L'Archiviste lève son bras. Des scènes de bataille ondulent sur sa peau. « Je collectionne les histoires. La tienne... sera longue. »",
+        "corruptionVariants": {
+          "0-25": "Les tatouages sont argentés. Presque nobles. « Tu commences bien. Continue. »",
+          "25-50": "Des veines noires apparaissent dans l'encre. « Intéressant. Tu dévies du script habituel. »",
+          "50-75": "Les tatouages saignent. « Ta peau accepte la noirceur. Comme la mienne autrefois. »",
+          "75-100": "Il rit. Amer. « Tu approches de la Sortie. Je la connais. Mais le prix... putain, le prix. »"
+        },
+        "revelation": "« Écoute-moi bien. » Ses yeux brûlent. « Nous sommes les parasites d'un cadavre divin. Les Abysses ? C'est les intestins d'un dieu mort. Et toi... toi, tu cherches le cœur. »"
+      },
+      "en": {
+        "name": "The Soul Illuminator",
+        "description": "No books. Just a man covered in living tattoos. Every line moves. Tells. Suffers.",
+        "firstVisit": "'Come closer.' The Archivist raises his arm. Battle scenes ripple on his skin. 'I collect stories. Yours... will be long.'",
+        "corruptionVariants": {
+          "0-25": "The tattoos are silver. Almost noble. 'You're starting well. Continue.'",
+          "25-50": "Black veins appear in the ink. 'Interesting. You're deviating from the usual script.'",
+          "50-75": "The tattoos bleed. 'Your skin accepts the darkness. Like mine once did.'",
+          "75-100": "He laughs. Bitter. 'You're approaching the Exit. I know it. But the price... fuck, the price.'"
+        },
+        "revelation": "'Listen carefully.' His eyes burn. 'We are parasites on a divine corpse. The Abyss? It's the guts of a dead god. And you... you're seeking the heart.'"
+      }
+    }
+  },
+
+  "dice": {
+    "greetings": {
+      "fr": {
+        "0-25": [
+          "Bienvenue pour la... attends, laisse-moi vérifier mes notes... ah oui. Trois cent douzième fois.",
+          "Encore là ? Impressionnant. La plupart abandonnent vers la centième mort.",
+          "Le Cortège t'attend. Comme toujours. Comme pour l'éternité."
+        ],
+        "25-50": [
+          "Tu sens ça ? La Souillure qui s'installe ? Normal. Continue.",
+          "Les gens commencent à te regarder différemment. C'est pas de la peur. Pas encore.",
+          "15% de corruption. Seuil TAINTED franchi. Félicitations, je suppose."
+        ],
+        "50-75": [
+          "Tu vois des visages maintenant, non ? Dans les murs ? Les pierres ? Bienvenue au club.",
+          "À ce stade, tu acceptes que ta vie n'est plus la tienne. Ça va mieux après.",
+          "Les Mémoires Résiduelles s'ouvrent à toi. Krovax. Morwyn. Leur fusion. Leur erreur."
+        ],
+        "75-100": [
+          "Bientôt, tu devras me tuer. Moi. Le Dé. Thalys. T'es prêt ?",
+          "Le Cortège ne te craint plus. Il t'adore. C'est pire.",
+          "J'ai une question. Si tu gagnes... qui tu sauves ? Tout le monde ? Ou juste l'idée de tout le monde ?"
+        ]
+      },
+      "en": {
+        "0-25": [
+          "Welcome for the... wait, let me check my notes... ah yes. Three hundred twelfth time.",
+          "Still here? Impressive. Most give up around the hundredth death.",
+          "The Convoy awaits. As always. For eternity."
+        ],
+        "25-50": [
+          "Feel that? The Taint settling in? Normal. Continue.",
+          "People start looking at you differently. It's not fear. Not yet.",
+          "15% corruption. TAINTED threshold crossed. Congratulations, I suppose."
+        ],
+        "50-75": [
+          "You see faces now, right? In walls? Stones? Welcome to the club.",
+          "At this stage, you accept your life isn't yours anymore. It gets better after.",
+          "Residual Memories open to you. Krovax. Morwyn. Their fusion. Their mistake."
+        ],
+        "75-100": [
+          "Soon, you'll have to kill me. Me. The Die. Thalys. Ready?",
+          "The Convoy no longer fears you. It adores you. That's worse.",
+          "I have a question. If you win... who do you save? Everyone? Or just the idea of everyone?"
+        ]
+      }
+    },
+
+    "mockery": {
+      "fr": [
+        "« Ta gueule, Dé. » Classique. Original. Je note.",
+        "Tu meurs. Je rigole. On recommence. Le cycle parfait.",
+        "Attends, tu croyais VRAIMENT que cette cage aurait une bonne réponse ? Adorable."
+      ],
+      "en": [
+        "'Shut up, Die.' Classic. Original. I'm taking notes.",
+        "You die. I laugh. We restart. The perfect cycle.",
+        "Wait, you REALLY thought that cage had a good answer? Adorable."
+      ]
+    },
+
+    "philosophy": {
+      "fr": [
+        "« Pourquoi tu continues ? » Bonne question. Moi aussi, je me la pose.",
+        "Les Sept Dieux se sont suicidés pour échapper. Toi ? Tu descends volontairement. Qui est le fou ?",
+        "Si je te dis que la sortie existe... tu me crois ? Non. Bien. Ne crois jamais un dé."
+      ],
+      "en": [
+        "'Why do you continue?' Good question. I wonder too.",
+        "The Seven Gods killed themselves to escape. You? You descend willingly. Who's the fool?",
+        "If I tell you the exit exists... do you believe me? No. Good. Never trust a die."
+      ]
+    }
+  },
+
+  "npcs": {
+    "drenvar": {
+      "fr": {
+        "name": "Drenvar l'Écorcheur de Fer",
+        "title": "Forgeron Nain - 156 ans",
+        "greeting": "« T'as des rubis ou tu viens juste mater ? »",
+        "serviceAccepted": "« Enclume chaude. Larmes de Krovax prêtes. Bouges pas. »",
+        "serviceDenied": "« Reviens avec du vrai argent. Ou crève ailleurs. »",
+        "corruption": {
+          "low": "« Bien. Pas de merde démoniaque sur ton acier. Je peux bosser propre. »",
+          "medium": "« Cette tache... » Il crache. « Je forge quand même. Mais ça va coûter plus cher. »",
+          "high": "« J'ai forgé pour des démons avant. Toi ? T'es entre les deux. Chais pas si c'est mieux. »",
+          "extreme": "Il trempe la lame dans l'eau noire. « Pour toi, je forge dans les Larmes Corrompues. Krovax me pardonnera. Peut-être. »"
+        }
+      },
+      "en": {
+        "name": "Drenvar the Iron Flayer",
+        "title": "Dwarven Blacksmith - 156 years",
+        "greeting": "'Got rubies or just here to stare?'",
+        "serviceAccepted": "'Anvil's hot. Krovax's Tears ready. Don't move.'",
+        "serviceDenied": "'Come back with real coin. Or die elsewhere.'",
+        "corruption": {
+          "low": "'Good. No demonic shit on your steel. I can work clean.'",
+          "medium": "'That stain...' He spits. 'I forge anyway. But it'll cost more.'",
+          "high": "'I've forged for demons before. You? You're in-between. Don't know if that's better.'",
+          "extreme": "He quenches the blade in black water. 'For you, I forge in Corrupted Tears. Krovax will forgive me. Maybe.'"
+        }
+      }
+    },
+
+    "gardener": {
+      "fr": {
+        "name": "Le Jardinier des Regrets",
+        "title": "Aveugle - Gardien des Lys du Pardon",
+        "greeting": "« Assieds-toi. Respire. Les lys écoutent déjà. »",
+        "serviceAccepted": "Le lys ploie vers toi. Ses racines s'enfoncent dans ta peau. Ça brûle. Puis... soulagement.",
+        "serviceDenied": "« Trop de noirceur. Même les lys ont des limites. Désolé, enfant. »",
+        "corruption": {
+          "low": "« Tu portes peu de poids. Les lys te nettoieront facilement. »",
+          "medium": "« Elles prennent. Elles souffrent. Mais elles prennent quand même. »",
+          "high": "Un lys meurt en absorbant ta corruption. « Sacrifice accepté. »",
+          "extreme": "Tous les lys sont noirs. « Je ne peux plus t'aider. Cherche un autre jardin. Un jardin... plus sombre. »"
+        }
+      },
+      "en": {
+        "name": "The Gardener of Regrets",
+        "title": "Blind - Keeper of Lilies of Forgiveness",
+        "greeting": "'Sit. Breathe. The lilies already listen.'",
+        "serviceAccepted": "The lily bends toward you. Its roots dig into your skin. It burns. Then... relief.",
+        "serviceDenied": "'Too much darkness. Even lilies have limits. Sorry, child.'",
+        "corruption": {
+          "low": "'You carry little weight. The lilies will cleanse you easily.'",
+          "medium": "'They take. They suffer. But they take anyway.'",
+          "high": "A lily dies absorbing your corruption. 'Sacrifice accepted.'",
+          "extreme": "All lilies are black. 'I can't help you anymore. Seek another garden. A... darker garden.'"
+        }
+      }
+    },
+
+    "archivist": {
+      "fr": {
+        "name": "L'Archiviste Enlumineur d'Âmes",
+        "title": "Historien Tatoué - Connaît la Sortie",
+        "greeting": "« Chaque mort laisse une trace. Sur toi. Sur moi. Montre-moi tes cicatrices. »",
+        "loreReveal": "« Les Abysses ne sont pas un lieu. C'est une digestion. Les dieux se sont mangés. On explore leurs intestins. »",
+        "exitHint": "« La sortie ? » Il rit. « Tue le Dé. Fusionne avec lui. Deviens le Huitième. Ou... » Il hésite. « Trouve la Balance d'Ael'mora. »",
+        "corruption": {
+          "low": "« Ton histoire commence. Argentée. Presque héroïque. Ça changera. »",
+          "medium": "« Des veines noires. Intéressant. Tu dévies du récit classique. »",
+          "high": "« Ma peau aussi a saigné. Quand j'ai compris. Quand j'ai VU. »",
+          "extreme": "« Tu es presque... écrit. Comme moi. Bienvenue dans l'encre éternelle. »"
+        }
+      },
+      "en": {
+        "name": "The Archivist Soul Illuminator",
+        "title": "Tattooed Historian - Knows the Exit",
+        "greeting": "'Every death leaves a mark. On you. On me. Show me your scars.'",
+        "loreReveal": "'The Abyss isn't a place. It's digestion. The gods ate themselves. We explore their guts.'",
+        "exitHint": "'The exit?' He laughs. 'Kill the Die. Merge with him. Become the Eighth. Or...' He hesitates. 'Find Ael'mora's Balance.'",
+        "corruption": {
+          "low": "'Your story begins. Silver. Almost heroic. It will change.'",
+          "medium": "'Black veins. Interesting. You deviate from the classic tale.'",
+          "high": "'My skin bled too. When I understood. When I SAW.'",
+          "extreme": "'You are almost... written. Like me. Welcome to eternal ink.'"
+        }
+      }
+    },
+
+    "kael": {
+      "fr": {
+        "name": "Kael",
+        "title": "Humain Pur - Cherche sa Sœur Lisa",
+        "greeting": "« Tu m'as sauvé. Pourquoi ? J'étais faible. Inutile. Pourquoi pas elle ? »",
+        "companionAccept": "« Je te dois ma vie. Alors... allons chercher Lisa. Ensemble. »",
+        "companionReject": "« Tu me laisses encore derrière ? Très bien. J'attendrai. Comme toujours. »",
+        "deathReaction": "« Elle était forte. Utile. Et tu l'as sacrifiée... pour moi. » Il pleure. « Je ne te pardonnerai jamais. Mais je te suivrai quand même. »"
+      },
+      "en": {
+        "name": "Kael",
+        "title": "Pure Human - Searching for Sister Lisa",
+        "greeting": "'You saved me. Why? I was weak. Useless. Why not her?'",
+        "companionAccept": "'I owe you my life. So... let's find Lisa. Together.'",
+        "companionReject": "'You leave me behind again? Fine. I'll wait. As always.'",
+        "deathReaction": "'She was strong. Useful. And you sacrificed her... for me.' He cries. 'I'll never forgive you. But I'll follow you anyway.'"
+      }
+    }
+  },
+
+  "events": {
+    "revolt": {
+      "fr": {
+        "title": "RÉVOLTE AU CORTÈGE",
+        "description": "Des cris. Des torches. « Le Pactiséest corrompu ! Il nous mène à la ruine ! »",
+        "options": {
+          "crush": "Écraser la révolte (Corruption +5%, Moral -30)",
+          "negotiate": "Négocier (Coût: 200 Or, Moral +10)",
+          "ignore": "Ignorer (Moral -50, risque désertion)"
+        },
+        "outcome": {
+          "crush": "Le silence retombe. Par la peur. Cinq corps pendent aux chariots.",
+          "negotiate": "L'or parle. Toujours. Les révoltes s'achètent.",
+          "ignore": "Trois familles désertent dans la nuit. Le Cortège rétrécit."
+        }
+      },
+      "en": {
+        "title": "CONVOY REVOLT",
+        "description": "Screams. Torches. 'The Pactbearer is corrupted! He leads us to ruin!'",
+        "options": {
+          "crush": "Crush the revolt (Corruption +5%, Morale -30)",
+          "negotiate": "Negotiate (Cost: 200 Gold, Morale +10)",
+          "ignore": "Ignore (Morale -50, desertion risk)"
+        },
+        "outcome": {
+          "crush": "Silence falls. Through fear. Five bodies hang from wagons.",
+          "negotiate": "Gold speaks. Always. Revolts are bought.",
+          "ignore": "Three families desert in the night. The Convoy shrinks."
+        }
+      }
+    },
+
+    "demonsArrival": {
+      "fr": {
+        "title": "DES VISITEURS NOCTURNES",
+        "description": "Trois mi-démons approchent du Cortège. Ils sentent ta corruption. Ils veulent rejoindre.",
+        "options": {
+          "accept": "Les accueillir (Moral -20, +3 recrues mi-démons puissantes)",
+          "refuse": "Les chasser (Combat difficile, Moral +10 si victoire)",
+          "negotiate": "Négocier (Test Corruption >50%)"
+        },
+        "outcome": {
+          "accept": "Les humains murmurent. Les démons sourient. Le Cortège change.",
+          "refuse": "Ils crachent du sang noir en partant. « On reviendra. »",
+          "negotiateSuccess": "« Nous servons le plus fort. Tu es le plus fort. Pour l'instant. »",
+          "negotiateFail": "« Pathétique. Ni humain ni démon. Juste... faible. »"
+        }
+      },
+      "en": {
+        "title": "NOCTURNAL VISITORS",
+        "description": "Three half-demons approach the Convoy. They smell your corruption. They want to join.",
+        "options": {
+          "accept": "Welcome them (Morale -20, +3 powerful half-demon recruits)",
+          "refuse": "Chase them away (Difficult combat, Morale +10 if victory)",
+          "negotiate": "Negotiate (Corruption test >50%)"
+        },
+        "outcome": {
+          "accept": "Humans murmur. Demons smile. The Convoy changes.",
+          "refuse": "They spit black blood as they leave. 'We'll return.'",
+          "negotiateSuccess": "'We serve the strongest. You are the strongest. For now.'",
+          "negotiateFail": "'Pathetic. Neither human nor demon. Just... weak.'"
+        }
+      }
+    }
+  },
+
+  "services": {
+    "forge": {
+      "upgradeWeapon": {
+        "fr": {
+          "name": "Améliorer Arme",
+          "description": "Drenvar retrempe ta lame dans les Larmes de Krovax. Cristaux divins. Puissance brute.",
+          "success": "La lame chante. Rouge sang. « Voilà du travail propre. »",
+          "failure": "Le cristal explose. « Merde. Ta corruption a foutu le bordel. Reviens quand t'es plus stable. »",
+          "corruptedVersion": "Il utilise des Larmes Noires. « Krovax me déteste déjà. Autant y aller à fond. »"
+        },
+        "en": {
+          "name": "Upgrade Weapon",
+          "description": "Drenvar quenches your blade in Krovax's Tears. Divine crystals. Raw power.",
+          "success": "The blade sings. Blood red. 'Now that's clean work.'",
+          "failure": "The crystal explodes. 'Shit. Your corruption fucked it up. Come back when you're more stable.'",
+          "corruptedVersion": "He uses Black Tears. 'Krovax already hates me. Might as well go all in.'"
+        }
+      }
+    },
+
+    "altar": {
+      "purify": {
+        "fr": {
+          "name": "Purification (-10% Corruption)",
+          "description": "Les Lys du Pardon absorbent ta noirceur. Ils meurent. Tu vis.",
+          "success": "Le lys devient gris. Noir. Flétrit. Tombe. Mais toi... tu respires mieux.",
+          "failure": "« Trop de noirceur. » Le Jardinier recule. « Reviens quand tu seras moins... toi. »",
+          "cost": "100 Or + Sacrifice d'un Lys"
+        },
+        "en": {
+          "name": "Purification (-10% Corruption)",
+          "description": "The Lilies of Forgiveness absorb your darkness. They die. You live.",
+          "success": "The lily turns gray. Black. Withers. Falls. But you... you breathe easier.",
+          "failure": "'Too much darkness.' The Gardener steps back. 'Come back when you're less... you.'",
+          "cost": "100 Gold + Lily Sacrifice"
+        }
+      },
+
+      "demonicPact": {
+        "fr": {
+          "name": "Pacte Démoniaque (+15% Corruption, buff puissant)",
+          "description": "Brûle un lys noir. Invoque une entité. Gagne du pouvoir. Perds ton âme. Classique.",
+          "success": "La fumée noire entre en toi. Ça brûle. Puis... puissance. Pure. Horrible. Tienne.",
+          "diceComment": "« Bien. Tu comprends. Le pouvoir n'est jamais gratuit. Ni propre. »",
+          "cost": "50 Or + 15% Corruption"
+        },
+        "en": {
+          "name": "Demonic Pact (+15% Corruption, powerful buff)",
+          "description": "Burn a black lily. Summon an entity. Gain power. Lose your soul. Classic.",
+          "success": "Black smoke enters you. It burns. Then... power. Pure. Horrible. Yours.",
+          "diceComment": "'Good. You understand. Power is never free. Nor clean.'",
+          "cost": "50 Gold + 15% Corruption"
+        }
+      }
+    },
+
+    "library": {
+      "loreFragment": {
+        "fr": {
+          "name": "Fragment de Connaissance",
+          "description": "L'Archiviste te montre ses tatouages. Une scène s'anime. Passé. Futur. Les deux ?",
+          "revelations": [
+            "« Morwyn et Krovax ont fusionné. Un dieu d'amour et de guerre. Ça a créé... la Compassion Armée. L'erreur ultime. »",
+            "« Les Sept ne se sont pas suicidés par peur. Mais par ennui. L'immortalité est une prison. »",
+            "« Le Dé ? Thalys. Huitième dieu. Né du chaos de leur mort. Il cherche... un remplaçant. »"
+          ]
+        },
+        "en": {
+          "name": "Knowledge Fragment",
+          "description": "The Archivist shows you his tattoos. A scene animates. Past. Future. Both?",
+          "revelations": [
+            "'Morwyn and Krovax merged. A god of love and war. It created... Armed Compassion. The ultimate mistake.'",
+            "'The Seven didn't suicide from fear. But from boredom. Immortality is a prison.'",
+            "'The Die? Thalys. Eighth god. Born from the chaos of their death. He seeks... a replacement.'"
+          ]
+        }
+      }
+    }
+  },
+
+  "templates": {
+    "priceModifier": {
+      "fr": "Prix de base: {basePrice} → Corruption {corruptionMod}% → Moral {moraleMod}% → TOTAL: {finalPrice}",
+      "en": "Base price: {basePrice} → Corruption {corruptionMod}% → Morale {moraleMod}% → TOTAL: {finalPrice}"
+    },
+
+    "companionStatus": {
+      "fr": "{name} - PV: {hp}/{maxHp} - Rôle: {role} - {corrupted}",
+      "en": "{name} - HP: {hp}/{maxHp} - Role: {role} - {corrupted}"
+    },
+
+    "villageEvolution": {
+      "fr": {
+        "level1": "Cortège Fragile - 12 chariots, feux faibles, moral instable",
+        "level2": "Cortège Établi - 18 chariots, forge permanente, recrues disponibles",
+        "level3": "Cortège Fortifié - 24 chariots, palissades, commerce actif",
+        "level4": "Cortège Corrompu - Architecture démoniaque, feux noirs, adoration"
+      },
+      "en": {
+        "level1": "Fragile Convoy - 12 wagons, weak fires, unstable morale",
+        "level2": "Established Convoy - 18 wagons, permanent forge, recruits available",
+        "level3": "Fortified Convoy - 24 wagons, palisades, active trade",
+        "level4": "Corrupted Convoy - Demonic architecture, black fires, worship"
+      }
+    }
+  }
+}

@@ -1,0 +1,152 @@
+/**
+ * RoomGenerator - Génération procédurale de donjons
+ * @description Crée grille avec salles et couloirs
+ */
+
+export class RoomGenerator {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.grid = [];
+        
+        // Types de tiles
+        this.TILE_TYPES = {
+            EMPTY: 0,
+            FLOOR: 1,
+            WALL: 2,
+            DOOR: 3,
+            SPAWN: 4, // Point d'apparition joueur
+            EXIT: 5   // Sortie de la salle
+        };
+        
+        this.initGrid();
+    }
+
+    /**
+     * Initialiser grille vide
+     */
+    initGrid() {
+        this.grid = [];
+        for (let y = 0; y < this.height; y++) {
+            this.grid[y] = [];
+            for (let x = 0; x < this.width; x++) {
+                this.grid[y][x] = this.TILE_TYPES.EMPTY;
+            }
+        }
+    }
+
+    /**
+     * Générer une salle simple (rectangulaire)
+     */
+    generateSimpleRoom() {
+        this.initGrid();
+        
+        // Créer salle au centre (80% de la grille)
+        const roomWidth = Math.floor(this.width * 0.8);
+        const roomHeight = Math.floor(this.height * 0.8);
+        const startX = Math.floor((this.width - roomWidth) / 2);
+        const startY = Math.floor((this.height - roomHeight) / 2);
+        
+        // Remplir sol
+        for (let y = startY; y < startY + roomHeight; y++) {
+            for (let x = startX; x < startX + roomWidth; x++) {
+                this.grid[y][x] = this.TILE_TYPES.FLOOR;
+            }
+        }
+        
+        // Ajouter murs
+        for (let y = startY - 1; y <= startY + roomHeight; y++) {
+            for (let x = startX - 1; x <= startX + roomWidth; x++) {
+                if (x === startX - 1 || x === startX + roomWidth || 
+                    y === startY - 1 || y === startY + roomHeight) {
+                    if (this.grid[y][x] !== this.TILE_TYPES.FLOOR) {
+                        this.grid[y][x] = this.TILE_TYPES.WALL;
+                    }
+                }
+            }
+        }
+        
+        // Point de spawn (centre)
+        const spawnX = Math.floor(this.width / 2);
+        const spawnY = Math.floor(this.height / 2);
+        this.grid[spawnY][spawnX] = this.TILE_TYPES.SPAWN;
+        
+        // Sortie (en haut)
+        const exitX = Math.floor(this.width / 2);
+        const exitY = startY;
+        this.grid[exitY][exitX] = this.TILE_TYPES.DOOR;
+        
+        console.log('✅ Simple room generated');
+    }
+
+    /**
+     * Obtenir type de tile à une position
+     */
+    getTile(x, y) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+            return this.TILE_TYPES.EMPTY;
+        }
+        return this.grid[y][x];
+    }
+
+    /**
+     * Définir type de tile
+     */
+    setTile(x, y, type) {
+        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+            this.grid[y][x] = type;
+        }
+    }
+
+    /**
+     * Vérifier si tile est walkable
+     */
+    isWalkable(x, y) {
+        const tile = this.getTile(x, y);
+        return tile === this.TILE_TYPES.FLOOR || 
+               tile === this.TILE_TYPES.SPAWN || 
+               tile === this.TILE_TYPES.DOOR;
+    }
+
+    /**
+     * Trouver position de spawn
+     */
+    getSpawnPosition() {
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                if (this.grid[y][x] === this.TILE_TYPES.SPAWN) {
+                    return { x, y };
+                }
+            }
+        }
+        // Si pas de spawn défini, retourner centre
+        return { 
+            x: Math.floor(this.width / 2), 
+            y: Math.floor(this.height / 2) 
+        };
+    }
+
+    /**
+     * Obtenir couleur selon type de tile (pour rendu)
+     */
+    getTileColor(x, y) {
+        const tile = this.getTile(x, y);
+        
+        switch(tile) {
+            case this.TILE_TYPES.EMPTY:
+                return { fill: '#000', border: '#111' };
+            case this.TILE_TYPES.FLOOR:
+                return { fill: '#2a2a3e', border: '#3a3a4e' };
+            case this.TILE_TYPES.WALL:
+                return { fill: '#1a1a2e', border: '#8b0000' };
+            case this.TILE_TYPES.DOOR:
+                return { fill: '#4CAF50', border: '#2E7D32' };
+            case this.TILE_TYPES.SPAWN:
+                return { fill: '#4a0e4e', border: '#8b1a8b' };
+            case this.TILE_TYPES.EXIT:
+                return { fill: '#d4af37', border: '#f4d03f' };
+            default:
+                return { fill: '#000', border: '#111' };
+        }
+    }
+}

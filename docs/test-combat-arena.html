@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Combat Arena - THE LAST COVENANT</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0d0d0d;
+            color: #d4c5b0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            background: #0a0a0f;
+        }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .hud > * {
+            pointer-events: auto;
+        }
+
+        /* Player Stats */
+        .player-stats {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 20px;
+            min-width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .player-stats h3 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .stat-bar {
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: rgba(212, 197, 176, 0.9);
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 22px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(90, 77, 58, 0.5);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .bar-fill.hp-bar {
+            background: linear-gradient(90deg, #8b1c1c 0%, #d14343 100%);
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+
+        .bar-fill.ap-bar {
+            background: linear-gradient(90deg, #1c4d8b 0%, #4387d1 100%);
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Combat Log */
+        .combat-log {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            height: 250px;
+            background: linear-gradient(135deg, rgba(15,13,11,0.95), rgba(25,20,17,0.95));
+            border: 1px solid rgba(80, 70, 50, 0.8);
+            border-left: 3px solid rgba(212, 175, 55, 0.5);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .combat-log h4 {
+            font-family: 'Crimson Text', serif;
+            color: #c9b998;
+            margin: 0;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(80, 70, 50, 0.5);
+        }
+
+        #logEntries {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+
+        #logEntries::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #logEntries::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+
+        #logEntries::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.4);
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(80, 70, 50, 0.2);
+            color: #d4c5b0;
+        }
+
+        .log-entry.attack { color: #e8a091; font-weight: 600; }
+        .log-entry.damage { color: #d14343; }
+        .log-entry.info { color: #c9a97a; }
+        .log-entry.success { color: #6bc46d; }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(40, 35, 30, 0.9), rgba(30, 25, 20, 0.9));
+            border: 2px solid rgba(80, 70, 50, 0.6);
+            color: #c9b998;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.95), rgba(50, 40, 30, 0.95));
+            border-color: rgba(212, 175, 55, 0.8);
+            color: #f4d03f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(100, 20, 20, 0.9), rgba(80, 0, 0, 0.9));
+            border-color: rgba(209, 67, 67, 0.6);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(140, 30, 30, 0.95), rgba(110, 10, 10, 0.95));
+            border-color: #d14343;
+            color: #fff;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.98), rgba(30,25,20,0.98));
+            border: 3px solid rgba(212, 175, 55, 0.6);
+            padding: 40px 60px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .loading h2 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #f4d03f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <!-- Loading Screen -->
+    <div class="loading" id="loadingScreen">
+        <h2>⚔️ Chargement de l'Arène</h2>
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="hud">
+        <!-- Player Stats -->
+        <div class="player-stats">
+            <h3>🛡️ Héros</h3>
+            
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>❤️ Vie</span>
+                    <span id="hpText">100/100</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill hp-bar" id="hpBar" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>⚡ PA</span>
+                    <span id="apText">6/6</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill ap-bar" id="apBar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Combat Log -->
+        <div class="combat-log">
+            <h4>📜 Journal de Combat</h4>
+            <div id="logEntries"></div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button id="btnAttack" class="btn-primary">⚔️ Attaquer</button>
+            <button id="btnEndTurn">⏭️ Fin du Tour</button>
+            <button id="btnNewCombat">🔄 Nouveau Combat</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // ═══════════════════════════════════════════════════════════
+        // COMBAT ARENA SYSTEM
+        // ═══════════════════════════════════════════════════════════
+        
+        class CombatArena {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                
+                // Texture
+                this.arenaTexture = null;
+                this.textureLoaded = false;
+                
+                // Arena dimensions (en pixels sur le canvas)
+                this.arenaWidth = 800;
+                this.arenaHeight = 600;
+                this.arenaCenterX = 0;
+                this.arenaCenterY = 0;
+                
+                // Smart positions (calculées selon la texture)
+                this.positions = {
+                    center: { x: 0, y: 0 },          // Cercle runique
+                    pillarNW: { x: -200, y: -150 },  // Pilier Nord-Ouest
+                    pillarNE: { x: 200, y: -150 },   // Pilier Nord-Est
+                    pillarSW: { x: -200, y: 150 },   // Pilier Sud-Ouest
+                    pillarSE: { x: 200, y: 150 },    // Pilier Sud-Est
+                    stairN: { x: 0, y: -200 },       // Escalier Nord
+                    stairS: { x: 0, y: 200 }         // Escalier Sud
+                };
+                
+                // Combat state
+                this.player = {
+                    x: 0,
+                    y: 0,
+                    hp: 100,
+                    maxHp: 100,
+                    ap: 6,
+                    maxAp: 6,
+                    size: 60
+                };
+                
+                this.enemies = [];
+                this.turn = 'player';
+                this.selectedEnemy = null;
+                
+                // Camera
+                this.camera = { x: 0, y: 0, zoom: 1.0 };
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                this.loadArena();
+                this.setupEvents();
+            }
+            
+            loadArena() {
+                console.log('🏛️ Chargement de l\'arène...');
+                
+                const img = new Image();
+                
+                img.onload = () => {
+                    this.arenaTexture = img;
+                    this.textureLoaded = true;
+                    console.log('✅ Arène chargée:', img.width, 'x', img.height);
+                    
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    
+                    // Initialiser le combat
+                    this.initCombat();
+                    this.render();
+                    this.log('⚔️ COMBAT COMMENCE !', 'info');
+                };
+                
+                img.onerror = () => {
+                    console.error('❌ Erreur chargement arène');
+                    document.getElementById('loadingScreen').innerHTML = 
+                        '<h2 style="color: #d14343;">❌ Erreur de Chargement</h2>';
+                };
+                
+                img.src = 'assets/images/combat/tiles/_c27c40ed-52af-4b39-83ca-e385d55d40bd.jpg';
+            }
+            
+            initCombat() {
+                // Placer le joueur au centre (cercle runique)
+                this.player.x = this.positions.center.x;
+                this.player.y = this.positions.center.y;
+                
+                // Placer 3 ennemis autour
+                this.enemies = [
+                    {
+                        id: 1,
+                        x: this.positions.pillarNE.x,
+                        y: this.positions.pillarNE.y,
+                        hp: 50,
+                        maxHp: 50,
+                        size: 50
+                    },
+                    {
+                        id: 2,
+                        x: this.positions.pillarSW.x,
+                        y: this.positions.pillarSW.y,
+                        hp: 50,
+                        maxHp: 50,
+                        size: 50
+                    },
+                    {
+                        id: 3,
+                        x: this.positions.stairN.x,
+                        y: this.positions.stairN.y,
+                        hp: 50,
+                        maxHp: 50,
+                        size: 50
+                    }
+                ];
+                
+                this.log('🛡️ Héros spawn au centre', 'info');
+                this.log(`👹 ${this.enemies.length} ennemis détectés`, 'info');
+                
+                this.updateUI();
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.render();
+            }
+            
+            render() {
+                // Clear
+                this.ctx.fillStyle = '#0a0a0f';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Transform
+                this.ctx.save();
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.scale(this.camera.zoom, this.camera.zoom);
+                this.ctx.translate(-this.camera.x, -this.camera.y);
+                
+                // Render arena texture
+                if (this.textureLoaded && this.arenaTexture) {
+                    const scale = 1.5;
+                    const w = this.arenaTexture.width * scale;
+                    const h = this.arenaTexture.height * scale;
+                    
+                    this.ctx.drawImage(
+                        this.arenaTexture,
+                        -w / 2,
+                        -h / 2,
+                        w,
+                        h
+                    );
+                }
+                
+                // Render entities
+                this.renderPlayer();
+                this.renderEnemies();
+                
+                this.ctx.restore();
+            }
+            
+            renderPlayer() {
+                const p = this.player;
+                
+                // Ombre
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                this.ctx.beginPath();
+                this.ctx.ellipse(p.x, p.y + p.size / 2 + 5, p.size / 2, p.size / 6, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Circle background
+                this.ctx.fillStyle = '#4a90e2';
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Border
+                this.ctx.strokeStyle = '#fff';
+                this.ctx.lineWidth = 4;
+                this.ctx.stroke();
+                
+                // HP bar
+                const barW = p.size;
+                const barH = 6;
+                const barY = p.y - p.size / 2 - 15;
+                
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                this.ctx.fillRect(p.x - barW / 2, barY, barW, barH);
+                
+                const hpPercent = p.hp / p.maxHp;
+                this.ctx.fillStyle = hpPercent > 0.5 ? '#6bc46d' : '#d14343';
+                this.ctx.fillRect(p.x - barW / 2, barY, barW * hpPercent, barH);
+                
+                // Icon
+                this.ctx.font = '36px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText('🛡️', p.x, p.y);
+            }
+            
+            renderEnemies() {
+                this.enemies.forEach(enemy => {
+                    // Ombre
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                    this.ctx.beginPath();
+                    this.ctx.ellipse(enemy.x, enemy.y + enemy.size / 2 + 5, enemy.size / 2, enemy.size / 6, 0, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Highlight si sélectionné
+                    if (this.selectedEnemy === enemy) {
+                        this.ctx.strokeStyle = '#f4d03f';
+                        this.ctx.lineWidth = 4;
+                        this.ctx.beginPath();
+                        this.ctx.arc(enemy.x, enemy.y, enemy.size / 2 + 8, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                    }
+                    
+                    // Circle background
+                    this.ctx.fillStyle = '#d14343';
+                    this.ctx.beginPath();
+                    this.ctx.arc(enemy.x, enemy.y, enemy.size / 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Border
+                    this.ctx.strokeStyle = '#fff';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.stroke();
+                    
+                    // HP bar
+                    const barW = enemy.size;
+                    const barH = 5;
+                    const barY = enemy.y - enemy.size / 2 - 12;
+                    
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                    this.ctx.fillRect(enemy.x - barW / 2, barY, barW, barH);
+                    
+                    const hpPercent = enemy.hp / enemy.maxHp;
+                    this.ctx.fillStyle = '#d14343';
+                    this.ctx.fillRect(enemy.x - barW / 2, barY, barW * hpPercent, barH);
+                    
+                    // Icon
+                    this.ctx.font = '30px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText('👹', enemy.x, enemy.y);
+                });
+            }
+            
+            setupEvents() {
+                // Click sur canvas pour sélectionner ennemi
+                this.canvas.addEventListener('click', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = (e.clientX - rect.left - this.canvas.width / 2) / this.camera.zoom + this.camera.x;
+                    const y = (e.clientY - rect.top - this.canvas.height / 2) / this.camera.zoom + this.camera.y;
+                    
+                    // Vérifier si on a cliqué sur un ennemi
+                    this.enemies.forEach(enemy => {
+                        const dist = Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2);
+                        if (dist < enemy.size / 2) {
+                            this.selectedEnemy = enemy;
+                            this.log(`🎯 Ennemi #${enemy.id} ciblé`, 'info');
+                            this.render();
+                        }
+                    });
+                });
+                
+                // Boutons
+                document.getElementById('btnAttack').addEventListener('click', () => this.attack());
+                document.getElementById('btnEndTurn').addEventListener('click', () => this.endTurn());
+                document.getElementById('btnNewCombat').addEventListener('click', () => this.newCombat());
+            }
+            
+            attack() {
+                if (this.turn !== 'player') {
+                    this.log('⚠️ Ce n\'est pas votre tour', 'info');
+                    return;
+                }
+                
+                if (this.player.ap < 3) {
+                    this.log('⚠️ PA insuffisants (3 requis)', 'info');
+                    return;
+                }
+                
+                if (!this.selectedEnemy) {
+                    this.log('⚠️ Aucun ennemi sélectionné', 'info');
+                    return;
+                }
+                
+                // Attaque
+                const damage = 15 + Math.floor(Math.random() * 10);
+                this.selectedEnemy.hp -= damage;
+                this.player.ap -= 3;
+                
+                this.log(`⚔️ Attaque ! ${damage} dégâts`, 'attack');
+                
+                // Mort ?
+                if (this.selectedEnemy.hp <= 0) {
+                    this.log(`💀 Ennemi #${this.selectedEnemy.id} éliminé !`, 'success');
+                    this.enemies = this.enemies.filter(e => e !== this.selectedEnemy);
+                    this.selectedEnemy = null;
+                    
+                    // Victoire ?
+                    if (this.enemies.length === 0) {
+                        this.log('🎉 VICTOIRE !', 'success');
+                        setTimeout(() => {
+                            alert('🎉 VICTOIRE ! Tous les ennemis sont vaincus !');
+                        }, 500);
+                    }
+                }
+                
+                this.updateUI();
+                this.render();
+            }
+            
+            endTurn() {
+                if (this.turn !== 'player') return;
+                
+                this.player.ap = this.player.maxAp;
+                this.turn = 'enemy';
+                this.log('⏭️ Tour ennemi...', 'info');
+                this.updateUI();
+                
+                // Tour des ennemis
+                setTimeout(() => this.enemyTurn(), 800);
+            }
+            
+            enemyTurn() {
+                this.enemies.forEach((enemy, i) => {
+                    setTimeout(() => {
+                        const damage = 8 + Math.floor(Math.random() * 8);
+                        this.player.hp -= damage;
+                        this.log(`👹 Ennemi #${enemy.id} attaque ! -${damage} HP`, 'damage');
+                        
+                        if (this.player.hp <= 0) {
+                            this.log('💀 DÉFAITE...', 'damage');
+                            setTimeout(() => {
+                                alert('💀 DÉFAITE ! Vous avez été vaincu...');
+                                this.newCombat();
+                            }, 500);
+                        }
+                        
+                        this.updateUI();
+                    }, i * 600);
+                });
+                
+                setTimeout(() => {
+                    this.turn = 'player';
+                    this.log('🎮 Votre tour !', 'info');
+                    this.updateUI();
+                }, this.enemies.length * 600 + 500);
+            }
+            
+            newCombat() {
+                this.player.hp = this.player.maxHp;
+                this.player.ap = this.player.maxAp;
+                this.turn = 'player';
+                this.selectedEnemy = null;
+                
+                // Clear log
+                document.getElementById('logEntries').innerHTML = '';
+                
+                this.initCombat();
+                this.render();
+            }
+            
+            updateUI() {
+                // HP
+                const hpPercent = (this.player.hp / this.player.maxHp) * 100;
+                document.getElementById('hpBar').style.width = hpPercent + '%';
+                document.getElementById('hpText').textContent = `${this.player.hp}/${this.player.maxHp}`;
+                
+                // AP
+                const apPercent = (this.player.ap / this.player.maxAp) * 100;
+                document.getElementById('apBar').style.width = apPercent + '%';
+                document.getElementById('apText').textContent = `${this.player.ap}/${this.player.maxAp}`;
+                
+                // Buttons
+                const isPlayerTurn = this.turn === 'player';
+                document.getElementById('btnAttack').disabled = !isPlayerTurn || this.player.ap < 3;
+                document.getElementById('btnEndTurn').disabled = !isPlayerTurn;
+            }
+            
+            log(message, type = 'info') {
+                const container = document.getElementById('logEntries');
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = message;
+                container.insertBefore(entry, container.firstChild);
+                
+                // Limiter à 50 entrées
+                while (container.children.length > 50) {
+                    container.removeChild(container.lastChild);
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('canvas');
+        const arena = new CombatArena(canvas);
+
+        // Animation loop
+        function loop() {
+            arena.render();
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        console.log('⚔️ Combat Arena initialisé !');
+        console.log('🎯 Cliquez sur un ennemi pour le cibler');
+    </script>
+</body>
+</html>

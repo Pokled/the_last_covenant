@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭 The Cage - The Last Covenant</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Crimson Text', serif;
+            --font-ui: 'Inter', sans-serif;
+            --gold-bright: #f4d03f;
+            --gold-dim: #d4af37;
+            --parchment: #f4e8d0;
+            --blood-red: #8b0000;
+            --corruption-purple: #8f5bd8;
+            --corruption-light: #d8b4ff;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: #0a0a0f;
+            color: var(--parchment);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* BACKGROUND */
+        /* ═══════════════════════════════════════════════════════ */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .cage-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(10, 10, 15, 0.6) 0%, 
+                    rgba(10, 10, 15, 0.3) 50%, 
+                    rgba(10, 10, 15, 0.7) 100%
+                ),
+                url('assets/images/background/background_cage_vieux_démon.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.7) contrast(1.1);
+            z-index: 1;
+        }
+
+        /* LUEUR CENTRALE */
+        #game-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(
+                circle,
+                rgba(143, 91, 216, 0.08) 0%,
+                transparent 60%
+            );
+            pointer-events: none;
+            z-index: 2;
+            animation: centralGlow 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes centralGlow {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+        }
+
+        /* Corruption Counter - LEFT SIDE */
+        #corruption-ui {
+            position: absolute;
+            top: calc(50% - 50px);
+            left: 30px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, 
+                rgba(15, 13, 18, 0.95) 0%, 
+                rgba(10, 10, 15, 0.98) 100%
+            );
+            border: 2px solid rgba(143, 91, 216, 0.5);
+            padding: 25px 20px;
+            border-radius: 8px;
+            box-shadow: 
+                0 0 30px rgba(143, 91, 216, 0.3),
+                0 10px 40px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+        }
+
+        #corruption-label {
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            color: var(--corruption-light);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+            writing-mode: horizontal-tb;
+        }
+
+        #corruption-value {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--corruption-light);
+            text-shadow: 
+                0 0 15px rgba(216, 180, 255, 0.7),
+                0 2px 6px rgba(0, 0, 0, 0.9);
+            margin-bottom: 15px;
+        }
+
+        #corruption-bar {
+            width: 12px;
+            height: 180px;
+            background: rgba(50, 20, 70, 0.4);
+            border: 1px solid rgba(143, 91, 216, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        #corruption-fill {
+            width: 100%;
+            height: 0%;
+            position: absolute;
+            bottom: 0;
+            background: linear-gradient(0deg, 
+                var(--corruption-purple) 0%, 
+                var(--corruption-light) 100%
+            );
+            transition: height 1.5s ease-out;
+            box-shadow: 
+                0 0 15px rgba(216, 180, 255, 0.6),
+                inset 1px 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        /* LAYOUT PRINCIPAL */
+        .cage-container {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 500px;
+            grid-template-rows: 1fr auto;
+            animation: contentFadeIn 1.5s ease-out;
+        }
+
+        @keyframes contentFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ZONE GAUCHE - VISUAL SCENE */
+        .scene-preview {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 60px;
+            overflow: hidden;
+            grid-row: 1 / 2;
+            grid-column: 1 / 2;
+        }
+
+        #scene-title {
+            font-family: var(--font-title);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 30px;
+            text-shadow: 
+                0 0 30px rgba(244, 208, 63, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.9);
+            text-align: center;
+        }
+
+        /* Visual hint only - cages in background */
+        .cage-visual-hint {
+            font-family: var(--font-body);
+            font-size: 1.3rem;
+            line-height: 2;
+            color: rgba(244, 232, 208, 0.7);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            font-style: italic;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+        }
+
+        /* CHOIX EN BAS DE L'IMAGE (Zone gauche, bas) */
+        .bottom-choices {
+            position: relative;
+            grid-row: 2 / 3;
+            grid-column: 1 / 2;
+            padding: 30px 60px;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 15, 0.7) 0%,
+                rgba(10, 10, 15, 0.95) 100%
+            );
+            border-top: 2px solid rgba(143, 91, 216, 0.3);
+            z-index: 20;
+        }
+
+        .bottom-choices .choices-title {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            color: var(--gold-dim);
+            margin-bottom: 15px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .bottom-choices #choices {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        /* ZONE DROITE - PANNEAU DE CHOIX */
+        .choice-panel {
+            position: relative;
+            background: linear-gradient(90deg, 
+                rgba(10, 10, 15, 0.95) 0%, 
+                rgba(15, 13, 18, 0.98) 100%
+            );
+            border-left: 2px solid rgba(143, 91, 216, 0.3);
+            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            height: 100vh;
+            grid-row: 1 / 3;
+            grid-column: 2 / 3;
+        }
+
+        .panel-header {
+            padding: 40px 30px 30px;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.2);
+        }
+
+        .narrative-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            margin-bottom: 15px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.1em;
+        }
+
+        #narrative {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(244, 232, 208, 0.85);
+            font-style: italic;
+        }
+
+        /* Prisoner Cards */
+        .prisoners-container {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .prisoner-card {
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.6) 0%,
+                rgba(15, 13, 18, 0.8) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .prisoner-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            transform: translateX(-5px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+        }
+
+        .prisoner-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .prisoner-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+        }
+
+        .prisoner-name {
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--gold-dim);
+            letter-spacing: 0.05em;
+        }
+
+        .prisoner-desc {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: rgba(244, 232, 208, 0.7);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .prisoner-plea {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--corruption-light);
+            font-style: italic;
+            border-left: 2px solid rgba(143, 91, 216, 0.4);
+            padding-left: 12px;
+            margin-top: 12px;
+        }
+
+        /* Remove old choices section from panel */
+        .choices-section {
+            display: none;
+        }
+
+        .choice-btn {
+            padding: 15px 20px;
+            font-family: var(--font-ui);
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 2px solid rgba(90, 77, 58, 0.4);
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.6) 0%,
+                rgba(15, 13, 18, 0.7) 100%
+            );
+            color: var(--parchment);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.05em;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(212, 175, 55, 0.1), 
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .choice-btn:hover::before {
+            left: 100%;
+        }
+
+        .choice-btn:hover {
+            transform: translateX(-5px);
+            border-color: rgba(212, 175, 55, 0.6);
+            background: linear-gradient(135deg,
+                rgba(30, 28, 25, 0.8) 0%,
+                rgba(25, 23, 28, 0.9) 100%
+            );
+            box-shadow: 
+                0 0 20px rgba(212, 175, 55, 0.2),
+                0 6px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        #choice-left {
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        #choice-left:hover {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 25px rgba(244, 208, 63, 0.25);
+        }
+
+        #choice-right {
+            border-color: rgba(143, 91, 216, 0.4);
+        }
+
+        #choice-right:hover {
+            border-color: var(--corruption-purple);
+            box-shadow: 0 0 25px rgba(143, 91, 216, 0.3);
+        }
+
+        #choice-both {
+            border-color: rgba(139, 0, 0, 0.4);
+        }
+
+        #choice-both:hover {
+            border-color: var(--blood-red);
+            box-shadow: 0 0 25px rgba(139, 0, 0, 0.3);
+        }
+
+        #choice-none {
+            border-color: rgba(60, 60, 60, 0.4);
+        }
+
+        #choice-none:hover {
+            border-color: rgba(100, 100, 100, 0.6);
+        }
+
+        .corruption-cost {
+            display: block;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            color: rgba(255, 107, 107, 0.8);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+        }
+
+        /* Consequence Screen */
+        #consequence {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.98);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 60px;
+        }
+
+        #consequence.show {
+            display: flex;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #consequence-text {
+            max-width: 900px;
+            font-family: var(--font-body);
+            font-size: 1.5rem;
+            line-height: 2;
+            color: var(--parchment);
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        #corruption-change {
+            font-family: var(--font-title);
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 40px 0;
+            text-shadow: 
+                0 0 30px currentColor,
+                0 4px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        #next-btn {
+            padding: 18px 50px;
+            font-family: var(--font-ui);
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg,
+                rgba(91, 43, 130, 0.8) 0%,
+                rgba(143, 91, 216, 0.8) 100%
+            );
+            border: 2px solid var(--corruption-purple);
+            color: var(--parchment);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        #next-btn:hover {
+            background: linear-gradient(135deg,
+                rgba(143, 91, 216, 0.9) 0%,
+                rgba(216, 180, 255, 0.9) 100%
+            );
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(143, 91, 216, 0.4);
+        }
+
+        /* Thalys Whisper - Between choice buttons */
+        #thalys-whisper {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--corruption-light);
+            font-style: italic;
+            opacity: 0;
+            animation: whisperPulse 4s ease-in-out infinite;
+            text-shadow: 
+                0 0 15px rgba(143, 91, 216, 0.7),
+                0 2px 6px rgba(0, 0, 0, 0.9);
+            text-align: center;
+            margin: 10px 0;
+            grid-column: 1 / 3;
+        }
+
+        @keyframes whisperPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- Background -->
+        <div class="cage-background"></div>
+
+        <!-- Corruption UI -->
+        <div id="corruption-ui">
+            <div id="corruption-label">Corruption</div>
+            <div id="corruption-value">0%</div>
+            <div id="corruption-bar">
+                <div id="corruption-fill"></div>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="cage-container">
+            <!-- Left: Scene Preview -->
+            <div class="scene-preview">
+                <h1 id="scene-title">The Cage</h1>
+                <p class="cage-visual-hint">
+                    Dans le désert blanc, les cages attendent.<br>
+                    Deux âmes prisonnières.<br>
+                    Un choix à faire.
+                </p>
+            </div>
+
+            <!-- Bottom Left: Choices -->
+            <div class="bottom-choices">
+                <h3 class="choices-title">Que fais-tu ?</h3>
+                <div id="choices">
+                    <button class="choice-btn" id="choice-left">
+                        Sauver le Vieux
+                        <span class="corruption-cost">+0% Corruption</span>
+                    </button>
+                    <button class="choice-btn" id="choice-right">
+                        Sauver le Démon
+                        <span class="corruption-cost">+15% Corruption</span>
+                    </button>
+                    
+                    <!-- Thalys Whisper between buttons -->
+                    <div id="thalys-whisper">"Qui mérite de vivre, d'après toi ?"</div>
+                    
+                    <button class="choice-btn" id="choice-both">
+                        Sauver les Deux
+                        <span class="corruption-cost">+30% Corruption</span>
+                    </button>
+                    <button class="choice-btn" id="choice-none">
+                        Ne Sauver Personne
+                        <span class="corruption-cost">+10% Corruption</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Choice Panel -->
+            <div class="choice-panel">
+                <div class="panel-header">
+                    <h2 class="narrative-title">Le Dilemme</h2>
+                    <p id="narrative">
+                        Au détour d'un couloir de pierre froide, tu trouves deux cages.<br>
+                        Deux prisonniers. Un choix.<br>
+                        Tu as une clé. Une seule.
+                    </p>
+                </div>
+
+                <div class="prisoners-container">
+                    <div class="prisoner-card">
+                        <div class="prisoner-header">
+                            <span class="prisoner-icon" id="prisoner-left-icon">👴</span>
+                            <span class="prisoner-name" id="prisoner-left-name">Le Vieux</span>
+                        </div>
+                        <p class="prisoner-desc" id="prisoner-left-desc">
+                            Frêle, tremblant. Il murmure des prières à des dieux morts.
+                        </p>
+                        <p class="prisoner-plea" id="prisoner-left-plea">
+                            "S'il te plaît... j'ai une famille..."
+                        </p>
+                    </div>
+
+                    <div class="prisoner-card">
+                        <div class="prisoner-header">
+                            <span class="prisoner-icon" id="prisoner-right-icon">👹</span>
+                            <span class="prisoner-name" id="prisoner-right-name">Le Démon</span>
+                        </div>
+                        <p class="prisoner-desc" id="prisoner-right-desc">
+                            Calme, puissant. Ses yeux brillent dans l'ombre.
+                        </p>
+                        <p class="prisoner-plea" id="prisoner-right-plea">
+                            "Je peux t'aider. Mais tu le sais déjà."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consequence Screen -->
+        <div id="consequence">
+            <div id="consequence-text"></div>
+            <div id="corruption-change"></div>
+            <button id="next-btn">Continuer</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Game State
+        let corruption = 0;
+        let currentScenario = 0;
+
+        // Scenarios
+        const scenarios = [
+            {
+                title: "The Cage",
+                narrative: "Au détour d'un couloir de pierre froide, tu trouves deux cages.<br>Deux prisonniers. Un choix.<br>Tu as une clé. Une seule.",
+                left: {
+                    icon: "👴",
+                    name: "Le Vieux",
+                    desc: "Frêle, tremblant. Il murmure des prières à des dieux morts.",
+                    plea: '"S\'il te plaît... j\'ai une famille..."'
+                },
+                right: {
+                    icon: "👹",
+                    name: "Le Démon",
+                    desc: "Calme, puissant. Ses yeux brillent dans l'ombre.",
+                    plea: '"Je peux t\'aider. Mais tu le sais déjà."'
+                },
+                whisper: "Qui mérite de vivre, d'après toi ?",
+                consequences: {
+                    left: {
+                        text: "Tu ouvres la cage du vieux. Il s'effondre dans tes bras, sanglotant.<br><br>Le démon te regarde partir. Sans un mot. Sans haine.<br><br>Juste... la résignation.",
+                        corruption: 0,
+                        color: "#4CAF50"
+                    },
+                    right: {
+                        text: "Tu ouvres la cage du démon. Il se lève, majestueux.<br><br>Le vieux hurle, pleure, supplie. Tu ne te retournes pas.<br><br>Le démon pose une main sur ton épaule. <i>\"Tu as choisi la force. C'est bien.\"</i>",
+                        corruption: 15,
+                        color: "#d8b4ff"
+                    },
+                    both: {
+                        text: "Tu brises les deux serrures. Le vieux s'enfuit en courant.<br><br>Le démon reste immobile. Il te fixe.<br><br><i>\"Tu crois avoir gagné ? Non. Tu as juste... triché.\"</i><br><br>Les deux cages se referment. Vides. Ils sont partis. Tous les deux.<br><br><b>Mais quelque chose en toi s'est brisé.</b>",
+                        corruption: 30,
+                        color: "#ff6b6b"
+                    },
+                    none: {
+                        text: "Tu poses la clé au sol. Entre les deux cages.<br><br>Le vieux pleure. Le démon rit doucement.<br><br><i>\"Sage... ou lâche ? On verra.\"</i><br><br>Tu pars. Le bruit de leurs chaînes te suit longtemps.",
+                        corruption: 10,
+                        color: "#888"
+                    }
+                }
+            },
+            {
+                title: "The Duel",
+                narrative: "Deux prisonniers se battent dans une cage. Ils s'entretuent.<br>Tu arrives trop tard pour les séparer.<br>Mais tu peux encore... agir.",
+                left: {
+                    icon: "⚔️",
+                    name: "Le Guerrier",
+                    desc: "Couvert de sang, mais vivant. Il peut encore se battre.",
+                    plea: '"Aide-moi à finir ça."'
+                },
+                right: {
+                    icon: "🩸",
+                    name: "Le Blessé",
+                    desc: "À terre, mourant. Il respire à peine.",
+                    plea: '"Ne le... laisse pas... gagner..."'
+                },
+                whisper: "La violence appelle la violence.",
+                consequences: {
+                    left: {
+                        text: "Tu aides le guerrier. Il achève son adversaire d'un coup net.<br><br>Il te remercie. Mais dans ses yeux, tu vois le vide.<br><br><i>\"C'était lui ou moi. Merci.\"</i>",
+                        corruption: 5,
+                        color: "#FFC107"
+                    },
+                    right: {
+                        text: "Tu soignes le blessé. Le guerrier hurle de rage.<br><br>Tu dois le tuer pour sauver l'autre.<br><br>Le blessé te regarde, terrifié. <i>\"Pourquoi... pourquoi moi ?\"</i>",
+                        corruption: 20,
+                        color: "#d8b4ff"
+                    },
+                    both: {
+                        text: "Tu tentes de les séparer. Trop tard.<br><br>Ils se tuent mutuellement. Devant toi.<br><br>Tu ramasses leurs âmes. Deux flammes mourantes.<br><br><b>Tu les gardes. Pour toujours.</b>",
+                        corruption: 40,
+                        color: "#ff4444"
+                    },
+                    none: {
+                        text: "Tu regardes. Sans bouger.<br><br>Le guerrier gagne. Le blessé meurt.<br><br>Le guerrier te regarde. <i>\"Tu n'as rien fait.\"</i><br><br>Il crache à tes pieds et s'en va.",
+                        corruption: 15,
+                        color: "#666"
+                    }
+                }
+            },
+            {
+                title: "The Child",
+                narrative: "Une cage. Un enfant. Seul.<br>Il tient un jouet cassé dans ses mains.<br>Il ne pleure pas. Il attend.",
+                left: {
+                    icon: "🧸",
+                    name: "L'Enfant",
+                    desc: "Petit, silencieux. Ses yeux sont vides.",
+                    plea: '"Tu vas m\'ouvrir ?"'
+                },
+                right: {
+                    icon: "🔒",
+                    name: "La Serrure",
+                    desc: "Étrange. Elle pulse. Comme un cœur.",
+                    plea: '...'
+                },
+                whisper: "Pas tous les prisonniers ne veulent être libérés.",
+                consequences: {
+                    left: {
+                        text: "Tu ouvres la cage. L'enfant ne bouge pas.<br><br>Il lève les yeux vers toi.<br><br><i>\"Merci. Mais je préférais être dedans.\"</i><br><br>Il marche dans l'ombre. Disparaît.<br><br>Tu ne sais pas si tu l'as sauvé... ou condamné.",
+                        corruption: 0,
+                        color: "#4CAF50"
+                    },
+                    right: {
+                        text: "Tu inspectes la serrure. Elle brille.<br><br>Un piège. Si tu l'ouvres, la cage explose.<br><br>Tu regardes l'enfant. Il sourit.<br><br><i>\"Tu as compris.\"</i><br><br>L'enfant n'était pas réel. C'était un test.",
+                        corruption: 0,
+                        color: "#2196F3"
+                    },
+                    both: {
+                        text: "Tu brises la serrure de force.<br><br>La cage explose. L'enfant disparaît dans la lumière.<br><br>Il n'était jamais là. Juste... un souvenir.<br><br><b>Le tien.</b>",
+                        corruption: 35,
+                        color: "#ff6b6b"
+                    },
+                    none: {
+                        text: "Tu ne touches à rien. Tu pars.<br><br>L'enfant te regarde partir.<br><br><i>\"Tu reviendras. Ils reviennent toujours.\"</i><br><br>Sa voix résonne encore. Longtemps après.",
+                        corruption: 10,
+                        color: "#888"
+                    }
+                }
+            }
+        ];
+
+        // DOM Elements
+        const corruptionValue = document.getElementById('corruption-value');
+        const corruptionFill = document.getElementById('corruption-fill');
+        const sceneTitle = document.getElementById('scene-title');
+        const narrative = document.getElementById('narrative');
+        const thalysWhisper = document.getElementById('thalys-whisper');
+        
+        const prisonerLeftIcon = document.getElementById('prisoner-left-icon');
+        const prisonerLeftName = document.getElementById('prisoner-left-name');
+        const prisonerLeftDesc = document.getElementById('prisoner-left-desc');
+        const prisonerLeftPlea = document.getElementById('prisoner-left-plea');
+        
+        const prisonerRightIcon = document.getElementById('prisoner-right-icon');
+        const prisonerRightName = document.getElementById('prisoner-right-name');
+        const prisonerRightDesc = document.getElementById('prisoner-right-desc');
+        const prisonerRightPlea = document.getElementById('prisoner-right-plea');
+
+        const choiceLeft = document.getElementById('choice-left');
+        const choiceRight = document.getElementById('choice-right');
+        const choiceBoth = document.getElementById('choice-both');
+        const choiceNone = document.getElementById('choice-none');
+
+        const consequence = document.getElementById('consequence');
+        const consequenceText = document.getElementById('consequence-text');
+        const corruptionChange = document.getElementById('corruption-change');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Load Scenario
+        function loadScenario(index) {
+            const scenario = scenarios[index];
+            
+            sceneTitle.textContent = scenario.title;
+            narrative.innerHTML = scenario.narrative;
+            thalysWhisper.textContent = `"${scenario.whisper}"`;
+
+            prisonerLeftIcon.textContent = scenario.left.icon;
+            prisonerLeftName.textContent = scenario.left.name;
+            prisonerLeftDesc.textContent = scenario.left.desc;
+            prisonerLeftPlea.textContent = scenario.left.plea;
+
+            prisonerRightIcon.textContent = scenario.right.icon;
+            prisonerRightName.textContent = scenario.right.name;
+            prisonerRightDesc.textContent = scenario.right.desc;
+            prisonerRightPlea.textContent = scenario.right.plea;
+        }
+
+        // Update Corruption
+        function updateCorruption(change) {
+            corruption += change;
+            corruption = Math.min(100, Math.max(0, corruption));
+            
+            corruptionValue.textContent = `${corruption}%`;
+            corruptionFill.style.height = `${corruption}%`;
+
+            // Change color based on corruption level
+            if (corruption < 30) {
+                corruptionValue.style.color = '#4CAF50';
+            } else if (corruption < 60) {
+                corruptionValue.style.color = '#d8b4ff';
+            } else {
+                corruptionValue.style.color = '#ff6b6b';
+            }
+        }
+
+        // Show Consequence
+        function showConsequence(choice) {
+            const scenario = scenarios[currentScenario];
+            const cons = scenario.consequences[choice];
+
+            consequenceText.innerHTML = cons.text;
+            
+            const changeAmount = cons.corruption;
+            if (changeAmount > 0) {
+                corruptionChange.textContent = `+${changeAmount}% Corruption`;
+                corruptionChange.style.color = cons.color;
+            } else {
+                corruptionChange.textContent = `Corruption inchangée`;
+                corruptionChange.style.color = '#4CAF50';
+            }
+
+            updateCorruption(changeAmount);
+
+            consequence.classList.add('show');
+        }
+
+        // Next Scenario
+        function nextScenario() {
+            consequence.classList.remove('show');
+            currentScenario++;
+
+            if (currentScenario >= scenarios.length) {
+                // End game
+                sceneTitle.textContent = "Fin de la Démo";
+                document.querySelector('.cage-visual-hint').innerHTML = 
+                    `Tu as terminé les dilemmes.<br><br>Corruption finale : <b style="color: var(--corruption-light);">${corruption}%</b><br><br>Les cages se referment. Pour toujours.`;
+                document.querySelector('.bottom-choices').style.display = 'none';
+                document.querySelector('.choice-panel').style.display = 'none';
+                thalysWhisper.textContent = '"Tu vois ? Tu as choisi. À chaque fois."';
+                thalysWhisper.style.opacity = '1';
+            } else {
+                loadScenario(currentScenario);
+            }
+        }
+
+        // Event Listeners
+        choiceLeft.addEventListener('click', () => showConsequence('left'));
+        choiceRight.addEventListener('click', () => showConsequence('right'));
+        choiceBoth.addEventListener('click', () => showConsequence('both'));
+        choiceNone.addEventListener('click', () => showConsequence('none'));
+        nextBtn.addEventListener('click', nextScenario);
+
+        // Initialize
+        loadScenario(0);
+        updateCorruption(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Test - Combat System</title>
+    
+    <!-- Fonts BG3/Diablo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0d0d0d;
+            color: #d4c5b0;
+            overflow: hidden;
+        }
+
+        /* CANVAS PRINCIPAL */
+        #combatCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 250px);
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        /* HUD OVERLAY */
+        .hud {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .hud > * {
+            pointer-events: auto;
+        }
+
+        /* STATS JOUEUR (Top Left) */
+        .player-stats {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95) 0%, rgba(30,25,20,0.95) 100%);
+            border: 2px solid #3d3426;
+            padding: 15px;
+            min-width: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+
+        .player-stats h3 {
+            font-family: 'Cinzel', serif;
+            color: #c9a97a;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .turn-badge {
+            font-size: 0.7em;
+            color: #8a7a64;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(90,77,58,0.3);
+            border-radius: 2px;
+        }
+        
+        .turn-badge.enemy-turn {
+            color: #d14343;
+            border-color: rgba(209,67,67,0.4);
+        }
+
+        .stat-bar {
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #5a4d3a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .bar-fill.hp {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .bar-fill.corruption {
+            background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%);
+        }
+
+        /* COMBAT LOG (RIGHT SIDE - ABOVE ACTION BAR) */
+        .combat-log {
+            position: fixed;
+            bottom: 260px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.98) 0%, rgba(30,25,20,0.98) 100%);
+            border: 2px solid #3d3426;
+            border-radius: 4px;
+            padding: 15px;
+            width: 320px;
+            height: 280px;
+            overflow-y: auto;
+            box-shadow: 
+                0 4px 20px rgba(0,0,0,0.7),
+                inset 1px 1px 0 rgba(120,100,75,0.1);
+            z-index: 10;
+        }
+
+        .combat-log h3 {
+            font-family: 'Cinzel', serif;
+            color: #c9a97a;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        #logContainer {
+            max-height: 200px; /* +70px */
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            font-size: 13px;
+            margin-bottom: 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(90,77,58,0.2);
+        }
+
+        .log-entry.player { color: #4a9eff; }
+        .log-entry.enemy { color: #d14343; }
+        .log-entry.system { color: #c9a97a; font-style: italic; }
+        .log-entry.dice { color: #ffd700; font-weight: bold; }
+
+        /* ACTIONS (Bottom Center) - STYLE MATURE */
+        .actions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            pointer-events: all;
+            align-items: center;
+        }
+        
+        .waiting-message {
+            font-family: 'Cinzel', serif;
+            color: #d14343;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .action-btn {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(180deg, 
+                rgba(40,35,30,0.98) 0%, 
+                rgba(25,22,18,0.98) 50%,
+                rgba(15,13,10,0.98) 100%
+            );
+            border: 1px solid rgba(90,77,58,0.6);
+            border-top: 1px solid rgba(120,100,75,0.3);
+            color: #a89274;
+            padding: 12px 30px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 2px 8px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(120,100,75,0.15);
+            position: relative;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, 
+                rgba(201,169,122,0.05) 0%, 
+                transparent 50%
+            );
+            pointer-events: none;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            border-color: rgba(201,169,122,0.6);
+            color: #c9a97a;
+            box-shadow: 
+                0 4px 12px rgba(0,0,0,0.7),
+                inset 0 1px 0 rgba(201,169,122,0.2),
+                0 0 20px rgba(201,169,122,0.1);
+            transform: translateY(-1px);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 
+                0 1px 4px rgba(0,0,0,0.8) inset,
+                0 2px 6px rgba(0,0,0,0.6);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: rgba(60,50,40,0.6);
+        }
+
+        .action-btn.dice {
+            background: linear-gradient(180deg, 
+                rgba(60,35,70,0.98) 0%, 
+                rgba(40,25,50,0.98) 50%,
+                rgba(25,15,35,0.98) 100%
+            );
+            border-color: rgba(120,80,140,0.4);
+            color: #9b7bb5;
+        }
+
+        .action-btn.dice:hover:not(:disabled) {
+            border-color: rgba(155,123,181,0.6);
+            color: #b899d4;
+            box-shadow: 
+                0 4px 12px rgba(0,0,0,0.7),
+                inset 0 1px 0 rgba(155,123,181,0.2),
+                0 0 20px rgba(155,123,181,0.15);
+        }
+
+        /* CSS Tutorial inutile supprimé - voir .help-panel */
+
+        .tutorial-toggle {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 60px;
+            background: linear-gradient(135deg, 
+                rgba(25,22,18,0.98) 0%, 
+                rgba(35,30,25,0.98) 100%
+            );
+            border: 1px solid rgba(90,77,58,0.5);
+            border-left: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            color: #a89274;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+        }
+
+        .tutorial-toggle:hover {
+            background: linear-gradient(135deg, 
+                rgba(35,30,25,0.98) 0%, 
+                rgba(45,38,32,0.98) 100%
+            );
+            color: #c9a97a;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.7);
+        }
+
+        .tutorial-toggle .arrow {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* TURN INDICATOR - SUPPRIMÉ (intégré dans stats) */
+
+        /* FLOATING TOOLTIP */
+        #tooltip {
+            position: fixed;
+            background: rgba(20,18,15,0.98);
+            border: 2px solid #5a4d3a;
+            padding: 10px 15px;
+            pointer-events: none;
+            z-index: 200;
+            display: none;
+            max-width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        #tooltip.show {
+            display: block;
+        }
+
+        /* SCROLLBAR CUSTOM */
+        .combat-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .combat-log::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .combat-log::-webkit-scrollbar-thumb {
+            background: #5a4d3a;
+            border-radius: 4px;
+        }
+
+        .combat-log::-webkit-scrollbar-thumb:hover {
+            background: #c9a97a;
+        }
+
+        /* HELP PANEL (LEFT SIDE - COLLAPSIBLE) */
+        .help-panel {
+            position: fixed;
+            top: 240px;
+            left: 0;
+            background: linear-gradient(135deg, rgba(20,18,15,0.98) 0%, rgba(30,25,20,0.98) 100%);
+            border: 2px solid #3d3426;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            padding: 15px;
+            width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            z-index: 15;
+            transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .help-panel.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .help-toggle {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, rgba(30,25,20,0.98) 0%, rgba(20,18,15,0.98) 100%);
+            border: 2px solid #3d3426;
+            border-left: none;
+            padding: 15px 8px;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.3s ease;
+            color: #c9a97a;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        .help-toggle:hover {
+            background: linear-gradient(135deg, rgba(40,35,30,0.98) 0%, rgba(30,25,20,0.98) 100%);
+            border-color: #c9a97a;
+        }
+
+        .toggle-arrow {
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .help-panel:not(.collapsed) .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .help-content h3 {
+            font-family: 'Cinzel', serif;
+            color: #c9a97a;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+
+        .help-tip {
+            font-size: 13px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border-left: 2px solid #c9a97a;
+            color: #a89274;
+        }
+
+        .help-tip strong {
+            color: #c9a97a;
+        }
+    </style>
+</head>
+<body>
+    <!-- CANVAS -->
+    <canvas id="combatCanvas"></canvas>
+    <canvas id="actionBarCanvas" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 250px; z-index: 5; pointer-events: auto;"></canvas>
+
+    <!-- HUD OVERLAY -->
+    <div class="hud">
+        <!-- STATS JOUEUR -->
+        <div class="player-stats">
+            <h3>
+                ⚔️ Guerrier
+                <span class="turn-badge" id="turnBadge">Tour 1</span>
+            </h3>
+            
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>HP</span>
+                    <span id="hpText">100/100</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-fill hp" id="hpBar" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="stat-bar">
+                <div class="stat-label">
+                    <span>Corruption</span>
+                    <span id="corruptionText">0%</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-fill corruption" id="corruptionBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 10px; font-size: 14px;">
+                <div>⚔️ ATK: <span id="atkText">15</span></div>
+                <div>🛡️ DEF: <span id="defText">10</span></div>
+                <div>⚡ SPD: <span id="spdText">10</span></div>
+            </div>
+        </div>
+
+        <!-- LOG - SORTIR DU HUD -->
+    </div>
+    
+    <!-- COMBAT LOG (hors HUD pour être visible) -->
+    <div class="combat-log">
+        <h3>📜 Combat Log</h3>
+        <div id="logContainer"></div>
+    </div>
+
+    <!-- HELP PANEL (LEFT SIDE - COLLAPSIBLE) -->
+    <div class="help-panel" id="helpPanel">
+        <button class="help-toggle" id="helpToggle">
+            <span class="toggle-arrow">◄</span>
+        </button>
+        <div class="help-content">
+            <h3>🎓 AIDE</h3>
+            <div class="help-tip">💡 <strong>Survolez</strong> les cases pour voir les actions possibles</div>
+            <div class="help-tip">⚔️ <strong>Cliquez</strong> sur un ennemi adjacent pour l'attaquer</div>
+            <div class="help-tip">🚶 <strong>Cliquez</strong> sur une case vide pour vous déplacer</div>
+            <div class="help-tip">🎲 <strong>Le Dé</strong> peut tout changer... mais coûte de la Corruption</div>
+        </div>
+    </div>
+
+    <!-- ACTIONS - Gérées par CombatActionBar maintenant -->
+
+    <!-- TOOLTIP -->
+    <div id="tooltip"></div>
+
+    <!-- SCRIPTS -->
+    <script type="module">
+        import { CorruptionSystem } from './src/systems/CorruptionSystem.js';
+        import { PlayerStatsSystem } from './src/systems/PlayerStatsSystem.js';
+        import { CombatSystem } from './src/systems/CombatSystem.js';
+        import { CombatRenderer } from './src/systems/CombatRenderer.js';
+        import { CombatIntroSystem } from './src/systems/CombatIntroSystem.js';
+        import { BasicSoundSystem } from './src/systems/BasicSoundSystem.js';
+        import { CombatPortraitsUI } from './src/systems/CombatPortraitsUI.js';
+        import { CombatActionBar } from './src/systems/CombatActionBar.js';
+        import { BloodPactSystem } from './src/systems/BloodPactSystem.js';
+        import { CombatFeedbackSystem } from './src/systems/CombatFeedbackSystem.js';
+        import { CombatAnimationSystem } from './src/systems/CombatAnimationSystem.js'; // 🎬 ANIMATIONS
+
+        // ═══════════════════════════════════════════════════════
+        // INITIALISATION
+        // ═══════════════════════════════════════════════════════
+        
+        const canvas = document.getElementById('combatCanvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 250; // Laisse place à l'action bar
+        
+        // Canvas séparé pour l'action bar
+        const actionBarCanvas = document.getElementById('actionBarCanvas');
+        actionBarCanvas.width = window.innerWidth;
+        actionBarCanvas.height = 250;
+
+        // Game instance mock
+        const game = { player: null };
+
+        // Systèmes
+        const soundSystem = new BasicSoundSystem();
+        window.soundSystem = soundSystem; // Global pour CombatIntroSystem
+        
+        const ctx = canvas.getContext('2d');
+        const feedbackSystem = new CombatFeedbackSystem(canvas, ctx, soundSystem); // 🔊 Passe soundSystem
+        
+        const corruptionSystem = new CorruptionSystem(game);
+        const playerStatsSystem = new PlayerStatsSystem(game, corruptionSystem);
+        const combatSystem = new CombatSystem(game, playerStatsSystem, corruptionSystem, null); // Intro ajoutée après
+        const combatRenderer = new CombatRenderer(canvas, combatSystem, corruptionSystem, feedbackSystem); // 🔥 Passe feedbackSystem
+        const animationSystem = new CombatAnimationSystem(combatRenderer); // 🎬 ANIMATIONS
+        const combatIntro = new CombatIntroSystem(canvas, combatRenderer); // Passe renderer pour logs
+        combatSystem.introSystem = combatIntro; // Injecte après coup
+        combatSystem.feedbackSystem = feedbackSystem; // 🔥 Donne accès au feedback dans combat
+        combatSystem.animationSystem = animationSystem; // 🎬 Donne accès aux animations
+        combatRenderer.animationSystem = animationSystem; // 🎬 Renderer a accès aux animations aussi
+        const portraitsUI = new CombatPortraitsUI(combatSystem, playerStatsSystem);
+        const bloodPactSystem = new BloodPactSystem(corruptionSystem, playerStatsSystem);
+        const actionBar = new CombatActionBar(combatSystem, corruptionSystem, actionBarCanvas, combatRenderer, bloodPactSystem);
+
+        game.player = playerStatsSystem;
+
+        // ═══════════════════════════════════════════════════════
+        // TEST COMBAT
+        // ═══════════════════════════════════════════════════════
+        
+        const testEnemies = [
+            {
+                name: 'Garde Corrompu',
+                icon: '🛡️',
+                HP: 40,
+                maxHP: 40,
+                ATK: 12,
+                DEF: 8,
+                SPEED: 8,
+                goldDrop: [10, 20]
+            },
+            {
+                name: 'Loup des Ombres',
+                icon: '🐺',
+                HP: 30,
+                maxHP: 30,
+                ATK: 15,
+                DEF: 5,
+                SPEED: 12,
+                goldDrop: [8, 15]
+            }
+        ];
+
+        // Démarrer combat avec intro
+        async function startCombatWithIntro() {
+            // Jouer intro
+            await combatIntro.playCombatIntro(testEnemies, true); // true = premier combat
+            
+            // Démarrer combat
+            combatSystem.startCombat([testEnemies[0], testEnemies[1]]);
+            
+            // Premier rendu
+            combatRenderer.render();
+            updateUI();
+        }
+
+        // Démarrer le render loop APRÈS l'intro
+        async function init() {
+            await startCombatWithIntro();
+            
+            // Custom render loop avec ActionBar + FeedbackSystem + Animations
+            let lastTime = performance.now();
+            
+            function renderLoop(currentTime) {
+                const deltaTime = (currentTime - lastTime) / 1000; // En secondes
+                lastTime = currentTime;
+                
+                // Update systems
+                feedbackSystem.update(deltaTime); // Particules, shake, etc.
+                animationSystem.update(deltaTime); // Animations d'entités
+                
+                // Render
+                combatRenderer.render();
+                actionBar.render();
+                feedbackSystem.render(ctx); // Render feedback PAR-DESSUS tout
+                
+                // portraitsUI utilise DOM, pas besoin de render() manuel
+                requestAnimationFrame(renderLoop);
+            }
+            requestAnimationFrame(renderLoop);
+        }
+
+        // Lancer
+        init();
+
+        // ═══════════════════════════════════════════════════════
+        // HELP PANEL TOGGLE
+        // ═══════════════════════════════════════════════════════
+        document.getElementById('helpToggle').addEventListener('click', () => {
+            const panel = document.getElementById('helpPanel');
+            const arrow = document.querySelector('.toggle-arrow');
+            panel.classList.toggle('collapsed');
+            arrow.textContent = panel.classList.contains('collapsed') ? '►' : '◄';
+        });
+
+        // ═══════════════════════════════════════════════════════
+        // UI UPDATE
+        // ═══════════════════════════════════════════════════════
+        
+        function updateUI() {
+            const stats = playerStatsSystem.getStats();
+            const combat = combatSystem.getState();
+            
+            // HP
+            document.getElementById('hpText').textContent = `${stats.HP}/${stats.maxHP}`;
+            document.getElementById('hpBar').style.width = `${(stats.HP / stats.maxHP) * 100}%`;
+            
+            // Corruption
+            const corr = corruptionSystem.corruption;
+            document.getElementById('corruptionText').textContent = `${corr.toFixed(1)}%`;
+            document.getElementById('corruptionBar').style.width = `${Math.min(corr, 100)}%`;
+            
+            // Stats
+            document.getElementById('atkText').textContent = stats.ATK;
+            document.getElementById('defText').textContent = stats.DEF;
+            document.getElementById('spdText').textContent = stats.SPEED;
+            
+            // Tour (dans le badge) avec emojis espacés
+            const phaseText = combat.phase === 'player' ? '⚔️  Votre tour' : '👹  Tour ennemi';
+            const actionsText = combat.phase === 'player' ? ` • ${combat.actionsRemaining} action(s)` : '';
+            const badge = document.getElementById('turnBadge');
+            badge.textContent = `${combat.turn} • ${phaseText}${actionsText}`;
+            badge.className = `turn-badge ${combat.phase === 'enemy' ? 'enemy-turn' : ''}`;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // COMBAT LOG (UN SEUL LISTENER!)
+        // ═══════════════════════════════════════════════════════
+        
+        window.addEventListener('combatLog', (e) => {
+            if (combatRenderer && combatRenderer.addLog) {
+                combatRenderer.addLog(e.detail.message, e.detail.type);
+            }
+        });
+        
+        // Plus besoin de fonction getIconForType car addLog gère les couleurs maintenant
+
+        window.addEventListener('combat:combatStart', updateUI);
+        window.addEventListener('combat:playerMoved', updateUI);
+        window.addEventListener('combat:enemyDamaged', updateUI);
+        window.addEventListener('combat:playerDamaged', updateUI);
+        window.addEventListener('combat:playerTurnStart', updateUI);
+        window.addEventListener('combat:combatEnd', updateUI);
+
+        // ═══════════════════════════════════════════════════════
+        // RENDER LOOP
+        // ═══════════════════════════════════════════════════════
+        
+        // PAS DE startRenderLoop() ici, démarré après intro
+
+        // Resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            combatRenderer.resize();
+        });
+
+        console.log('⚔️ Combat test prêt !');
+    </script>
+</body>
+</html>

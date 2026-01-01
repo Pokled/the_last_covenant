@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ Donjon - THE LAST COVENANT</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Crimson Text', serif;
+            --font-ui: 'Inter', sans-serif;
+            --gold-bright: #f4d03f;
+            --gold-dim: #d4af37;
+            --parchment: #f4e8d0;
+            --blood-red: #8b0000;
+            --corruption-purple: #8f5bd8;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-body);
+            color: var(--parchment);
+            background: #0a0a0f;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at center, rgba(143, 91, 216, 0.03) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1520 50%, #0a0a0f 100%);
+            z-index: -1;
+        }
+
+        /* Layout Principal */
+        .dungeon-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* Header HUD */
+        .dungeon-hud {
+            flex: 0 0 80px;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 15, 0.98) 0%, 
+                rgba(15, 13, 18, 0.95) 100%
+            );
+            border-bottom: 2px solid rgba(143, 91, 216, 0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+        }
+
+        .hud-section {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .hud-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hud-label {
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            color: rgba(244, 232, 208, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .hud-value {
+            font-family: var(--font-title);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-shadow: 0 0 10px rgba(244, 208, 63, 0.3);
+        }
+
+        /* Health Bar */
+        .health-bar-container {
+            width: 200px;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(50, 20, 20, 0.5);
+            border: 1px solid rgba(139, 0, 0, 0.5);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #ff4444);
+            width: 100%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+        }
+
+        /* Corruption Bar */
+        .corruption-bar-container {
+            width: 150px;
+        }
+
+        .corruption-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(50, 20, 70, 0.5);
+            border: 1px solid rgba(143, 91, 216, 0.5);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .corruption-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--corruption-purple), #d8b4ff);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(216, 180, 255, 0.6);
+        }
+
+        // Canvas Zone
+        .dungeon-canvas-zone {
+            flex: 1 1 auto;
+            position: relative;
+            width: 100%;
+            min-height: 0;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        #dungeonCanvas {
+            display: block;
+            cursor: crosshair;
+            background: #000;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Controls Footer */
+        .dungeon-controls {
+            flex: 0 0 70px;
+            background: linear-gradient(180deg,
+                rgba(15, 13, 18, 0.95) 0%, 
+                rgba(10, 10, 15, 0.98) 100%
+            );
+            border-top: 2px solid rgba(143, 91, 216, 0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .controls-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.8) 0%,
+                rgba(15, 13, 18, 0.9) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.4);
+            color: var(--parchment);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .control-btn:hover {
+            border-color: var(--gold-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 208, 63, 0.2);
+        }
+
+        .control-btn.primary {
+            background: linear-gradient(135deg,
+                rgba(91, 43, 130, 0.8) 0%,
+                rgba(143, 91, 216, 0.8) 100%
+            );
+            border-color: var(--corruption-purple);
+        }
+
+        .control-btn.primary:hover {
+            border-color: #d8b4ff;
+            box-shadow: 0 4px 12px rgba(143, 91, 216, 0.4);
+        }
+
+        .controls-hint {
+            font-family: var(--font-ui);
+            font-size: 0.85rem;
+            color: rgba(244, 232, 208, 0.5);
+        }
+
+        /* Event Popup */
+        #eventPopup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 10, 15, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #eventPopup.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .event-card {
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.98) 0%,
+                rgba(15, 13, 18, 0.98) 100%
+            );
+            border: 3px solid var(--gold-bright);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 
+                0 0 40px rgba(244, 208, 63, 0.3),
+                0 20px 60px rgba(0, 0, 0, 0.9);
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .event-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+
+        .event-title {
+            font-family: var(--font-title);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 0.1em;
+        }
+
+        .event-description {
+            font-family: var(--font-body);
+            font-size: 1.2rem;
+            color: rgba(244, 232, 208, 0.9);
+            text-align: center;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .event-btn {
+            padding: 15px 30px;
+            font-family: var(--font-ui);
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg,
+                rgba(91, 43, 130, 0.8) 0%,
+                rgba(143, 91, 216, 0.8) 100%
+            );
+            border: 2px solid var(--corruption-purple);
+            color: var(--parchment);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .event-btn:hover {
+            background: linear-gradient(135deg,
+                rgba(143, 91, 216, 0.9) 0%,
+                rgba(216, 180, 255, 0.9) 100%
+            );
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(143, 91, 216, 0.4);
+        }
+
+        .event-btn.secondary {
+            background: linear-gradient(135deg,
+                rgba(20, 18, 15, 0.8) 0%,
+                rgba(15, 13, 18, 0.9) 100%
+            );
+            border-color: rgba(90, 77, 58, 0.4);
+        }
+
+        .event-btn.secondary:hover {
+            border-color: var(--gold-bright);
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-title);
+            font-size: 2rem;
+            color: var(--gold-bright);
+            text-align: center;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+    <div class="dungeon-container">
+        <!-- HUD Header -->
+        <div class="dungeon-hud">
+            <div class="hud-section">
+                <div class="hud-stat health-bar-container">
+                    <div class="hud-label">Santé</div>
+                    <div class="hud-value"><span id="healthValue">100</span> / <span id="maxHealthValue">100</span></div>
+                    <div class="health-bar">
+                        <div class="health-bar-fill" id="healthBarFill"></div>
+                    </div>
+                </div>
+                
+                <div class="hud-stat corruption-bar-container">
+                    <div class="hud-label">Corruption</div>
+                    <div class="hud-value"><span id="corruptionValue">0</span>%</div>
+                    <div class="corruption-bar">
+                        <div class="corruption-bar-fill" id="corruptionBarFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-section">
+                <div class="hud-stat">
+                    <div class="hud-label">Niveau</div>
+                    <div class="hud-value" id="levelValue">1</div>
+                </div>
+
+                <div class="hud-stat">
+                    <div class="hud-label">Or</div>
+                    <div class="hud-value" id="goldValue">0</div>
+                </div>
+
+                <div class="hud-stat">
+                    <div class="hud-label">XP</div>
+                    <div class="hud-value" id="xpValue">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Principal -->
+        <div class="dungeon-canvas-zone">
+            <canvas id="dungeonCanvas"></canvas>
+        </div>
+
+        <!-- Controls Footer -->
+        <div class="dungeon-controls">
+            <div class="controls-section">
+                <button class="control-btn primary" id="btnNewDungeon">🎲 Nouveau Donjon</button>
+                <button class="control-btn" id="btnSave">💾 Sauvegarder</button>
+                <button class="control-btn" id="btnLoad">📂 Charger</button>
+            </div>
+
+            <div class="controls-hint">
+                ⬆️⬇️⬅️➡️ Déplacer | 🖱️ Molette Zoom | Clic sur salle pour avancer
+            </div>
+
+            <div class="controls-section">
+                <button class="control-btn" id="btnInventory">🎒 Inventaire</button>
+                <button class="control-btn" id="btnMenu">⚙️ Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Popup -->
+    <div id="eventPopup">
+        <div class="event-card">
+            <div class="event-icon" id="eventIcon">⚔️</div>
+            <div class="event-title" id="eventTitle">Événement</div>
+            <div class="event-description" id="eventDescription">Description</div>
+            <div class="event-actions" id="eventActions">
+                <!-- Boutons générés dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DungeonGenerator } from './src/systems/DungeonGenerator.js';
+        import { DungeonRenderer } from './src/systems/DungeonRenderer.js';
+        import { DungeonEventSystem } from './src/systems/DungeonEventSystem.js';
+        import { DungeonProgressionManager } from './src/systems/DungeonProgressionManager.js';
+
+        // DOM Elements
+        const canvas = document.getElementById('dungeonCanvas');
+        const btnNewDungeon = document.getElementById('btnNewDungeon');
+        const btnSave = document.getElementById('btnSave');
+        const btnLoad = document.getElementById('btnLoad');
+        const btnInventory = document.getElementById('btnInventory');
+        const eventPopup = document.getElementById('eventPopup');
+        const eventIcon = document.getElementById('eventIcon');
+        const eventTitle = document.getElementById('eventTitle');
+        const eventDescription = document.getElementById('eventDescription');
+        const eventActions = document.getElementById('eventActions');
+
+        // State
+        let generator, renderer, eventSystem, progressionManager;
+
+        // Initialize
+        function init() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            generateNewDungeon();
+        }
+
+        // Resize canvas intelligemment
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            
+            console.log('Resizing canvas:', rect.width, 'x', rect.height);
+            
+            // Taille du canvas (résolution interne)
+            canvas.width = Math.floor(rect.width);
+            canvas.height = Math.floor(rect.height);
+            
+            if (renderer) {
+                renderer.render();
+            }
+        }
+
+        // Generate new dungeon
+        function generateNewDungeon() {
+            const seed = Date.now();
+            generator = new DungeonGenerator(seed);
+            const dungeon = generator.generate();
+
+            // Event system
+            eventSystem = new DungeonEventSystem(dungeon);
+
+            // Progression manager
+            progressionManager = new DungeonProgressionManager(
+                eventSystem,
+                onEventTrigger
+            );
+
+            // Renderer
+            renderer = new DungeonRenderer(canvas, dungeon);
+            renderer.eventSystem = eventSystem; // Pour afficher icônes
+            
+            // Ajuster le zoom initial pour voir plus large
+            renderer.camera.scale = 0.6;
+            renderer.camera.targetScale = 0.6;
+            renderer.camera.minScale = 0.3;
+            renderer.camera.maxScale = 1.5;
+            
+            renderer.render();
+
+            updateHUD();
+        }
+
+        // Event triggered
+        function onEventTrigger(event, x, y) {
+            console.log('Event triggered at', x, y, ':', event);
+            showEventPopup(event);
+        }
+
+        // Show event popup
+        function showEventPopup(event) {
+            eventIcon.textContent = event.icon;
+            eventIcon.style.color = event.color;
+            
+            eventTitle.textContent = getEventTitle(event);
+            eventDescription.innerHTML = getEventDescription(event);
+            
+            // Clear actions
+            eventActions.innerHTML = '';
+            
+            // Generate action buttons
+            const actions = getEventActions(event);
+            actions.forEach(action => {
+                const btn = document.createElement('button');
+                btn.className = `event-btn ${action.type || ''}`;
+                btn.textContent = action.label;
+                btn.onclick = () => {
+                    action.callback();
+                    closeEventPopup();
+                };
+                eventActions.appendChild(btn);
+            });
+            
+            eventPopup.classList.add('active');
+        }
+
+        function closeEventPopup() {
+            eventPopup.classList.remove('active');
+        }
+
+        function getEventTitle(event) {
+            const titles = {
+                'combat': `Combat : ${event.enemy}`,
+                'treasure': 'Coffre au Trésor',
+                'cage': 'Le Dilemme',
+                'merchant': 'Marchand',
+                'rest': 'Lieu de Repos',
+                'boss': `Boss : ${event.boss}`,
+                'random': event.eventName
+            };
+            return titles[event.type] || 'Événement';
+        }
+
+        function getEventDescription(event) {
+            const descriptions = {
+                'combat': `Un <b>${event.enemy}</b> te barre la route !<br>Difficulté : ${event.difficulty}`,
+                'treasure': `Un coffre fermé. Rareté : <b>${event.rarity}</b>`,
+                'cage': `Deux prisonniers te supplient : <b>${event.prisoners.join(' et ')}</b>`,
+                'merchant': `${event.npc} te propose ses marchandises...`,
+                'rest': `Un feu de camp brûle faiblement. Tu peux te reposer ici.`,
+                'boss': `<b>${event.boss}</b> t'attend dans l'ombre.`,
+                'random': event.description
+            };
+            return descriptions[event.type] || 'Un événement étrange...';
+        }
+
+        function getEventActions(event) {
+            const actions = {
+                'combat': [
+                    { label: '⚔️ Combattre', callback: () => startCombat(event) },
+                    { label: '🏃 Fuir', type: 'secondary', callback: () => console.log('Fled') }
+                ],
+                'treasure': [
+                    { label: '🔓 Ouvrir', callback: () => openChest(event) }
+                ],
+                'cage': [
+                    { label: '🔓 Aller voir', callback: () => startCageDilemma(event) }
+                ],
+                'merchant': [
+                    { label: '🛒 Acheter', callback: () => openShop(event) },
+                    { label: '❌ Ignorer', type: 'secondary', callback: () => console.log('Ignored') }
+                ],
+                'rest': [
+                    { label: '🔥 Se reposer', callback: () => rest(event) },
+                    { label: '➡️ Continuer', type: 'secondary', callback: () => console.log('Continued') }
+                ],
+                'boss': [
+                    { label: '⚔️ Affronter', callback: () => startBossFight(event) }
+                ],
+                'random': [
+                    { label: '👁️ Examiner', callback: () => examineRandom(event) },
+                    { label: '🏃 Partir', type: 'secondary', callback: () => console.log('Left') }
+                ]
+            };
+            return actions[event.type] || [{ label: 'OK', callback: () => {} }];
+        }
+
+        // Event handlers
+        function startCombat(event) {
+            console.log('Starting combat with', event.enemy);
+            // TODO: Transition vers test-combat-arena.html
+            window.location.href = `test-combat-arena.html?enemy=${event.enemy}`;
+        }
+
+        function openChest(event) {
+            progressionManager.resolveTreasure(event.loot);
+            updateHUD();
+            alert(`Tu as trouvé:\n${event.loot.gold} or\n${event.loot.items.join(', ')}`);
+        }
+
+        function startCageDilemma(event) {
+            // TODO: Transition vers test-cage-dilemma.html
+            window.location.href = `test-cage-dilemma.html?scenario=${event.scenarioId}`;
+        }
+
+        function openShop(event) {
+            console.log('Opening shop');
+            // TODO: UI shop
+        }
+
+        function rest(event) {
+            progressionManager.resolveRest(event.healAmount, event.corruptionReduction);
+            updateHUD();
+            alert('Vous vous êtes reposé...');
+        }
+
+        function startBossFight(event) {
+            console.log('Starting boss fight with', event.boss);
+            // TODO: Boss fight
+        }
+
+        function examineRandom(event) {
+            console.log('Examining', event.eventName);
+            // TODO: Event specific logic
+        }
+
+        // Update HUD
+        function updateHUD() {
+            const state = progressionManager.getStateForUI();
+            
+            document.getElementById('healthValue').textContent = state.health;
+            document.getElementById('maxHealthValue').textContent = state.maxHealth;
+            document.getElementById('healthBarFill').style.width = state.healthPercent + '%';
+            
+            document.getElementById('corruptionValue').textContent = state.corruption;
+            document.getElementById('corruptionBarFill').style.width = state.corruptionPercent + '%';
+            
+            document.getElementById('levelValue').textContent = state.level;
+            document.getElementById('goldValue').textContent = state.gold;
+            document.getElementById('xpValue').textContent = state.xp;
+        }
+
+        // Canvas interactions
+        canvas.addEventListener('click', (e) => {
+            if (!renderer) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // TODO: Convert screen coords to dungeon coords
+            // and move player
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!renderer || eventPopup.classList.contains('active')) return;
+            
+            let moved = false;
+            switch(e.key) {
+                case 'ArrowUp':
+                    moved = renderer.movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                    moved = renderer.movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                    moved = renderer.movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                    moved = renderer.movePlayer(1, 0);
+                    break;
+            }
+            
+            if (moved) {
+                const pos = renderer.getPlayerPosition();
+                progressionManager.movePlayer(pos.x, pos.y);
+                renderer.render();
+                e.preventDefault();
+            }
+        });
+
+        // Zoom
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (!renderer) return;
+            
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            renderer.zoom(delta);
+            renderer.render();
+        });
+
+        // Buttons
+        btnNewDungeon.addEventListener('click', generateNewDungeon);
+        btnSave.addEventListener('click', () => {
+            progressionManager.saveState();
+            alert('Partie sauvegardée !');
+        });
+        btnLoad.addEventListener('click', () => {
+            if (progressionManager.loadState()) {
+                renderer.render();
+                updateHUD();
+                alert('Partie chargée !');
+            } else {
+                alert('Aucune sauvegarde trouvée.');
+            }
+        });
+        btnInventory.addEventListener('click', () => {
+            const items = progressionManager.gameState.inventory;
+            alert('Inventaire:\n' + (items.length > 0 ? items.join('\n') : 'Vide'));
+        });
+
+        // Animation loop
+        function animate() {
+            if (renderer) {
+                renderer.render();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Start
+        init();
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✂️ Texture Slicer Test - THE LAST COVENANT</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0d0d0d;
+            color: #d4c5b0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            background: #0a0a0f;
+        }
+        
+        #canvas.grabbing {
+            cursor: grabbing;
+        }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .hud > * {
+            pointer-events: auto;
+        }
+
+        /* Info Panel */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 20px;
+            min-width: 320px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-panel h3 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(244, 208, 63, 0.5);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.2);
+            font-size: 0.9em;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #c9a97a;
+        }
+
+        .info-value {
+            color: #d4c5b0;
+            font-weight: bold;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(40, 35, 30, 0.9), rgba(30, 25, 20, 0.9));
+            border: 2px solid rgba(80, 70, 50, 0.6);
+            color: #c9b998;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.95), rgba(50, 40, 30, 0.95));
+            border-color: rgba(212, 175, 55, 0.8);
+            color: #f4d03f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .zoom-btn {
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .zoom-display {
+            width: 45px;
+            height: 35px;
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid rgba(90, 77, 58, 0.6);
+            color: #0f0;
+            font-family: monospace;
+            font-size: 0.75em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.98), rgba(30,25,20,0.98));
+            border: 3px solid rgba(212, 175, 55, 0.6);
+            padding: 40px 60px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .loading h2 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #f4d03f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .loading-status {
+            margin-top: 15px;
+            color: #c9a97a;
+            font-size: 0.9em;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <!-- Loading Screen -->
+    <div class="loading" id="loadingScreen">
+        <h2>✂️ Découpage Texture</h2>
+        <div class="loading-spinner"></div>
+        <div class="loading-status" id="loadingStatus">Initialisation...</div>
+    </div>
+    
+    <div class="hud">
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <h3>✂️ Texture Slicer</h3>
+            <div class="info-item">
+                <span class="info-label">Status</span>
+                <span class="info-value" id="sliceStatus">⏳ Chargement...</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tiles Total</span>
+                <span class="info-value" id="tilesTotal">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Floor Tiles</span>
+                <span class="info-value" id="tilesFloor">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Wall Tiles</span>
+                <span class="info-value" id="tilesWall">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Zoom</span>
+                <span class="info-value" id="zoomValue">100%</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Hover Tile</span>
+                <span class="info-value" id="hoverTile">-</span>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button id="btnRegenerate">🔄 Régénérer Map</button>
+            <button id="btnCenter">🎯 Centrer</button>
+            <button id="btnToggleGrid">📐 Grille</button>
+            <button id="btnExport">💾 Export Tiles</button>
+        </div>
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="btnZoomIn">+</button>
+            <div class="zoom-display" id="zoomDisplay">100%</div>
+            <button class="zoom-btn" id="btnZoomOut">−</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { TextureAtlasSlicer, ProceduralTilemap, TilemapRenderer } from './src/systems/TextureAtlasSlicer.js';
+        
+        // ═══════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════
+        window.ZOOM_LEVEL = 1.0;
+        const ZOOM_MIN = 0.5;
+        const ZOOM_MAX = 3.0;
+        const ZOOM_STEP = 0.1;
+        const GRID_SIZE = 25;
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('canvas');
+        let renderer = null;
+        let tilemap = null;
+        let atlas = null;
+
+        async function init() {
+            try {
+                updateLoadingStatus('Chargement de la texture...');
+                
+                // Créer et charger l'atlas (nouvelle texture !)
+                atlas = new TextureAtlasSlicer(
+                    'assets/images/combat/tiles/_c27c40ed-52af-4b39-83ca-e385d55d40bd.jpg',
+                    GRID_SIZE
+                );
+                
+                await atlas.load();
+                
+                updateLoadingStatus('Découpage en tiles...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Créer la tilemap
+                updateLoadingStatus('Génération de la map...');
+                tilemap = new ProceduralTilemap(atlas, GRID_SIZE);
+                
+                // Créer le renderer
+                updateLoadingStatus('Initialisation du renderer...');
+                renderer = new TilemapRenderer(canvas, tilemap);
+                
+                // Mettre à jour l'UI
+                document.getElementById('tilesTotal').textContent = atlas.tiles.length;
+                document.getElementById('tilesFloor').textContent = atlas.floorTiles.length;
+                document.getElementById('tilesWall').textContent = atlas.wallTiles.length;
+                document.getElementById('sliceStatus').textContent = '✅ Prêt';
+                
+                // Masquer loading
+                document.getElementById('loadingScreen').classList.add('hidden');
+                
+                console.log('✅ Initialisation terminée !');
+                
+                // Démarrer la boucle de rendu
+                startRenderLoop();
+                
+            } catch (error) {
+                console.error('❌ Erreur initialisation:', error);
+                document.getElementById('loadingStatus').innerHTML = 
+                    `<span style="color: #d14343;">❌ Erreur: ${error.message}</span>`;
+            }
+        }
+
+        function updateLoadingStatus(text) {
+            document.getElementById('loadingStatus').textContent = text;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // PAN CONTROLS
+        // ═══════════════════════════════════════════════════════════
+        let isPanning = false;
+        let panStart = { x: 0, y: 0 };
+        let panOffset = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && renderer) {
+                isPanning = true;
+                panStart = { x: e.clientX, y: e.clientY };
+                panOffset = { x: renderer.camera.x, y: renderer.camera.y };
+                canvas.classList.add('grabbing');
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!renderer) return;
+            
+            // Hover tile
+            const gridPos = renderer.screenToGrid(e.clientX, e.clientY);
+            if (gridPos.x >= 0 && gridPos.x < GRID_SIZE && gridPos.y >= 0 && gridPos.y < GRID_SIZE) {
+                renderer.hoveredTile = gridPos;
+                const tileData = tilemap.getTileAt(gridPos.x, gridPos.y);
+                document.getElementById('hoverTile').textContent = 
+                    `${gridPos.x},${gridPos.y} (${tileData ? tileData.type : 'empty'})`;
+            } else {
+                renderer.hoveredTile = null;
+                document.getElementById('hoverTile').textContent = '-';
+            }
+            
+            // Pan
+            if (isPanning) {
+                const dx = e.clientX - panStart.x;
+                const dy = e.clientY - panStart.y;
+                
+                renderer.camera.targetX = panOffset.x - dx / window.ZOOM_LEVEL;
+                renderer.camera.targetY = panOffset.y - dy / window.ZOOM_LEVEL;
+                renderer.camera.x = renderer.camera.targetX;
+                renderer.camera.y = renderer.camera.targetY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                canvas.classList.remove('grabbing');
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            if (isPanning) {
+                isPanning = false;
+                canvas.classList.remove('grabbing');
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // ZOOM
+        // ═══════════════════════════════════════════════════════════
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+            setZoom(window.ZOOM_LEVEL + delta);
+        });
+
+        function setZoom(newZoom) {
+            window.ZOOM_LEVEL = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newZoom));
+            const percent = Math.round(window.ZOOM_LEVEL * 100);
+            document.getElementById('zoomValue').textContent = percent + '%';
+            document.getElementById('zoomDisplay').textContent = percent + '%';
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // BUTTONS
+        // ═══════════════════════════════════════════════════════════
+        document.getElementById('btnRegenerate').addEventListener('click', () => {
+            if (tilemap && renderer) {
+                tilemap.regenerate();
+                console.log('🔄 Map régénérée');
+            }
+        });
+
+        document.getElementById('btnCenter').addEventListener('click', () => {
+            if (renderer) {
+                renderer.center();
+            }
+        });
+
+        document.getElementById('btnToggleGrid').addEventListener('click', () => {
+            if (renderer) {
+                renderer.showGrid = !renderer.showGrid;
+            }
+        });
+
+        document.getElementById('btnExport').addEventListener('click', () => {
+            if (atlas) {
+                if (confirm('💾 Exporter tous les tiles ? (peut prendre du temps)')) {
+                    atlas.exportTiles();
+                }
+            }
+        });
+
+        document.getElementById('btnZoomIn').addEventListener('click', () => {
+            setZoom(window.ZOOM_LEVEL + ZOOM_STEP);
+        });
+
+        document.getElementById('btnZoomOut').addEventListener('click', () => {
+            setZoom(window.ZOOM_LEVEL - ZOOM_STEP);
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // KEYBOARD
+        // ═══════════════════════════════════════════════════════════
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                setZoom(window.ZOOM_LEVEL + ZOOM_STEP);
+            } else if (e.key === '-') {
+                e.preventDefault();
+                setZoom(window.ZOOM_LEVEL - ZOOM_STEP);
+            } else if (e.key === '0') {
+                e.preventDefault();
+                setZoom(1.0);
+            } else if (e.key === 'c' || e.key === ' ') {
+                e.preventDefault();
+                if (renderer) renderer.center();
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                if (tilemap) tilemap.regenerate();
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // RENDER LOOP
+        // ═══════════════════════════════════════════════════════════
+        function startRenderLoop() {
+            function loop() {
+                if (renderer) {
+                    renderer.render();
+                }
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // START
+        // ═══════════════════════════════════════════════════════════
+        init();
+
+        console.log('✂️ Texture Slicer initialisé !');
+        console.log('🎮 Controls:');
+        console.log('   - Drag: Pan caméra');
+        console.log('   - Molette: Zoom');
+        console.log('   - R: Régénérer map');
+        console.log('   - C: Centrer');
+    </script>
+</body>
+</html>

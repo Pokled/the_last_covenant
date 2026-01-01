@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Test - PlayerStatsSystem</title>
+    <link rel="stylesheet" href="assets/css/game-ui.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* PARTICULES BACKGROUND */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        .fog {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.15;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(40,30,25,0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(30,25,20,0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(35,28,23,0.2) 0%, transparent 60%);
+            animation: fogMove 60s ease-in-out infinite;
+        }
+
+        @keyframes fogMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-5%, 5%) rotate(5deg); }
+            66% { transform: translate(5%, -5%) rotate(-5deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* INVENTAIRE + ÉQUIPEMENT COMBINÉS */
+        .inventory-equipment-panel {
+            display: grid;
+            grid-template-columns: 1fr 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* INVENTAIRE GRID */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .item-slot {
+            aspect-ratio: 1;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--color-border-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: all 0.2s ease;
+            font-size: 1.8em;
+            position: relative;
+        }
+
+        .item-slot:active {
+            cursor: grabbing;
+        }
+
+        .item-slot:hover {
+            background: rgba(0,0,0,0.6);
+            border-color: var(--color-border-light);
+        }
+
+        .item-slot.filled {
+            background: rgba(42,36,25,0.6);
+            border-color: var(--color-text-accent);
+        }
+
+        .item-slot.drag-over {
+            background: rgba(106,58,106,0.4);
+            border-color: var(--color-text-accent);
+            box-shadow: 0 0 20px rgba(106,58,106,0.6);
+        }
+
+        .item-stack {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 0.5em;
+            color: var(--color-text-primary);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            font-weight: bold;
+        }
+
+        /* ZONE ÉQUIPEMENT AVEC SILHOUETTE */
+        .equipment-container {
+            position: relative;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border: 2px solid var(--color-border-dark);
+        }
+
+        /* Silhouette en arrière-plan */
+        .character-silhouette {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12em;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Grid des slots DEVANT la silhouette */
+        .equipment-grid {
+            display: grid;
+            grid-template-areas:
+                ".      head    ."
+                "shoulder shoulder shoulder"
+                "weapon body   relic1"
+                ".      legs    ."
+                ".      feet    .";
+            grid-template-columns: 70px 100px 70px;
+            grid-template-rows: repeat(5, 60px);
+            gap: 8px;
+            justify-items: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .equipment-slot {
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--color-border-dark);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.5em;
+            position: relative;
+        }
+
+        .equipment-slot:hover {
+            background: rgba(0,0,0,0.7);
+            border-color: var(--color-border-light);
+        }
+
+        .equipment-slot.filled {
+            background: rgba(42,36,25,0.6);
+            border-color: var(--color-text-accent);
+        }
+
+        .equipment-slot.drag-over {
+            background: rgba(106,58,106,0.4);
+            border-color: var(--color-text-accent);
+            box-shadow: 0 0 20px rgba(106,58,106,0.6);
+        }
+
+        .equipment-slot[data-slot="head"] { grid-area: head; }
+        .equipment-slot[data-slot="shoulder"] { 
+            grid-area: shoulder; 
+            width: 100%;
+            max-width: 200px;
+        }
+        .equipment-slot[data-slot="weapon"] { grid-area: weapon; }
+        .equipment-slot[data-slot="armor"] { grid-area: body; }
+        .equipment-slot[data-slot="relic1"] { grid-area: relic1; }
+        .equipment-slot[data-slot="legs"] { grid-area: legs; }
+        .equipment-slot[data-slot="feet"] { grid-area: feet; }
+
+        /* TOOLTIP */
+        .tooltip {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(20,18,15,0.98) 0%, rgba(30,25,20,0.98) 100%);
+            border: 2px solid var(--color-border-light);
+            padding: 12px 16px;
+            pointer-events: none;
+            z-index: 10000;
+            display: none;
+            max-width: 350px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.9);
+        }
+
+        .tooltip.show {
+            display: block;
+        }
+
+        .tooltip-title {
+            font-family: var(--font-title);
+            color: var(--color-text-accent);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--color-border-dark);
+            padding-bottom: 4px;
+        }
+
+        .tooltip-stat {
+            font-size: 0.9em;
+            color: var(--color-text-primary);
+            margin: 4px 0;
+        }
+
+        .tooltip-stat.positive {
+            color: #6a8a6a;
+        }
+
+        .tooltip-stat.negative {
+            color: #8a6a6a;
+        }
+
+        .tooltip-stat.comparison {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.3);
+            margin: 2px 0;
+        }
+
+        .tooltip-stat.comparison .better {
+            color: #6a8a6a;
+            font-weight: bold;
+        }
+
+        .tooltip-stat.comparison .worse {
+            color: #8a6a6a;
+        }
+
+        .tooltip-separator {
+            height: 1px;
+            background: var(--color-border-dark);
+            margin: 8px 0;
+        }
+
+        .tooltip-description {
+            font-size: 0.85em;
+            color: var(--color-text-secondary);
+            font-style: italic;
+            margin-top: 8px;
+            border-top: 1px solid var(--color-border-dark);
+            padding-top: 8px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        /* Stats avec tooltip indicator */
+        .stat-row {
+            position: relative;
+            cursor: help;
+        }
+
+        .stat-row::after {
+            content: '?';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            color: var(--color-text-secondary);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- PARTICULES -->
+    <canvas id="particles"></canvas>
+    
+    <!-- BROUILLARD -->
+    <div class="fog"></div>
+    <div class="container">
+        <h1 class="title-main text-center mb-lg">Player Stats System</h1>
+
+        <!-- STATS & BARRES -->
+        <div class="grid-2">
+            <!-- Stats Combat -->
+            <div class="panel">
+                <h2 class="title-section">⚔️ Stats de Combat</h2>
+                
+                <!-- Barre HP -->
+                <div class="bar-container mt-md">
+                    <div class="bar-fill hp" id="hpBar">100/100</div>
+                </div>
+
+                <!-- Barre Corruption -->
+                <div class="bar-container">
+                    <div class="bar-fill corruption" id="corruptionBar">0</div>
+                </div>
+
+                <div class="stat-row" data-tooltip="Dégâts de base infligés par attaque">
+                    <span class="stat-label">⚔️ ATK</span>
+                    <span class="stat-value" id="atkValue">15</span>
+                </div>
+
+                <div class="stat-row" data-tooltip="Réduction des dégâts reçus">
+                    <span class="stat-label">🛡️ DEF</span>
+                    <span class="stat-value" id="defValue">10</span>
+                </div>
+
+                <div class="stat-row" data-tooltip="Chance de coup critique (x150% dégâts)">
+                    <span class="stat-label">⚡ CRIT</span>
+                    <span class="stat-value" id="critValue">10%</span>
+                </div>
+
+                <div class="stat-row" data-tooltip="Détermine l'ordre d'action en combat">
+                    <span class="stat-label">🏃 SPEED</span>
+                    <span class="stat-value" id="speedValue">10</span>
+                </div>
+
+                <div class="stat-row" data-tooltip="Pièces d'or disponibles">
+                    <span class="stat-label">💰 Gold</span>
+                    <span class="stat-value" id="goldValue">100</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="panel">
+                <h2 class="title-section">⚡ Actions de Test</h2>
+                
+                <div class="actions-grid mt-md">
+                    <button class="btn btn-danger" id="btnDamage">
+                        💔 Dégâts (20)
+                    </button>
+
+                    <button class="btn btn-success" id="btnHeal">
+                        💚 Soigner (30)
+                    </button>
+
+                    <button class="btn" id="btnAttack">
+                        ⚔️ Attaquer
+                    </button>
+
+                    <button class="btn" id="btnGold">
+                        💰 +50 Gold
+                    </button>
+
+                    <button class="btn" id="btnBuy">
+                        🛒 Acheter Épée
+                    </button>
+
+                    <button class="btn" id="btnPotion">
+                        🍷 Potion
+                    </button>
+
+                    <button class="btn btn-danger" id="btnDeath">
+                        💀 Mort
+                    </button>
+
+                    <button class="btn" id="btnEquip">
+                        ⚔️ Équiper
+                    </button>
+
+                    <button class="btn btn-success" id="btnNPC">
+                        🧑 +NPC
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTAIRE + ÉQUIPEMENT (Style Diablo) -->
+        <div class="panel">
+            <h2 class="title-section">🎒 Inventaire & Équipement</h2>
+
+            <div class="inventory-equipment-panel mt-md">
+                <!-- INVENTAIRE GAUCHE -->
+                <div>
+                    <div class="text-small mb-sm" style="color: var(--color-text-accent)">
+                        Inventaire (<span id="invCount">0</span>/20)
+                    </div>
+                    <div class="inventory-grid" id="inventory">
+                        <!-- Généré en JS -->
+                    </div>
+                </div>
+
+                <!-- SILHOUETTE CENTRALE -->
+                <div class="equipment-container">
+                    <!-- Silhouette en arrière-plan -->
+                    <div class="character-silhouette">👤</div>
+                    
+                    <!-- Grid équipement DEVANT -->
+                    <div class="equipment-grid">
+                        <div class="equipment-slot" data-slot="head" data-tooltip="Casque">
+                            <span class="text-small">🪖</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="shoulder" data-tooltip="Épaules">
+                            <span class="text-small">🎖️</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="weapon" data-tooltip="Arme principale">
+                            <span class="text-small">⚔️</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="armor" data-tooltip="Armure">
+                            <span class="text-small">🛡️</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="relic1" data-tooltip="Relique / Bijou">
+                            <span class="text-small">📿</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="legs" data-tooltip="Jambières">
+                            <span class="text-small">👖</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="feet" data-tooltip="Bottes">
+                            <span class="text-small">🥾</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATISTIQUES DÉTAILLÉES DROITE -->
+                <div>
+                    <div class="text-small mb-sm" style="color: var(--color-text-accent)">
+                        Statistiques
+                    </div>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">💀 Morts</span>
+                        <span class="stat-value" id="deathCount">0</span>
+                    </div>
+
+                    <div class="stat-row">
+                        <span class="stat-label">⚔️ Ennemis tués</span>
+                        <span class="stat-value" id="killCount">0</span>
+                    </div>
+
+                    <div class="stat-row">
+                        <span class="stat-label">💥 Dégâts infligés</span>
+                        <span class="stat-value" id="damageDealt">0</span>
+                    </div>
+
+                    <div class="stat-row">
+                        <span class="stat-label">💔 Dégâts subis</span>
+                        <span class="stat-value" id="damageTaken">0</span>
+                    </div>
+
+                    <div class="stat-row">
+                        <span class="stat-label">💰 Or gagné</span>
+                        <span class="stat-value" id="goldEarned">0</span>
+                    </div>
+
+                    <div class="stat-row">
+                        <span class="stat-label">🧑 NPCs sauvés</span>
+                        <span class="stat-value" id="npcsSaved">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLTIP GLOBAL -->
+    <div class="tooltip" id="tooltip">
+        <div class="tooltip-title" id="tooltipTitle"></div>
+        <div id="tooltipContent"></div>
+    </div>
+
+    <script type="module">
+        import { CorruptionSystem } from './src/systems/CorruptionSystem.js';
+        import { PlayerStatsSystem } from './src/systems/PlayerStatsSystem.js';
+
+        // Mock game instance
+        const gameInstance = {
+            player: { corruptionModifier: 1.0 }
+        };
+
+        // Init systèmes
+        window.corruptionSystem = new CorruptionSystem(gameInstance);
+        window.playerStats = new PlayerStatsSystem(gameInstance, window.corruptionSystem);
+
+        // Écouter events
+        window.addEventListener('playerStatsChanged', updateUI);
+        window.addEventListener('inventoryChanged', updateInventory);
+        window.addEventListener('equipmentChanged', updateEquipment);
+        window.addEventListener('corruptionChanged', updateCorruption);
+
+        // ═════════════════════════════════════════════════════
+        // PARTICULES BACKGROUND
+        // ═════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+        const particleCount = 80;
+
+        class Particle {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -10;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedY = Math.random() * 0.4 + 0.1;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                this.life = Math.random() * 3000 + 4000;
+                this.birthTime = Date.now();
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                const age = Date.now() - this.birthTime;
+                if (age > this.life || this.y > canvas.height || this.x < 0 || this.x > canvas.width) {
+                    this.reset();
+                }
+                
+                if (age < 500) {
+                    this.currentOpacity = this.opacity * (age / 500);
+                } else if (age > this.life - 500) {
+                    this.currentOpacity = this.opacity * ((this.life - age) / 500);
+                } else {
+                    this.currentOpacity = this.opacity;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(201, 169, 122, ${this.currentOpacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // ═════════════════════════════════════════════════════
+        // DRAG & DROP
+        // ═════════════════════════════════════════════════════
+        let draggedItem = null;
+        let draggedIndex = null;
+        let draggedFrom = null; // 'inventory' ou 'equipment'
+
+        // ═════════════════════════════════════════════════════
+        // UI UPDATE
+        // ═════════════════════════════════════════════════════
+        function updateUI() {
+            const stats = window.playerStats.getStats();
+            
+            const hpPercent = (stats.HP / stats.maxHP) * 100;
+            const hpBar = document.getElementById('hpBar');
+            hpBar.style.width = `${hpPercent}%`;
+            hpBar.textContent = `${Math.floor(stats.HP)}/${stats.maxHP}`;
+
+            document.getElementById('atkValue').textContent = Math.floor(stats.ATK);
+            document.getElementById('defValue').textContent = Math.floor(stats.DEF);
+            document.getElementById('critValue').textContent = `${(stats.CRIT_CHANCE * 100).toFixed(0)}%`;
+            document.getElementById('speedValue').textContent = Math.floor(stats.SPEED);
+        }
+
+        function updateInventory() {
+            const inv = window.playerStats.inventory;
+            
+            document.getElementById('goldValue').textContent = inv.gold;
+            document.getElementById('invCount').textContent = inv.items.length;
+
+            const grid = document.getElementById('inventory');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < inv.maxSlots; i++) {
+                const item = inv.items[i];
+                const slot = document.createElement('div');
+                slot.className = 'item-slot';
+                slot.dataset.index = i;
+                
+                if (item) {
+                    slot.classList.add('filled');
+                    slot.innerHTML = item.icon || '📦';
+                    
+                    // Stack indicator
+                    if (item.stack && item.stack > 1) {
+                        const stackSpan = document.createElement('span');
+                        stackSpan.className = 'item-stack';
+                        stackSpan.textContent = item.stack;
+                        slot.appendChild(stackSpan);
+                    }
+                    
+                    // Drag & Drop
+                    slot.draggable = true;
+                    slot.addEventListener('dragstart', (e) => handleDragStart(e, item, i, 'inventory'));
+                    slot.addEventListener('dragend', handleDragEnd);
+                    
+                    // Tooltip avec Ctrl pour comparaison
+                    slot.addEventListener('mouseenter', (e) => showTooltip(e, item, e.ctrlKey));
+                    slot.addEventListener('mouseleave', hideTooltip);
+                    slot.addEventListener('mousemove', (e) => {
+                        updateTooltipPosition(e);
+                        // Update tooltip si Ctrl pressé/relâché
+                        if (e.ctrlKey !== isCtrlPressed) {
+                            isCtrlPressed = e.ctrlKey;
+                            showTooltip(e, item, e.ctrlKey);
+                        }
+                    });
+                    
+                    // Double-click pour équiper/utiliser
+                    slot.addEventListener('dblclick', () => useOrEquip(i));
+                }
+                
+                // Drop zone
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('drop', (e) => handleDrop(e, i, 'inventory'));
+                slot.addEventListener('dragleave', handleDragLeave);
+                
+                grid.appendChild(slot);
+            }
+            
+            updateStatsPanel();
+        }
+
+        function updateEquipment() {
+            const eq = window.playerStats.equipment;
+
+            updateEquipmentSlot('head', eq.head);
+            updateEquipmentSlot('shoulder', eq.shoulder);
+            updateEquipmentSlot('weapon', eq.weapon);
+            updateEquipmentSlot('armor', eq.armor);
+            updateEquipmentSlot('relic1', eq.relic1);
+            updateEquipmentSlot('legs', eq.legs);
+            updateEquipmentSlot('feet', eq.feet);
+        }
+
+        function updateEquipmentSlot(slotName, item) {
+            const slot = document.querySelector(`[data-slot="${slotName}"]`);
+            if (!slot) return;
+
+            // Clear previous listeners
+            const newSlot = slot.cloneNode(false);
+            slot.parentNode.replaceChild(newSlot, slot);
+            const finalSlot = document.querySelector(`[data-slot="${slotName}"]`);
+
+            if (item) {
+                finalSlot.classList.add('filled');
+                finalSlot.innerHTML = `<span style="font-size: 1.8em">${item.icon || '✨'}</span>`;
+                
+                // Drag & Drop
+                finalSlot.draggable = true;
+                finalSlot.addEventListener('dragstart', (e) => handleDragStart(e, item, slotName, 'equipment'));
+                finalSlot.addEventListener('dragend', handleDragEnd);
+                
+                // Tooltip
+                finalSlot.addEventListener('mouseenter', (e) => showTooltip(e, item, false));
+                finalSlot.addEventListener('mouseleave', hideTooltip);
+                finalSlot.addEventListener('mousemove', updateTooltipPosition);
+            } else {
+                finalSlot.classList.remove('filled');
+                const label = finalSlot.getAttribute('data-tooltip');
+                finalSlot.innerHTML = `<span class="text-small">${getSlotIcon(slotName)}</span>`;
+                
+                // Simple tooltip
+                finalSlot.addEventListener('mouseenter', (e) => showSimpleTooltip(e, label));
+                finalSlot.addEventListener('mouseleave', hideTooltip);
+                finalSlot.addEventListener('mousemove', updateTooltipPosition);
+            }
+
+            // Drop zone
+            finalSlot.addEventListener('dragover', handleDragOver);
+            finalSlot.addEventListener('drop', (e) => handleDrop(e, slotName, 'equipment'));
+            finalSlot.addEventListener('dragleave', handleDragLeave);
+        }
+
+        function getSlotIcon(slot) {
+            const icons = {
+                head: '🪖',
+                shoulder: '🎖️',
+                weapon: '⚔️',
+                armor: '🛡️',
+                relic1: '📿',
+                legs: '👖',
+                feet: '🥾'
+            };
+            return icons[slot] || '📦';
+        }
+
+        function updateStatsPanel() {
+            const stats = window.playerStats.stats;
+            
+            document.getElementById('deathCount').textContent = stats.deaths;
+            document.getElementById('killCount').textContent = stats.enemiesKilled;
+            document.getElementById('damageDealt').textContent = stats.damageDealt;
+            document.getElementById('damageTaken').textContent = stats.damageTaken;
+            document.getElementById('goldEarned').textContent = stats.goldEarned;
+            document.getElementById('npcsSaved').textContent = stats.npcsSaved;
+        }
+
+        function updateCorruption() {
+            const corruption = window.corruptionSystem.corruption;
+            const bar = document.getElementById('corruptionBar');
+            const percent = Math.min(100, (corruption / 15) * 100);
+            bar.style.width = `${percent}%`;
+            bar.textContent = corruption.toFixed(1);
+        }
+
+        // ═════════════════════════════════════════════════════
+        // DRAG & DROP HANDLERS
+        // ═════════════════════════════════════════════════════
+        function handleDragStart(e, item, indexOrSlot, from) {
+            draggedItem = item;
+            draggedIndex = indexOrSlot;
+            draggedFrom = from;
+            e.dataTransfer.effectAllowed = 'move';
+            e.currentTarget.style.opacity = '0.4';
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.style.opacity = '1';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e, targetIndexOrSlot, targetLocation) {
+            if (e.stopPropagation) e.stopPropagation();
+            e.currentTarget.classList.remove('drag-over');
+
+            if (!draggedItem) return false;
+
+            // Logique selon source et destination
+            if (draggedFrom === 'inventory' && targetLocation === 'inventory') {
+                // Swap items dans inventaire
+                swapInventoryItems(draggedIndex, targetIndexOrSlot);
+            } else if (draggedFrom === 'inventory' && targetLocation === 'equipment') {
+                // Équiper depuis inventaire
+                if (draggedItem.slot === targetIndexOrSlot) {
+                    window.playerStats.equipItem(draggedItem, draggedIndex);
+                }
+            } else if (draggedFrom === 'equipment' && targetLocation === 'inventory') {
+                // Déséquiper vers inventaire
+                window.playerStats.unequipItem(draggedIndex);
+            } else if (draggedFrom === 'equipment' && targetLocation === 'equipment') {
+                // Swap équipement (pas implémenté pour l'instant)
+            }
+
+            draggedItem = null;
+            draggedIndex = null;
+            draggedFrom = null;
+            return false;
+        }
+
+        function swapInventoryItems(index1, index2) {
+            const inv = window.playerStats.inventory;
+            const item1 = inv.items[index1];
+            const item2 = inv.items[index2];
+
+            // Stackable ? Empiler au lieu de swap
+            if (item1 && item2 && item1.id === item2.id && item1.stackable) {
+                const space = item2.maxStack - item2.stack;
+                const toTransfer = Math.min(item1.stack, space);
+                
+                if (toTransfer > 0) {
+                    item2.stack += toTransfer;
+                    item1.stack -= toTransfer;
+                    
+                    if (item1.stack <= 0) {
+                        inv.items.splice(index1, 1);
+                    }
+                    
+                    window.playerStats.emitInventoryChanged();
+                    return;
+                }
+            }
+
+            // Swap classique
+            [inv.items[index1], inv.items[index2]] = [inv.items[index2], inv.items[index1]];
+            window.playerStats.emitInventoryChanged();
+        }
+
+        function useOrEquip(index) {
+            const item = window.playerStats.inventory.items[index];
+            if (!item) return;
+
+            if (item.type === 'consumable') {
+                window.playerStats.useItem(index);
+            } else if (item.slot) {
+                window.playerStats.equipItem(item, index);
+            }
+        }
+
+        // ═════════════════════════════════════════════════════
+        // SYSTÈME DE TOOLTIPS AVEC COMPARAISON (Ctrl)
+        // ═════════════════════════════════════════════════════
+        const tooltip = document.getElementById('tooltip');
+        let currentTooltipElement = null;
+        let isCtrlPressed = false;
+
+        function showTooltip(event, item, showComparison = false) {
+            const title = document.getElementById('tooltipTitle');
+            const content = document.getElementById('tooltipContent');
+            
+            title.textContent = item.name;
+            
+            let html = '';
+            
+            // Type
+            html += `<div class="tooltip-stat">${item.type || 'Item'}</div>`;
+            
+            // Stats de l'item
+            if (item.stats) {
+                if (item.stats.HP) html += `<div class="tooltip-stat positive">❤️ +${item.stats.HP} HP Max</div>`;
+                if (item.stats.ATK) html += `<div class="tooltip-stat positive">⚔️ +${item.stats.ATK} ATK</div>`;
+                if (item.stats.DEF) html += `<div class="tooltip-stat positive">🛡️ +${item.stats.DEF} DEF</div>`;
+                if (item.stats.CRIT_CHANCE) html += `<div class="tooltip-stat positive">⚡ +${(item.stats.CRIT_CHANCE * 100).toFixed(0)}% Crit</div>`;
+                if (item.stats.SPEED) html += `<div class="tooltip-stat positive">🏃 +${item.stats.SPEED} Speed</div>`;
+            }
+            
+            // COMPARAISON (Ctrl pressé et item équipable)
+            if (showComparison && item.slot) {
+                const equippedItem = window.playerStats.equipment[item.slot];
+                
+                if (equippedItem) {
+                    html += `<div class="tooltip-separator"></div>`;
+                    html += `<div class="tooltip-stat">📊 Comparaison avec ${equippedItem.name}:</div>`;
+                    
+                    // Comparer chaque stat
+                    if (item.stats && equippedItem.stats) {
+                        const statsToCompare = ['HP', 'ATK', 'DEF', 'CRIT_CHANCE', 'SPEED'];
+                        
+                        statsToCompare.forEach(stat => {
+                            const newVal = item.stats[stat] || 0;
+                            const oldVal = equippedItem.stats[stat] || 0;
+                            const diff = newVal - oldVal;
+                            
+                            if (diff !== 0) {
+                                const icon = {
+                                    HP: '❤️',
+                                    ATK: '⚔️',
+                                    DEF: '🛡️',
+                                    CRIT_CHANCE: '⚡',
+                                    SPEED: '🏃'
+                                }[stat];
+                                
+                                const displayVal = stat === 'CRIT_CHANCE' ? `${(diff * 100).toFixed(0)}%` : diff;
+                                const className = diff > 0 ? 'better' : 'worse';
+                                
+                                html += `<div class="tooltip-stat comparison">`;
+                                html += `<span>${icon} ${stat}</span>`;
+                                html += `<span class="${className}">${diff > 0 ? '+' : ''}${displayVal}</span>`;
+                                html += `</div>`;
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Effets
+            if (item.effect) {
+                if (item.effect.HP) html += `<div class="tooltip-stat positive">💚 Restaure ${item.effect.HP} HP</div>`;
+                if (item.effect.corruption) {
+                    const sign = item.effect.corruption > 0 ? '+' : '';
+                    const className = item.effect.corruption > 0 ? 'negative' : 'positive';
+                    html += `<div class="tooltip-stat ${className}">💜 ${sign}${item.effect.corruption} Corruption</div>`;
+                }
+            }
+            
+            // Prix
+            if (item.price) {
+                html += `<div class="tooltip-stat">💰 ${item.price} gold</div>`;
+            }
+            
+            // Stack
+            if (item.stack) {
+                html += `<div class="tooltip-stat">Quantité: ${item.stack}${item.maxStack ? `/${item.maxStack}` : ''}</div>`;
+            }
+            
+            // Hint
+            if (!showComparison && item.slot) {
+                html += `<div class="tooltip-description">💡 Maintiens Ctrl pour comparer</div>`;
+            }
+            
+            content.innerHTML = html;
+            
+            tooltip.classList.add('show');
+            currentTooltipElement = event.currentTarget;
+            updateTooltipPosition(event);
+        }
+
+        function showSimpleTooltip(event, text) {
+            const title = document.getElementById('tooltipTitle');
+            const content = document.getElementById('tooltipContent');
+            
+            title.textContent = text;
+            content.innerHTML = '';
+            
+            tooltip.classList.add('show');
+            currentTooltipElement = event.currentTarget;
+            updateTooltipPosition(event);
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('show');
+            currentTooltipElement = null;
+        }
+
+        function updateTooltipPosition(event) {
+            if (!currentTooltipElement) return;
+            
+            const x = event.clientX;
+            const y = event.clientY;
+            
+            tooltip.style.left = `${x + 15}px`;
+            tooltip.style.top = `${y + 15}px`;
+        }
+
+        // Tooltips pour stats (data-tooltip)
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+            if (!element.classList.contains('equipment-slot')) {
+                element.addEventListener('mouseenter', (e) => {
+                    const text = element.getAttribute('data-tooltip');
+                    showSimpleTooltip(e, text);
+                });
+                element.addEventListener('mouseleave', hideTooltip);
+                element.addEventListener('mousemove', updateTooltipPosition);
+            }
+        });
+
+        // ═════════════════════════════════════════════════════
+        // ACTIONS (avec event listeners au lieu de onclick)
+        // ═════════════════════════════════════════════════════
+        document.getElementById('btnDamage').addEventListener('click', () => {
+            window.playerStats.takeDamage(20, 'Test');
+        });
+
+        document.getElementById('btnHeal').addEventListener('click', () => {
+            window.playerStats.heal(30);
+        });
+
+        document.getElementById('btnAttack').addEventListener('click', () => {
+            const result = window.playerStats.calculateDamage(1.0);
+            alert(`⚔️ Attaque : ${result.damage} dégâts${result.isCrit ? ' CRITIQUE !' : ''}`);
+        });
+
+        document.getElementById('btnGold').addEventListener('click', () => {
+            window.playerStats.addGold(50);
+        });
+
+        document.getElementById('btnBuy').addEventListener('click', () => {
+            if (window.playerStats.removeGold(100)) {
+                window.playerStats.addItem({
+                    id: 'IRON_SWORD',
+                    name: 'Épée de Fer',
+                    type: 'weapon',
+                    slot: 'weapon',
+                    icon: '⚔️',
+                    stats: { ATK: 10 },
+                    price: 100
+                });
+            }
+        });
+
+        document.getElementById('btnPotion').addEventListener('click', () => {
+            window.playerStats.addItem({
+                id: 'HEALTH_POTION',
+                name: 'Potion de Soin',
+                type: 'consumable',
+                icon: '🍷',
+                stackable: true,
+                maxStack: 5,
+                effect: { HP: 30 }
+            });
+        });
+
+        document.getElementById('btnDeath').addEventListener('click', () => {
+            window.playerStats.currentStats.HP = 0;
+            window.playerStats.onDeath();
+            updateUI();
+        });
+
+        document.getElementById('btnEquip').addEventListener('click', () => {
+            // Ajouter épée si pas déjà là
+            const hasSword = window.playerStats.inventory.items.find(i => i.id === 'IRON_SWORD');
+            if (!hasSword) {
+                window.playerStats.addItem({
+                    id: 'IRON_SWORD',
+                    name: 'Épée de Fer',
+                    type: 'weapon',
+                    slot: 'weapon',
+                    icon: '⚔️',
+                    stats: { ATK: 10 }
+                });
+            }
+
+            // Équiper
+            const index = window.playerStats.inventory.items.findIndex(i => i.id === 'IRON_SWORD');
+            if (index >= 0) {
+                window.playerStats.equipItem(window.playerStats.inventory.items[index], index);
+            }
+        });
+
+        document.getElementById('btnNPC').addEventListener('click', () => {
+            const names = ['Kael', 'Zhara', 'Thorin', 'Lyra'];
+            const name = names[Math.floor(Math.random() * names.length)];
+            window.playerStats.addToCortege({
+                id: Date.now(),
+                name: name,
+                type: Math.random() > 0.5 ? 'human' : 'demon'
+            });
+            alert(`✅ ${name} rejoint le cortège !`);
+        });
+
+        // Init
+        updateUI();
+        updateInventory();
+        updateEquipment();
+        updateCorruption();
+
+        console.log('✅ PlayerStatsSystem Test chargé !');
+        console.log('💡 Features:');
+        console.log('   - Drag & Drop items');
+        console.log('   - Stack automatique (potions jusqu\'à x5)');
+        console.log('   - Ctrl + Hover pour comparer stats');
+        console.log('   - Particules + brouillard animé');
+        console.log('   - Double-click pour équiper/utiliser');
+    </script>
+</body>
+</html>

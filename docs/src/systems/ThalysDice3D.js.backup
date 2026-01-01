@@ -1,0 +1,624 @@
+/**
+ * 🎲👁️ THALYS - LE DÉ DIVIN ET MAUDIT
+ * 
+ * "Je suis le Hasard et la Dette. Lance-moi, et scelle ton destin."
+ * 
+ * LORE :
+ * Thalys est un ancien dieu du Chaos, emprisonné dans un dé d'ivoire maudit.
+ * Chaque lancer l'invoque brièvement dans notre réalité, corrompant l'âme du lanceur.
+ * Il murmure, tente, séduit... attendant le moment où il pourra s'échapper.
+ * 
+ * Face 6 = Son œil se révèle = Il te voit directement.
+ * 
+ * DESIGN :
+ * - Texture osseuse (ivoire ancien, dents, os gravés)
+        
+        <!-- Face 2 (back) : 1 -->
+        <div class="dice-face back" data-value="1">
+          <div class="face-content">
+            <div class="face-number">1</div>
+          </div>
+        </div>
+        
+        <!-- Face 3 (right) : 3 -->
+        <div class="dice-face right" data-value="3">
+          <div class="face-content">
+            <div class="face-number">3</div>
+          </div>
+        </div>
+        
+        <!-- Face 4 (left) : 4 -->
+        <div class="dice-face left" data-value="4">
+          <div class="face-content">
+            <div class="face-number">4</div>
+          </div>
+        </div>
+        
+        <!-- Face 5 (top) : 5 -->
+        <div class="dice-face top" data-value="5">
+          <div class="face-content">
+            <div class="face-number">5</div>
+          </div>
+        </div>
+        
+        <!-- Face 6 (bottom) : 2 -->
+        <div class="dice-face bottom" data-value="2">
+          <div class="face-content">
+            <div class="face-number">2</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    this.container.appendChild(this.diceEl);
+    this.cubeEl = this.diceEl.querySelector('.dice-cube');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // YEUX DIVINS (sur face avant)
+  // ═══════════════════════════════════════════════════════════════
+
+  createEyes() {
+    const frontFace = this.diceEl.querySelector('.front .face-content');
+    
+    const eyesContainer = document.createElement('div');
+    eyesContainer.className = 'dice-eyes';
+    eyesContainer.innerHTML = `
+      <div class="eye left-eye">
+        <div class="eye-outer-glow"></div>
+        <div class="eye-iris">
+          <div class="eye-pupil"></div>
+          <div class="eye-shine"></div>
+        </div>
+      </div>
+      
+      <div class="eye right-eye">
+        <div class="eye-outer-glow"></div>
+        <div class="eye-iris">
+          <div class="eye-pupil"></div>
+          <div class="eye-shine"></div>
+        </div>
+      </div>
+    `;
+    
+    frontFace.appendChild(eyesContainer);
+    
+    // Clignement aléatoire
+    this.startBlinking();
+  }
+
+  startBlinking() {
+    const blink = () => {
+      const eyes = this.diceEl.querySelectorAll('.eye');
+      eyes.forEach(eye => eye.classList.add('blinking'));
+      
+      setTimeout(() => {
+        eyes.forEach(eye => eye.classList.remove('blinking'));
+      }, 150);
+      
+      // Prochain clignement dans 3-7 secondes
+      setTimeout(blink, 3000 + Math.random() * 4000);
+    };
+    
+    blink();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // PARTICULES MYSTIQUES
+  // ═══════════════════════════════════════════════════════════════
+
+  createParticles() {
+    this.particlesContainer = document.createElement('div');
+    this.particlesContainer.className = 'dice-particles';
+    this.diceEl.appendChild(this.particlesContainer);
+    
+    // Créer 20 particules
+    for (let i = 0; i < 20; i++) {
+      this.createParticle();
+    }
+  }
+
+  createParticle() {
+    const particle = document.createElement('div');
+    particle.className = 'mystical-particle';
+    
+    // Position aléatoire autour du dé
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 120 + Math.random() * 40;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    
+    particle.style.setProperty('--particle-x', `${x}px`);
+    particle.style.setProperty('--particle-y', `${y}px`);
+    particle.style.setProperty('--particle-delay', `${Math.random() * 5}s`);
+    particle.style.setProperty('--particle-duration', `${5 + Math.random() * 3}s`);
+    
+    this.particlesContainer.appendChild(particle);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // GLOW ÉMISSIF (change selon corruption)
+  // ═══════════════════════════════════════════════════════════════
+
+  createEmissiveGlow() {
+    this.glowEl = document.createElement('div');
+    this.glowEl.className = 'dice-emissive-glow';
+    this.diceEl.appendChild(this.glowEl);
+    
+    this.updateGlowColor();
+  }
+
+  updateGlowColor() {
+    const corruptionLevel = this.corruption;
+    
+    let color1, color2;
+    if (corruptionLevel < 25) {
+      // Or divin (peu corrompu)
+      color1 = 'rgba(212, 175, 55, 0.6)';
+      color2 = 'rgba(255, 215, 100, 0.4)';
+    } else if (corruptionLevel < 50) {
+      // Orange corrompu
+      color1 = 'rgba(255, 140, 50, 0.7)';
+      color2 = 'rgba(255, 100, 30, 0.5)';
+    } else if (corruptionLevel < 75) {
+      // Rouge sang
+      color1 = 'rgba(200, 50, 40, 0.8)';
+      color2 = 'rgba(150, 30, 20, 0.6)';
+    } else {
+      // Noir/violet démoniaque
+      color1 = 'rgba(100, 20, 80, 0.9)';
+      color2 = 'rgba(50, 10, 40, 0.7)';
+    }
+    
+    this.glowEl.style.background = `
+      radial-gradient(circle at center, ${color1} 0%, ${color2} 50%, transparent 100%)
+    `;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ANIMATIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  setupAnimations() {
+    // Animation idle : rotation lente + hover
+    this.cubeEl.style.animation = 'thalysIdleRotation 20s linear infinite';
+    
+    // Pulse du glow
+    this.glowEl.style.animation = 'thalysGlowPulse 3s ease-in-out infinite';
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // INTERACTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  setupInteractions() {
+    this.diceEl.addEventListener('mouseenter', () => {
+      this.isHovering = true;
+      this.diceEl.classList.add('hovering');
+      
+      // Yeux qui s'ouvrent plus
+      this.eyeGlowIntensity = 1;
+      this.updateEyeGlow();
+      
+      // Son de murmure
+      this.playWhisper();
+    });
+    
+    this.diceEl.addEventListener('mouseleave', () => {
+      this.isHovering = false;
+      this.diceEl.classList.remove('hovering');
+      
+      this.eyeGlowIntensity = 0.5;
+      this.updateEyeGlow();
+    });
+    
+    this.diceEl.addEventListener('click', () => {
+      this.shake();
+      this.playChuckle();
+    });
+  }
+
+  updateEyeGlow() {
+    const eyes = this.diceEl.querySelectorAll('.eye-outer-glow');
+    eyes.forEach(eye => {
+      eye.style.opacity = this.eyeGlowIntensity;
+    });
+  }
+
+  shake() {
+    this.diceEl.classList.add('shaking');
+    setTimeout(() => {
+      this.diceEl.classList.remove('shaking');
+    }, 500);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SONS (simples)
+  // ═══════════════════════════════════════════════════════════════
+
+  playWhisper() {
+    // TODO: Intégrer avec BasicSoundSystem
+    console.log('🔊 Murmure de Thalys...');
+  }
+
+  playChuckle() {
+    // TODO: Intégrer avec BasicSoundSystem
+    console.log('🔊 Rire sarcastique de Thalys...');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // API PUBLIQUE
+  // ═══════════════════════════════════════════════════════════════
+
+  updateCorruption(newCorruption) {
+    this.corruption = newCorruption;
+    this.updateGlowColor();
+    
+    // Si corruption élevée, les yeux deviennent rouges
+    if (newCorruption > 75) {
+      this.diceEl.classList.add('corrupted');
+    } else {
+      this.diceEl.classList.remove('corrupted');
+    }
+  }
+
+  destroy() {
+    this.diceEl.remove();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STYLES CSS
+// ═══════════════════════════════════════════════════════════════
+
+const thalysStyles = `
+/* ════════════════════════════════════════════ */
+/* THALYS - LE DÉ VIVANT (AAA+) */
+/* ════════════════════════════════════════════ */
+
+.thalys-dice-3d {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  perspective: 1000px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.thalys-dice-3d:hover {
+  transform: scale(1.1);
+}
+
+.thalys-dice-3d.shaking {
+  animation: thalysShake 0.5s ease;
+}
+
+@keyframes thalysShake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-5deg) scale(1.05); }
+  50% { transform: rotate(5deg) scale(1.05); }
+  75% { transform: rotate(-3deg) scale(1.05); }
+}
+
+/* ════════════════════════════════════════════ */
+/* CUBE 3D */
+/* ════════════════════════════════════════════ */
+
+.dice-cube {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: thalysIdleRotation 20s linear infinite;
+  filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.8));
+}
+
+@keyframes thalysIdleRotation {
+  0% { transform: rotateX(-20deg) rotateY(0deg); }
+  100% { transform: rotateX(-20deg) rotateY(360deg); }
+}
+
+.thalys-dice-3d.hovering .dice-cube {
+  animation: thalysHoverRotation 4s ease-in-out infinite;
+}
+
+@keyframes thalysHoverRotation {
+  0%, 100% { transform: rotateX(-15deg) rotateY(0deg) rotateZ(-5deg); }
+  50% { transform: rotateX(-25deg) rotateY(180deg) rotateZ(5deg); }
+}
+
+/* ════════════════════════════════════════════ */
+/* FACES DU DÉ (Texture divine/osseuse) */
+/* ════════════════════════════════════════════ */
+
+.dice-face {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: 
+    /* Texture osseuse */
+    radial-gradient(ellipse at 30% 30%, rgba(255, 250, 240, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, rgba(240, 235, 220, 0.2) 0%, transparent 50%),
+    /* Veines dorées */
+    linear-gradient(135deg, transparent 48%, rgba(212, 175, 55, 0.15) 49%, transparent 50%),
+    linear-gradient(45deg, transparent 63%, rgba(212, 175, 55, 0.1) 64%, transparent 65%),
+    /* Base ivoire/os */
+    linear-gradient(135deg, 
+      #f5f0e8 0%, 
+      #ede8dc 25%, 
+      #ddd8cc 50%, 
+      #cdc8bc 75%, 
+      #bdb8ac 100%
+    );
+  border: 3px solid rgba(120, 100, 70, 0.8);
+  box-shadow: 
+    /* Ombres externes */
+    0 10px 30px rgba(0, 0, 0, 0.7),
+    /* Relief interne */
+    inset 0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 -3px 8px rgba(255, 255, 255, 0.2),
+    /* Lueur magique */
+    inset 0 0 30px rgba(212, 175, 55, 0.1);
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Positions 3D des faces */
+.dice-face.front  { transform: rotateY(0deg) translateZ(90px); }
+.dice-face.back   { transform: rotateY(180deg) translateZ(90px); }
+.dice-face.right  { transform: rotateY(90deg) translateZ(90px); }
+.dice-face.left   { transform: rotateY(-90deg) translateZ(90px); }
+.dice-face.top    { transform: rotateX(90deg) translateZ(90px); }
+.dice-face.bottom { transform: rotateX(-90deg) translateZ(90px); }
+
+.face-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inscriptions runiques */
+.rune-inscription {
+  position: absolute;
+  top: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7em;
+  color: rgba(212, 175, 55, 0.8);
+  text-shadow: 
+    0 0 5px rgba(212, 175, 55, 0.6),
+    0 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 3px;
+  animation: runeGlow 3s ease-in-out infinite;
+}
+
+@keyframes runeGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; text-shadow: 0 0 10px rgba(212, 175, 55, 1); }
+}
+
+.face-number {
+  font-size: 5em;
+  font-weight: bold;
+  color: #3d2817;
+  text-shadow: 
+    2px 2px 0 rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+/* ════════════════════════════════════════════ */
+/* YEUX DIVINS (Face avant uniquement) */
+/* ════════════════════════════════════════════ */
+
+.dice-eyes {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 40px;
+  z-index: 10;
+}
+
+.eye {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+/* Lueur externe de l'œil */
+.eye-outer-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.8) 0%, transparent 70%);
+  animation: eyeGlowPulse 2s ease-in-out infinite;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes eyeGlowPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+}
+
+/* Iris */
+.eye-iris {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle at 40% 40%, 
+    rgba(255, 215, 100, 0.9) 0%, 
+    rgba(212, 175, 55, 1) 40%, 
+    rgba(150, 120, 40, 1) 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(212, 175, 55, 0.8);
+  animation: eyeIdle 4s ease-in-out infinite;
+}
+
+@keyframes eyeIdle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Pupille */
+.eye-pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #000;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+/* Reflet lumineux */
+.eye-shine {
+  position: absolute;
+  top: 20%;
+  left: 25%;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 100%);
+  border-radius: 50%;
+}
+
+/* Clignement */
+.eye.blinking .eye-iris {
+  animation: eyeBlink 0.15s ease-out;
+}
+
+@keyframes eyeBlink {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+/* État corrompu (yeux rouges) */
+.thalys-dice-3d.corrupted .eye-iris {
+  background: radial-gradient(circle at 40% 40%, 
+    rgba(255, 100, 80, 0.9) 0%, 
+    rgba(200, 50, 40, 1) 40%, 
+    rgba(120, 20, 20, 1) 100%
+  );
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(200, 50, 40, 1);
+}
+
+.thalys-dice-3d.corrupted .eye-outer-glow {
+  background: radial-gradient(circle, rgba(200, 50, 40, 0.9) 0%, transparent 70%);
+}
+
+/* ════════════════════════════════════════════ */
+/* PARTICULES MYSTIQUES */
+/* ════════════════════════════════════════════ */
+
+.dice-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  pointer-events: none;
+}
+
+.mystical-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: particleFloat var(--particle-duration) ease-in-out infinite;
+  animation-delay: var(--particle-delay);
+  opacity: 0;
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translate(var(--particle-x), var(--particle-y));
+    opacity: 0;
+  }
+  10% { opacity: 0.8; }
+  50% {
+    transform: translate(
+      calc(var(--particle-x) * 0.5),
+      calc(var(--particle-y) * 0.5)
+    );
+    opacity: 1;
+  }
+  90% { opacity: 0.8; }
+}
+
+/* ════════════════════════════════════════════ */
+/* GLOW ÉMISSIF (Pulse selon corruption) */
+/* ════════════════════════════════════════════ */
+
+.dice-emissive-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.6) 0%, transparent 70%);
+  animation: thalysGlowPulse 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes thalysGlowPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(0.9); 
+    opacity: 0.5; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.4); 
+    opacity: 0.9; 
+  }
+}
+
+.thalys-dice-3d.hovering .dice-emissive-glow {
+  animation: thalysGlowPulseIntense 1.5s ease-in-out infinite;
+}
+
+@keyframes thalysGlowPulseIntense {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.7; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.6); 
+    opacity: 1; 
+    filter: blur(15px);
+  }
+}
+`;
+
+// Injecter les styles
+if (typeof document !== 'undefined' && !document.getElementById('thalysStyles')) {
+  const styleEl = document.createElement('style');
+  styleEl.id = 'thalysStyles';
+  styleEl.textContent = thalysStyles;
+  document.head.appendChild(styleEl);
+}
+
+// Export
+if (typeof window !== 'undefined') {
+  window.ThalysDice3D = ThalysDice3D;
+}

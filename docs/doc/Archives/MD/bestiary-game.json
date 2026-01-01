@@ -1,0 +1,946 @@
+{
+  "BESTIARY": {
+    "REGULAR_ENEMIES": {
+      "ZOMBIE": {
+        "id": "ZOMBIE",
+        "name": "Zombie",
+        "nameVariants": ["Zombie Errant", "Âme Perdue", "Chercheur de Noxar"],
+        "icon": "🧟",
+        "godAffinity": "NOXAR",
+        "tier": "Common",
+
+        "stats": {
+          "hp": 40,
+          "attack": 8,
+          "defense": 5,
+          "speed": 4,
+          "xp": 15,
+          "gold": "5-10"
+        },
+
+        "lore": {
+          "short": "Âmes qui cherchent encore Noxar, le Dieu de la Mort.",
+          "full": "\"Pourquoi ne vient-il plus?\" murmurent-ils.\n\nParce que Noxar est mort. Dévoré en dernier lors du Grand Déchirement.\n\nMais eux ne le savent pas. Alors ils errent. Cherchant leur dieu. Attendant qu'il vienne les chercher. Les guider vers l'au-delà.\n\nIls attendent depuis 500 ans.\n\nCombien de temps encore?",
+          "whispers": ["Noxar... où...?", "Passeur... viens...", "Combien... temps...?", "Oublié... encore..."]
+        },
+
+        "behavior": {
+          "standard": {
+            "pattern": "Walk slowly, attack melee, telegraphed bite",
+            "ai": "Low aggro range (3m), loses target easily"
+          },
+
+          "corruptionBased": {
+            "pure": {
+              "trigger": "Player corruption < 20%",
+              "change": "+30% aggro range, smell 'life', more aggressive",
+              "dialogue": "...vivant... mangé..."
+            },
+            "corrupted": {
+              "trigger": "Player corruption > 60%",
+              "change": "Hesitate 1 tour before attack, recognize 'kin'",
+              "dialogue": "...frère?" (rare, 5% chance)
+            }
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "Falls, moans 'enfin...'",
+            "drop": "Rotten Flesh (consumable, -10 HP but +5 corruption)"
+          },
+          "purified": {
+            "trigger": "Killed with holy damage",
+            "effect": "Soul released, white particle effect",
+            "reward": "-1% corruption for player",
+            "dialogue": "Une lumière blanche. Un soupir. Le silence. Enfin."
+          }
+        },
+
+        "secrets": {
+          "canTalk": {
+            "unlock": "Équiper 'Noxar's Whisper' item (rare)",
+            "dialogue": [
+              "Pourquoi... abandonné?",
+              "Dieu... promis... retour...",
+              "Combien... temps... passé?",
+              "Cinq cents ans, dis-tu? Mais... hier... il était là..."
+            ],
+            "truthChoice": {
+              "tellTruth": {
+                "say": "'Noxar est mort. Il ne reviendra jamais.'",
+                "effect": "Zombie se dissout pacifiquement, +10 XP, no corruption",
+                "response": "Mort? Alors... nous sommes... libres? Merci."
+              },
+              "lie": {
+                "say": "'Il arrive bientôt. Attends encore.'",
+                "effect": "Zombie continue d'errer, +5% corruption (cruauté)",
+                "response": "Bientôt... j'attendrai... encore..."
+              }
+            }
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Rotten Flesh", "chance": 60 },
+          "uncommon": { "item": "Soul Fragment", "chance": 20 },
+          "rare": { "item": "Noxar's Whisper", "chance": 0.5 }
+        }
+      },
+
+      "SKELETON_WARRIOR": {
+        "id": "SKELETON_WARRIOR",
+        "name": "Guerrier Squelette",
+        "nameVariants": ["Soldat Oublié", "Champion d'Os", "Gardien Éternel"],
+        "icon": "💀",
+        "godAffinity": "KROVAX",
+        "tier": "Uncommon",
+
+        "stats": {
+          "hp": 60,
+          "attack": 15,
+          "defense": 10,
+          "speed": 8,
+          "xp": 30,
+          "gold": "10-20"
+        },
+
+        "lore": {
+          "short": "Guerriers de Krovax. Morts au combat. Refusent de partir.",
+          "full": "L'honneur demeure quand la chair pourrit.\n\nIls étaient soldats de Krovax, le Scelleur de la Guerre Juste. Sont morts au combat, l'épée en main, le cri de guerre aux lèvres.\n\nMais Krovax ne vint jamais les chercher. Alors ils continuent de combattre.\n\nPour quoi? Ils ont oublié. Le roi est mort. Le royaume, poussière. La cause, perdue.\n\nMais l'honneur... l'honneur suffit.",
+          "oath": "Combattre jusqu'à la dernière lame. Même si la lame est nous-mêmes."
+        },
+
+        "behavior": {
+          "honorCode": {
+            "rule": "N'attaquent JAMAIS en surnombre",
+            "implementation": "Si 2+ squelettes vs 1 player, ils attaquent 1 par 1 (turn-based duel)",
+            "exploit": "Player peut isoler et combattre séparément",
+            "loreReason": "Krovax enseignait: l'honneur même dans la mort"
+          },
+
+          "salute": {
+            "trigger": "Player utilise 'Bow' emote avant combat",
+            "effect": "Skeleton salue en retour, combat +10% XP (mutual respect)",
+            "dialogue": "Un guerrier respectable. Affrontons-nous dignement."
+          },
+
+          "pastSelf": {
+            "trigger": "5% chance si player = SHATTERED_KNIGHT",
+            "reveal": "Ce squelette porte TON armure d'une run précédente",
+            "dialogue": [
+              "...toi? Encore toi?",
+              "Combien de fois devrons-nous mourir?",
+              "Le cycle... éternel... je me souviens... de toi..."
+            ],
+            "mechanic": "Devient mini-boss variant, connaît tes patterns, +lore secret si battu"
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "Salue, dit 'Bien combattu', s'effondre",
+            "drop": "Rusty Sword (weapon, 10 dmg)"
+          },
+          "honorableDeath": {
+            "trigger": "Battu en duel 1v1 sans items/skills",
+            "reward": "Double XP, Skeleton salue avant de mourir",
+            "dialogue": "Un combat... digne. Krovax... serait fier."
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Bone", "chance": 70 },
+          "uncommon": { "item": "Rusty Sword", "chance": 30 },
+          "rare": { "item": "Warrior's Honor (ring)", "chance": 5 }
+        }
+      },
+
+      "CORRUPTED_GUARD": {
+        "id": "CORRUPTED_GUARD",
+        "name": "Garde Corrompu",
+        "icon": "🛡️",
+        "godAffinity": "MORWYN",
+        "tier": "Uncommon",
+
+        "stats": {
+          "hp": 70,
+          "attack": 12,
+          "defense": 18,
+          "speed": 6,
+          "xp": 35,
+          "gold": "15-25"
+        },
+
+        "lore": {
+          "short": "Garde royal. Patrouille des couloirs qui n'existent plus.",
+          "full": "\"Halte! Qui va là?\"\n\nIl patrouille. Encore. Toujours.\n\nLe château est en ruines. Le roi, mort depuis 300 ans. Les couloirs, effondrés.\n\nMais lui patrouille. Parce que c'était son devoir. Parce que Morwyn, le Scelleur de l'Ordre, l'a commandé.\n\nMorwyn est mort. Mais les ordres... persistent.\n\nAlors il marche. Éternellement. Gardant des halls fantômes. Protégeant des rois-cadavres.\n\nC'est ça, le devoir.",
+          "routine": "Shift A, Shift B, Shift C. Routine éternelle. Jamais de repos."
+        },
+
+        "behavior": {
+          "patrol": {
+            "pattern": "Suit un chemin fixe, predictable",
+            "vision": "Cône frontal 90°, aveugle sur côtés",
+            "alert": "Si détecte player: 'INTRUS!' +30% atk 3 tours"
+          },
+
+          "orderFollowing": {
+            "trigger": "Si player = SHATTERED_KNIGHT",
+            "dialogue": "Vous... un chevalier? Montrez votre insigne!",
+            "choice": {
+              "showOath": {
+                "condition": "Avoir Sacred Oath actif",
+                "effect": "Guard stands down, +10% shop discount si village",
+                "dialogue": "Pardon, sire. L'Ordre demeure. Passez."
+              },
+              "attack": {
+                "effect": "Combat normal, mais Guard reluctant (+dialogue guilt)"
+              }
+            }
+          }
+        },
+
+        "death": {
+          "standard": {
+            "dialogue": "Mon... devoir... accompli...? Non... jamais... accompli...",
+            "animation": "Tombe, hand reaches for spear one last time"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Guard's Spear", "chance": 50 },
+          "uncommon": { "item": "Duty Badge", "chance": 20 },
+          "rare": { "item": "Eternal Vigilance (helm)", "chance": 3 }
+        }
+      },
+
+      "GIANT_SPIDER": {
+        "id": "GIANT_SPIDER",
+        "name": "Araignée Géante",
+        "icon": "🕷️",
+        "godAffinity": "SYLTHARA",
+        "tier": "Uncommon",
+
+        "stats": {
+          "hp": 50,
+          "attack": 18,
+          "defense": 6,
+          "speed": 14,
+          "xp": 40,
+          "gold": "8-15"
+        },
+
+        "lore": {
+          "short": "Servantes de Sylthara. Tissent encore, sans but.",
+          "full": "Sylthara, la Scelleuse des Destinées, tissait les fils du Destin.\n\nSes servantes l'imitaient. Araignées géantes, tisseuses de toiles complexes. Chaque fil = une vie. Chaque nœud = un choix.\n\nMais Sylthara s'est effilochée. Déchirée. Disparue.\n\nSes araignées tissent encore. Par habitude. Par instinct. Par espoir?\n\nMais les toiles... ne mènent nulle part. Fils sans destinée. Motifs sans sens.\n\nElles tissent le Vide lui-même.",
+          "pattern": "Certaines toiles montrent des patterns impossibles - prophéties? Ou folie?"
+        },
+
+        "behavior": {
+          "webTrap": {
+            "mechanic": "Pose webs au sol (visible), player marche dessus = rooted 2 tours",
+            "telegraph": "Webs glow silver, avoidable",
+            "combo": "Si rooted, spider +100% crit chance"
+          },
+
+          "fateWeaving": {
+            "trigger": "HP < 30%",
+            "effect": "Tisse 'Fate Thread' - attache à player, si spider meurt, player -20% max HP jusqu'à fin floor",
+            "counter": "Cut thread avant spider death (skill/item required)",
+            "loreReason": "Elle tisse ton destin à sa mort"
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "Web collapses, spider curls up",
+            "dialogue": "La toile... inachevée... toujours... inachevée..."
+          },
+          "sylthara": {
+            "trigger": "Killed by HOLLOW_ROGUE",
+            "dialogue": "Toi... coupeur de fils... Maîtresse... serait... fière...?",
+            "reward": "+5 XP bonus"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Spider Silk", "chance": 80 },
+          "uncommon": { "item": "Venom Sac", "chance": 40 },
+          "rare": { "item": "Fate Thread (accessory)", "chance": 8 }
+        }
+      },
+
+      "CORRUPTED_SUCCUBUS": {
+        "id": "CORRUPTED_SUCCUBUS",
+        "name": "Succube Corrompue",
+        "icon": "💃",
+        "godAffinity": "None (Void-born)",
+        "tier": "Rare",
+
+        "stats": {
+          "hp": 80,
+          "attack": 20,
+          "defense": 8,
+          "speed": 12,
+          "xp": 60,
+          "gold": "20-40"
+        },
+
+        "lore": {
+          "short": "Cherche son amant mort il y a 300 ans. Ne se souvient plus de son visage.",
+          "full": "Elle s'appelait Lyanna. Lui, Kaelen. Soldat. Ils s'aimaient.\n\nIl est mort à la guerre. Elle a pleuré 40 jours. Puis a fait un pacte avec le Vide : le retrouver.\n\nLe Vide a pris son humanité. L'a transformée en... ça.\n\nElle cherche encore. 300 ans. Parmi les ombres, les morts, les vivants.\n\nMais elle ne se souvient plus de son visage. Juste... qu'elle l'aimait.\n\nAlors elle séduit. Encore et encore. Peut-être l'un d'eux sera Kaelen.\n\nMais aucun ne l'est jamais.",
+          "tragedy": "Kaelen est au Paradis (s'il existe). Elle en Enfer. L'amour ne peut pas franchir le Vide."
+        },
+
+        "behavior": {
+          "charm": {
+            "mechanic": "Charm attack (40% chance), player contrôle inversé 1 tour",
+            "resist": "Si player a companion, -50% chance (amour protège)",
+            "immune": "Si player corruption > 60% (déjà séduit par pire)"
+          },
+
+          "dialogue": {
+            "trigger": "Player = male character avec companion female",
+            "line": "Vous... vous vous aimez? Comment est-ce... d'être aimé? Je... j'ai oublié.",
+            "choice": {
+              "kind": {
+                "say": "'L'amour, c'est... choisir de rester. Même quand c'est difficile.'",
+                "effect": "Succubus pleure, fuit combat, +lore fragment, +10 XP",
+                "corruption": "-3%"
+              },
+              "cruel": {
+                "say": "'L'amour n'existe pas. Ce n'était qu'une illusion.'",
+                "effect": "Succubus enrage, +50% all stats (boss variant), meilleur loot",
+                "corruption": "+15%"
+              }
+            }
+          },
+
+          "locketSecret": {
+            "trigger": "Player possède 'Lover's Locket' item",
+            "action": "Montrer le médaillon pendant combat (item use)",
+            "effect": {
+              "recognition": "Elle se fige. 'C'est... son médaillon. Kaelen. Mon... Kaelen.'",
+              "memory": "Elle se souvient. Son visage. Sa voix. Tout.",
+              "dissolution": "Elle pleure. Sourit. Se dissout en lumière.",
+              "reward": "Drop 'Eternal Love Ring' (legendary), +lore entry, -5% corruption",
+              "quest": "Unlock sidequest 'Reunite the Lovers' (étage 7-8)"
+            }
+          }
+        },
+
+        "death": {
+          "standard": {
+            "dialogue": "Kaelen... je cherche encore... attends-moi...",
+            "animation": "Reaches toward nothing, fades"
+          },
+          "purified": {
+            "trigger": "Via Locket secret",
+            "dialogue": "Je me souviens... ton sourire... ta voix... 'Je t'attendrai.' Et tu... tu m'as attendue. Merci.",
+            "visual": "Dissolves into white light, whispers 'Je t'aime' one last time"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Void Essence", "chance": 50 },
+          "uncommon": { "item": "Charm Dust", "chance": 30 },
+          "rare": { "item": "Lover's Locket", "chance": 10 },
+          "legendary": { "item": "Eternal Love Ring", "chance": 100, "condition": "Via locket secret only" }
+        }
+      },
+
+      "MINOR_DEMON": {
+        "id": "MINOR_DEMON",
+        "name": "Démon Mineur",
+        "icon": "👹",
+        "godAffinity": "Void",
+        "tier": "Rare",
+
+        "stats": {
+          "hp": 90,
+          "attack": 25,
+          "defense": 12,
+          "speed": 10,
+          "xp": 70,
+          "gold": "25-50"
+        },
+
+        "lore": {
+          "short": "Né de la question: 'Pourquoi les dieux nous ont-ils abandonnés?'",
+          "full": "Les démons ne sont pas nés du Mal.\n\nIls sont nés du Doute.\n\nQuand les Sept Dieux se sont dévorés, l'humanité a crié : 'POURQUOI?'\n\nCe cri, ce doute, ce désespoir... a pris forme.\n\nLes Démons Mineurs. Incarnations de l'abandon divin.\n\nIls n'ont pas de nom. Pas de but. Juste... la colère d'avoir été oubliés.\n\nIls sont nous. Nos peurs. Notre rage. Notre désespoir.\n\nC'est pour ça qu'ils sont si durs à tuer.\n\nComment tuer ta propre douleur?",
+          "question": "Si les dieux reviennent, les démons disparaissent-ils? Ou sont-ils éternels maintenant?"
+        },
+
+        "behavior": {
+          "berserk": {
+            "trigger": "HP < 40%",
+            "effect": "+60% atk, -30% def, attacks twice per turn",
+            "visual": "Eyes glow red, body distorts"
+          },
+
+          "corruptionSense": {
+            "high": {
+              "trigger": "Player corruption > 70%",
+              "effect": "Demon hesitates, 'Kin... smell', -20% aggro",
+              "dialogue": "Toi... comme nous... pourquoi... combattre?"
+            },
+            "pure": {
+              "trigger": "Player corruption < 20%",
+              "effect": "Enrage immédiatement, +40% stats",
+              "dialogue": "PUR! DÉTESTE! DIEUX! MENSONGE!"
+            }
+          }
+        },
+
+        "death": {
+          "standard": {
+            "dialogue": "Pourquoi... abandonnés... toujours... abandonnés...",
+            "drop": "Demon Heart (consumable: heal 100%, +10% corruption)"
+          },
+          "purified": {
+            "trigger": "Holy damage kill",
+            "effect": "Demon screams, dissolves, leaves behind 'Lost Prayer' (note item)",
+            "note": "'Père Morwyn, si tu m'entends... pardon pour mes doutes. - Eryn, villageois'"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Demon Horn", "chance": 60 },
+          "uncommon": { "item": "Demon Heart", "chance": 35 },
+          "rare": { "item": "Despair Shard", "chance": 10 }
+        }
+      },
+
+      "GOBLIN": {
+        "id": "GOBLIN",
+        "name": "Gobelin",
+        "nameVariants": ["Gobelin Voleur", "Petit Chapardeur", "Enfant Post-Divin"],
+        "icon": "👹",
+        "godAffinity": "None",
+        "tier": "Common",
+
+        "stats": {
+          "hp": 25,
+          "attack": 6,
+          "defense": 3,
+          "speed": 12,
+          "xp": 12,
+          "gold": "3-8"
+        },
+
+        "lore": {
+          "short": "Nés après la Chute. Sans dieux. Sans lois. Sans comprendre.",
+          "full": "Les gobelins n'existaient pas avant la Chute.\n\nIls sont des enfants post-divins. Nés sans dieux. Sans lois. Sans but.\n\nIls volent pas par malice. Ils volent parce qu'ils ne comprennent pas la propriété.\n\nCertains cherchent à apprendre. D'autres... ont abandonné.",
+          "whispers": ["Brillant!", "Moi prendre!", "Toi pas besoin!", "Pourquoi... méchant...?"]
+        },
+
+        "behavior": {
+          "thief": {
+            "pattern": "Tente de voler un item random au début du combat",
+            "mechanics": "Si tué trop vite (<2 tours), item perdu. Si blessé assez (HP <40%), fuit en lâchant l'item"
+          },
+          "scared": {
+            "trigger": "Player ATK > 20",
+            "effect": "Hesitate first turn, 30% chance de fuir immédiatement",
+            "dialogue": "Trop fort! Moi partir!"
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "Petit cri aigu, lâche jouet cassé (ours en peluche)",
+            "lore": "Pourquoi portait-il ce jouet? Était-il... un enfant?"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Stolen Rubies", "chance": 65 },
+          "uncommon": { "item": "Broken Toy", "chance": 25 },
+          "rare": { "item": "Trick Bag", "chance": 5, "effect": "Passive: vole 1 rubis par combat" }
+        }
+      },
+
+      "ORC_BERSERKER": {
+        "id": "ORC_BERSERKER",
+        "name": "Orc Berserker",
+        "nameVariants": ["Guerrier Enragé", "Fils de Krovax", "Rage Incarnée"],
+        "icon": "🪓",
+        "godAffinity": "KROVAX",
+        "tier": "Uncommon",
+
+        "stats": {
+          "hp": 80,
+          "attack": 18,
+          "defense": 10,
+          "speed": 6,
+          "xp": 50,
+          "gold": "15-30"
+        },
+
+        "lore": {
+          "short": "Sans dieu pour canaliser sa rage, il attaque... tout.",
+          "full": "Enfants spirituels de Krovax. Mais sans dieu pour canaliser leur rage, ils se battent entre eux.\n\nFamilles. Clans. Tribus. Extinction lente par auto-destruction.\n\nCe berserker a perdu tout le monde. Sa rage n'a plus de cible logique. Alors il attaque... tout.",
+          "roar": "KROVAX! OÙ ES-TU?! RÉPONDS!!!"
+        },
+
+        "behavior": {
+          "rage": {
+            "pattern": "Chaque coup augmente son ATK (+3 par tour)",
+            "cost": "Perd 8 HP/tour (autodestruction)",
+            "maxStacks": 5
+          },
+          "berserk": {
+            "trigger": "HP < 30%",
+            "effect": "Double attacks per turn, but loses 15 HP/tour",
+            "dialogue": "MOURIR! TOUS! MOURIR!"
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "Tombe à genoux, pleure sans larmes (juste spasmes)",
+            "dialogue": "...enfin... repos..."
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Cursed Axe", "chance": 55 },
+          "uncommon": { "item": "Orc Tusk", "chance": 30 },
+          "rare": { "item": "Krovax's Rage", "chance": 12, "effect": "Buff: +ATK chaque tour mais perd HP" }
+        }
+      },
+
+      "STONE_GOLEM": {
+        "id": "STONE_GOLEM",
+        "name": "Golem de Pierre",
+        "nameVariants": ["Construct Abandonné", "Serviteur de Morwyn", "Bâtisseur Éternel"],
+        "icon": "🗿",
+        "godAffinity": "MORWYN",
+        "tier": "Rare",
+
+        "stats": {
+          "hp": 150,
+          "attack": 15,
+          "defense": 30,
+          "speed": 3,
+          "xp": 60,
+          "gold": "20-40"
+        },
+
+        "lore": {
+          "short": "Créé pour construire. Morwyn morte = plus d'instructions. Continue quand même.",
+          "full": "Créé par Morwyn pour construire le Royaume de Pierre.\n\nInstructions:\n1. Pose cette pierre\n2. Pose cette autre pierre\n3. Répète\n\nMorwyn morte = plus d'instructions. Le golem continue. Pierre. Pierre. Pierre. Infini.\n\nSi tu es sur son chemin? Pierre. Toi aussi.",
+          "grinding": "Pierre... pierre... pierre..."
+        },
+
+        "behavior": {
+          "unstoppable": {
+            "pattern": "Marche lentement. Ignore tout sauf obstacles",
+            "mechanics": "Si player bloque son chemin = attaque pour retirer obstacle"
+          },
+          "armored": {
+            "defense": "Réduit tous dégâts de 50% (armure de pierre)",
+            "weakness": "Magic damage ignore armor"
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "S'effondre, pierres roulent",
+            "inscription": "Sur une pierre gravé: 'Merci, serviteur fidèle. - Morwyn' (500 ans)"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Stone Heart", "chance": 70 },
+          "uncommon": { "item": "Granite Chunk", "chance": 20 },
+          "rare": { "item": "Morwyn's Square", "chance": 10, "effect": "Item: équilibre toutes stats" }
+        }
+      },
+
+      "HEADLESS_KNIGHT": {
+        "id": "HEADLESS_KNIGHT",
+        "name": "Chevalier Sans Tête",
+        "nameVariants": ["Chercheur Éternel", "L'Aveugle Qui Entend", "Tête Perdue"],
+        "icon": "🎴",
+        "godAffinity": "MORWYN",
+        "tier": "Elite",
+
+        "stats": {
+          "hp": 120,
+          "attack": 28,
+          "defense": 22,
+          "speed": 8,
+          "xp": 80,
+          "gold": "30-60"
+        },
+
+        "lore": {
+          "short": "Cherche sa tête depuis 500 ans. Combat au son.",
+          "full": "Il cherche sa tête. Perdue pendant la Chute.\n\nSans tête = sans yeux. Il combat au son. Parfait contre invisibilité. Faible contre silence.\n\nSelon légende, si tu trouves sa tête et la lui rends, il deviendra allié.\n\nMais personne n'a jamais trouvé la tête. Peut-être n'existe-t-elle plus.",
+          "runes": "MA TÊTE. L'AS-TU VUE? JE LA CHERCHE DEPUIS 500 ANS."
+        },
+
+        "behavior": {
+          "soundBased": {
+            "mechanics": "Combat au son. Immunisé blind. +50% accuracy vs stealth",
+            "weakness": "Silence effects -40% accuracy"
+          },
+          "searching": {
+            "dialogue": "After each turn: 'Non... pas ici... où... où est-elle?'",
+            "obsession": "Ne poursuit pas si tu fuis (trop occupé à chercher)"
+          }
+        },
+
+        "death": {
+          "standard": {
+            "animation": "Tombe, armure résonne",
+            "laugh": "Rire fantomatique de l'intérieur: 'Peut-être que je n'ai jamais eu de tête...'",
+            "philosophy": "'...que c'était un mensonge que je me racontais pour continuer.'"
+          }
+        },
+
+        "secrets": {
+          "headFound": {
+            "trigger": "Player possède 'Knight's Head' item (1% drop boss)",
+            "action": "Option spéciale: RENDRE LA TÊTE",
+            "reward": "Devient compagnon permanent (Easter Egg)",
+            "stats": "Tank ultime avec abilities soniques"
+          }
+        },
+
+        "drops": {
+          "common": { "item": "Headless Armor", "chance": 50 },
+          "uncommon": { "item": "Echo Steel", "chance": 30 },
+          "rare": { "item": "Runes of Listening", "chance": 20, "effect": "Passive: détecte ennemis invisibles" }
+        }
+      }
+    },
+
+    "BOSSES": {
+      "KEEPER_OF_BONES": {
+        "id": "KEEPER_OF_BONES",
+        "name": "Le Gardien des Os",
+        "nameEN": "The Keeper of Bones",
+        "icon": "💀👑",
+        "floor": 3,
+        "godAffinity": "NOXAR",
+        "tier": "Boss Act 1",
+
+        "stats": {
+          "hp": 500,
+          "attack": 30,
+          "defense": 20,
+          "speed": 8,
+          "phases": 2,
+          "xp": 300,
+          "gold": "200-400"
+        },
+
+        "lore": {
+          "short": "Gardait les tombes sacrées. Devint l'une d'elles.",
+          "full": "Il s'appelait Aldeon. Prêtre de Noxar, Gardien des Catacombes Royales.\n\nSon devoir : protéger les morts. 60 ans. Chaque jour. Seul.\n\n'Les morts ont plus besoin de protection que les vivants', disait-il.\n\nMais quand Noxar mourut, les morts se levèrent. Zombies. Squelettes. Horreurs.\n\nAldeon ne quitta pas son poste. Il combattit. Seul. Contre ses propres protégés.\n\nIl perdit.\n\nMais il ne mourut pas. Il devint... autre chose. Gardien ET Mort. Protecteur ET Menace.\n\nMaintenant, il garde encore. Mais garde quoi? Contre qui?\n\nPeut-être qu'il a oublié. Peut-être qu'il s'en fout.\n\nLe devoir demeure.",
+          "tomb": "Sa tombe dit: 'Ci-gît Aldeon, Gardien Éternel. Il n'a jamais quitté son poste.' C'est à la fois honorable et tragique."
+        },
+
+        "phases": {
+          "PHASE_1": {
+            "hp": "100% → 50%",
+            "pattern": [
+              "Bone Spear: Ranged 35 dmg",
+              "Summon Skeletons: 2 skeleton adds",
+              "Tomb Slam: AOE 40 dmg + stun 1 turn"
+            ],
+            "dialogue": [
+              "'Intrus. Les morts sont sous ma protection.'",
+              "'Tu ne passeras pas. Jamais.'",
+              "'Noxar m'a confié ce devoir. Je ne faillirai pas.'"
+            ],
+            "arena": "Tombstones rise, creates cover but also summon points"
+          },
+
+          "PHASE_2": {
+            "hp": "50% → 0%",
+            "trigger": "Crown cracks, red eyes glow",
+            "pattern": [
+              "Bone Storm: Screen AOE 20 dmg/sec",
+              "Death's Grasp: Pulls player close, 60 dmg grab",
+              "Summon Wraiths: 3 wraith adds (incorporeal)",
+              "Necro Nova: 100 dmg nuke, telegraphed 3 sec"
+            ],
+            "dialogue": [
+              "'NOXAR EST MORT! MAIS MOI... MOI JE RESTE!'",
+              "'500 ANS! 500 ANS J'ATTENDS QU'IL REVIENNE!'",
+              "'Pourquoi?! POURQUOI M'A-T-IL ABANDONNÉ?!'",
+              "'...je suis fatigué. Si fatigué. Mais le devoir... le devoir...'"
+            ],
+            "emotion": "Rage → Désespoir → Résignation"
+          }
+        },
+
+        "defeat": {
+          "standard": {
+            "animation": "Crown falls, kneels, bone body crumbles",
+            "dialogue": "'Enfin... relève... de... garde...'",
+            "reward": "Keeper's Crown (helm, +15 def, undead +30% respect)",
+            "corruption": "+5% (tu as tué quelqu'un qui faisait son devoir)"
+          },
+
+          "mercy": {
+            "trigger": "Reduce HP to 10%, use 'Mercy' emote",
+            "effect": "Keeper stops fighting",
+            "dialogue": [
+              "'Tu... m'épargnes? Pourquoi?'",
+              "'Le devoir... je peux... enfin... reposer?'",
+              "'Merci. Jeune... guerrier. Les morts... sont tiens maintenant.'"
+            ],
+            "reward": "Keeper's Blessing (permanent +10% XP from undead), -10% corruption",
+            "special": "Keeper devient NPC au village (vendor: undead items)"
+          }
+        },
+
+        "drops": {
+          "guaranteed": { "item": "Keeper's Crown", "chance": 100 },
+          "rare": { "item": "Broken Oath (if Shattered Knight)", "chance": 15 },
+          "legendary": { "item": "Duty's End (ring)", "chance": 5 }
+        }
+      },
+
+      "BETRAYER_KING": {
+        "id": "BETRAYER_KING",
+        "name": "Le Roi Traître",
+        "nameEN": "The Betrayer King",
+        "icon": "👑⚔️",
+        "floor": 6,
+        "godAffinity": "THALYS",
+        "tier": "Boss Act 2",
+
+        "stats": {
+          "hp": 800,
+          "attack": 45,
+          "defense": 30,
+          "speed": 12,
+          "phases": 3,
+          "xp": 600,
+          "gold": "500-800"
+        },
+
+        "lore": {
+          "short": "A fait un pacte avec les Dés. A perdu son royaume.",
+          "full": "Roi Varyn. Régnait sur Aethermoor Nord. Royaume prospère. Peuple heureux.\n\nMais Varyn voulait plus. Toujours plus.\n\nIl a trouvé les Dés du Destin dans les Abysses. Thalys lui a parlé:\n\n'Un pacte. Je te donne pouvoir, immortalité, victoires éternelles. Tu me donnes... un jour. Un seul jour de ton royaume.'\n\nVaryn a accepté.\n\nLe lendemain, son royaume... n'existait plus. Effacé. 100 000 âmes. Disparues.\n\nThalys avait pris son 'jour' littéralement. Le jour où le royaume existait.\n\nVaryn hurla. Pleura. Maudit les Dés.\n\nMais le pacte tient. Il est immortel. Puissant. Victorieux.\n\nDe rien. Sur rien. Pour personne.\n\nÉternellement.",
+          "irony": "Il voulait tout. Il a eu tout. Sauf ce qui comptait."
+        },
+
+        "phases": {
+          "PHASE_1": {
+            "hp": "100% → 66%",
+            "pattern": [
+              "Royal Strike: 50 dmg melee",
+              "Command: Summon 2 phantom guards",
+              "King's Decree: AOE slow 50%, 2 turns"
+            ],
+            "dialogue": [
+              "'Je suis ROI! TU DOIS T'AGENOUILLER!'",
+              "'Mon royaume... mon royaume reviendra!'",
+              "'Les Dés m'ont promis! ILS ONT PROMIS!'"
+            ],
+            "crown": "Glows golden, intact"
+          },
+
+          "PHASE_2": {
+            "hp": "66% → 33%",
+            "trigger": "Crown cracks, madness sets in",
+            "pattern": [
+              "Dice Roll: Random effect (1-6 table)",
+              "Phantom Army: 5 ghost soldiers",
+              "Royal Madness: Attacks random (player/adds/self)"
+            ],
+            "diceTable": {
+              "1": "Self-damage 100",
+              "2": "Summon 3 demons",
+              "3": "Heal 200",
+              "4": "Player -50% atk 3 turns",
+              "5": "AOE 60 dmg",
+              "6": "Full heal + enrage"
+            },
+            "dialogue": [
+              "'Les Dés! Ils se moquent! ENCORE!'",
+              "'Mon peuple... où est mon peuple?!'",
+              "'100 000 âmes! POUR QUOI?! POUR RIEN!'"
+            ]
+          },
+
+          "PHASE_3": {
+            "hp": "33% → 0%",
+            "trigger": "Crown shatters, accepts fate",
+            "pattern": [
+              "Betrayer's Lament: Constant aura -10 HP/sec",
+              "Final Gamble: Dice roll, double or nothing (50% instant kill player OR instant death self)",
+              "King's Fall: Telegraphed 200 dmg nuke"
+            ],
+            "dialogue": [
+              "'Je ne voulais que... protéger mon royaume.'",
+              "'Les Dés... Thalys... il savait. Il a toujours su.'",
+              "'Un pacte avec un dieu... je suis un imbécile.'",
+              "'Finis-en. S'il te plaît. Libère-moi.'"
+            ],
+            "emotion": "Rage → Folie → Acceptation"
+          }
+        },
+
+        "defeat": {
+          "standard": {
+            "animation": "Crown shatters, king kneels, whispers 'enfin...'",
+            "dialogue": "'Mon royaume... je les rejoins... enfin...'",
+            "reward": "Betrayer's Crown (helm, +luck but -morale NPC)",
+            "thalys": "Les Dés rient. 'Un autre qui a cru pouvoir négocier. Amusant.'"
+          },
+
+          "silent_archer": {
+            "trigger": "If player = SILENT_ARCHER",
+            "recognition": "'Toi... tu as tué mon... non. Pas mon roi. Un roi. Pas le mien.'",
+            "forgiveness": "'Tu as fait ce que j'aurais dû. Merci.'",
+            "reward": "King's Last Breath (arc légendaire), +special dialogue",
+            "corruption": "-10% (résolution, pas vengeance)"
+          }
+        },
+
+        "drops": {
+          "guaranteed": { "item": "Betrayer's Crown", "chance": 100 },
+          "rare": { "item": "King's Last Breath (if Silent Archer)", "chance": 100 },
+          "legendary": { "item": "Dice Fragment", "chance": 20 }
+        }
+      },
+
+      "THE_DICE_ITSELF": {
+        "id": "THE_DICE_ITSELF",
+        "name": "Les Dés du Destin",
+        "nameEN": "The Dice of Destiny",
+        "icon": "🎲✨",
+        "floor": 10,
+        "godAffinity": "THALYS",
+        "tier": "Final Boss",
+
+        "stats": {
+          "hp": 2000,
+          "attack": "Variable (dice-based)",
+          "defense": "Variable (dice-based)",
+          "speed": 15,
+          "phases": 10,
+          "xp": 2000,
+          "gold": "N/A (ending-based)"
+        },
+
+        "lore": {
+          "short": "Thalys. Le dieu qui devint le RNG lui-même.",
+          "full": "Ce n'est pas un boss.\n\nC'est une conversation.\n\nThalys, le Scelleur des Hasards Contrôlés, s'est transformé volontairement en ces Dés lors du Grand Déchirement.\n\nPourquoi? Pour observer. Pour tester. Pour comprendre.\n\n'Si je deviens le Hasard lui-même', pensait-il, 'je pourrai enfin voir... si le libre arbitre existe.'\n\n500 ans. Il a observé. Des milliers de mortels. Tous face aux Dés.\n\nCertains ont triché. Certains ont prié. Certains ont accepté.\n\nMais toi?\n\nToi, tu es différent. Le Dernier Pactualisé. Lié aux cycles.\n\nAlors Thalys veut savoir:\n\nQui es-tu vraiment?",
+          "truth": "Le combat n'est pas physique. C'est philosophique. Chaque phase = 1 jet de dé (1-10). Chaque résultat = une question existentielle."
+        },
+
+        "phases": {
+          "mechanic": "Le boss roll 1d10. Chaque face = 1 phase différente. Non-linéaire. Chaotique. C'est Thalys.",
+
+          "PHASE_1": {
+            "roll": 1,
+            "name": "L'Échec Total",
+            "effect": "Thalys se moque. Tous tes attacks miss. 1 minute.",
+            "dialogue": "'Un 1. Catastrophique. Comme ta vie. Comme tes choix. Qu'en penses-tu?'",
+            "survive": "Endure 1 min sans mourir = pass"
+          },
+
+          "PHASE_2": {
+            "roll": 2,
+            "name": "Le Sacrifice",
+            "challenge": "Thalys: 'Sacrifie quelque chose. Prouve que tu peux lâcher prise.'",
+            "choice": {
+              "companion": "Kill companion (+40% corruption, pass)",
+              "item": "Destroy legendary item (pass)",
+              "self": "Lose 50% max HP permanent (pass)",
+              "refuse": "Combat standard, Thalys +50% stats"
+            }
+          },
+
+          "PHASE_3": {
+            "roll": 3,
+            "name": "La Tentation",
+            "offer": "Thalys: 'Je t'offre 100% corruption. Pouvoir absolu. Ascension. Maintenant.'",
+            "choice": {
+              "accept": "Instant Ending B (Apotheosis)",
+              "refuse": "Continue fight, Thalys impressed"
+            }
+          },
+
+          "PHASE_6": {
+            "roll": 6,
+            "name": "Le Destin Parfait",
+            "effect": "Thalys te heal 100%, drop legendary item, buffs",
+            "dialogue": "'Un 6. Parfait. Mais... pourquoi? Hasard? Destin? Ou... pitié?'",
+            "twist": "C'est un test. Accepter la chance facile ou la refuser?"
+          },
+
+          "PHASE_10": {
+            "roll": 10,
+            "name": "La Vérité (Secret)",
+            "trigger": "Only if Thalys's Broken Tooth equipped",
+            "reveal": "Thalys se manifeste. Avatar spectral.",
+            "dialogue": [
+              "'Tu portes... une partie de moi.'",
+              "'500 ans. J'ai observé. Testé. Jugé.'",
+              "'Et toi... tu es le premier à...'",
+              "'...à me rendre ce que j'avais perdu: l'espoir.'"
+            ],
+            "choice": {
+              "returnTooth": {
+                "effect": "Thalys pleure (si un dieu peut pleurer)",
+                "blessing": "Permanent +10 luck, Ending C path unlock",
+                "dialogue": "'Merci. Jeune âme. Tu m'as rappelé... pourquoi j'aimais l'humanité.'"
+              },
+              "keepTooth": {
+                "effect": "Thalys comprend",
+                "dialogue": "'Garde-la. Souviens-toi de moi. Pas comme un dieu. Comme... un ami.'",
+                "reward": "Tooth upgraded: 3 rerolls/jour"
+              }
+            }
+          }
+        },
+
+        "endings": {
+          "ENDING_A": {
+            "trigger": "Corruption < 25%, refuse pouvoir",
+            "thalys": "'Tu choisis... l'humanité. Ael'mora avait raison. Vous êtes... magnifiques.'",
+            "effect": "Thalys brise le pacte, tu deviens mortel, free"
+          },
+
+          "ENDING_B": {
+            "trigger": "Corruption > 75%, accept pouvoir",
+            "thalys": "'Alors... le Huitième Dieu naît. Bienvenue, frère.'",
+            "effect": "Tu absorbes Thalys, deviens nouveau dieu"
+          },
+
+          "ENDING_C": {
+            "trigger": "Corruption exactly 50% (±2%), secret conditions",
+            "thalys": "'L'équilibre parfait. Ni pur ni corrompu. Juste... toi.'",
+            "ael_mora": "Ael'mora apparaît. 'Enfin. Quelqu'un a compris.'",
+            "effect": "Third Way unlock, transcendance"
+          }
+        },
+
+        "drops": {
+          "none": "Ending-based rewards, no traditional loot"
+        }
+      }
+    },
+
+    "META": {
+      "totalEnemies": 20,
+      "implemented": 6,
+      "bosses": 3,
+      "corruptionAI": "Enemies react to player corruption 0-100%",
+      "loreDepth": "Every enemy = victim with backstory",
+      "secretInteractions": 12,
+      "dialogueLines": 200,
+      "emotionalGoal": "Player should feel guilty killing at least 3 enemy types"
+    }
+  }
+}

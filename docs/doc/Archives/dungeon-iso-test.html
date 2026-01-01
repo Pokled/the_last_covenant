@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏰 Donjon Isométrique - Test Volume</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #0a0a0f;
+      cursor: crosshair;
+    }
+
+    /* UI Overlay */
+    .ui-overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(10, 10, 15, 0.9);
+      border: 2px solid #d4af37;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      max-width: 300px;
+      pointer-events: none;
+    }
+
+    .ui-overlay h2 {
+      color: #d4af37;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .ui-overlay p {
+      margin: 5px 0;
+      color: #ccc;
+    }
+
+    .ui-overlay .label {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .ui-overlay .value {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 10, 15, 0.9);
+      border: 2px solid #d4af37;
+      padding: 15px 30px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .controls p {
+      margin: 5px 0;
+      color: #d4af37;
+      font-size: 14px;
+    }
+
+    button {
+      margin: 10px 5px 0;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+      color: #d4af37;
+      border: 2px solid #d4af37;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+<!-- UI Info -->
+<div class="ui-overlay">
+  <h2>🏰 Donjon Isométrique</h2>
+  <p><span class="label">Nodes:</span> <span class="value" id="nodeCount">0</span></p>
+  <p><span class="label">Position:</span> <span class="value" id="playerPos">0, 0</span></p>
+  <p><span class="label">Corruption:</span> <span class="value" id="corruption">0%</span></p>
+  <p><span class="label">Camera Zoom:</span> <span class="value" id="zoomLevel">1.5x</span></p>
+  <p><span class="label">FPS:</span> <span class="value" id="fps">60</span></p>
+</div>
+
+<!-- Contrôles -->
+<div class="controls">
+  <p>🎮 Contrôles: Flèches / WASD • Zoom: Molette • Espace: Régénérer</p>
+  <button id="btnRegen">🔄 Nouveau Donjon</button>
+  <button id="btnZoomIn">🔍 Zoom +</button>
+  <button id="btnZoomOut">🔍 Zoom -</button>
+  <button id="btnTogglePaths">👻 Chemins Corrompus</button>
+</div>
+
+<!-- Scripts -->
+<script src="js/organic-dungeon-generator.js"></script>
+<script src="js/isometric-dungeon-renderer.js"></script>
+
+<script>
+/**
+ * 🎮 SYSTÈME DE JEU PRINCIPAL
+ */
+
+class DungeonGame {
+  constructor() {
+    // Générateur de donjon
+    this.generator = new OrganicDungeonGenerator({
+      length: 26,
+      roomFrequency: 0.3,
+      branchChance: 0.15,
+      destinyNodeFrequency: 5
+    });
+
+    // Renderer
+    this.renderer = new IsometricDungeonRenderer('gameCanvas', {
+      tileWidth: 64,
+      tileHeight: 32,
+      wallHeight: 96,
+      tileDepth: 16
+    });
+
+    // État du jeu
+    this.dungeon = null;
+    this.player = {
+      x: 0,
+      y: 0,
+      nodeIndex: 0,
+      corruption: 0,
+      isOnDestinyNode: false
+    };
+
+    // Input
+    this.keys = {};
+    this.showCorruptedPaths = false;
+
+    // FPS
+    this.lastTime = performance.now();
+    this.fps = 60;
+
+    this.init();
+  }
+
+  init() {
+    console.log('🎮 Initialisation du jeu...');
+
+    // Générer le donjon
+    this.regenerateDungeon();
+
+    // Input handlers
+    this.setupInputs();
+
+    // Boucle de rendu
+    this.gameLoop();
+
+    console.log('✅ Jeu initialisé');
+  }
+
+  regenerateDungeon() {
+    console.log('🔄 Régénération du donjon...');
+    
+    const result = this.generator.generate();
+    this.dungeon = result;
+
+    // Placer le joueur au début
+    const startNode = result.mainPath[0];
+    this.player.x = startNode.x;
+    this.player.y = startNode.y;
+    this.player.nodeIndex = 0;
+
+    this.updateUI();
+  }
+
+  setupInputs() {
+    // Clavier
+    window.addEventListener('keydown', (e) => {
+      this.keys[e.key.toLowerCase()] = true;
+
+      // Régénérer avec Espace
+      if (e.key === ' ') {
+        this.regenerateDungeon();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      this.keys[e.key.toLowerCase()] = false;
+    });
+
+    // Zoom avec molette
+    document.getElementById('gameCanvas').addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      this.renderer.camera.zoom = Math.max(0.5, Math.min(3, this.renderer.camera.zoom + delta));
+      this.updateUI();
+    });
+
+    // Boutons
+    document.getElementById('btnRegen').addEventListener('click', () => {
+      this.regenerateDungeon();
+    });
+
+    document.getElementById('btnZoomIn').addEventListener('click', () => {
+      this.renderer.camera.zoom = Math.min(3, this.renderer.camera.zoom + 0.2);
+      this.updateUI();
+    });
+
+    document.getElementById('btnZoomOut').addEventListener('click', () => {
+      this.renderer.camera.zoom = Math.max(0.5, this.renderer.camera.zoom - 0.2);
+      this.updateUI();
+    });
+
+    document.getElementById('btnTogglePaths').addEventListener('click', () => {
+      this.showCorruptedPaths = !this.showCorruptedPaths;
+      console.log(`👻 Chemins corrompus: ${this.showCorruptedPaths ? 'Visibles' : 'Cachés'}`);
+    });
+  }
+
+  update(deltaTime) {
+    // Déplacement du joueur
+    const speed = 0.2;
+
+    if (this.keys['arrowup'] || this.keys['w']) {
+      this.player.y -= speed;
+    }
+    if (this.keys['arrowdown'] || this.keys['s']) {
+      this.player.y += speed;
+    }
+    if (this.keys['arrowleft'] || this.keys['a']) {
+      this.player.x -= speed;
+    }
+    if (this.keys['arrowright'] || this.keys['d']) {
+      this.player.x += speed;
+    }
+
+    // Vérifier si sur un Nœud de Destin
+    const currentNode = this.dungeon.nodes.find(n => 
+      Math.abs(n.x - this.player.x) < 0.5 && Math.abs(n.y - this.player.y) < 0.5
+    );
+
+    if (currentNode) {
+      this.player.isOnDestinyNode = currentNode.isDestinyNode;
+      this.player.nodeIndex = currentNode.index;
+    } else {
+      this.player.isOnDestinyNode = false;
+    }
+
+    this.updateUI();
+  }
+
+  render() {
+    // Filtrer les chemins corrompus si nécessaire
+    const visibleDungeon = {
+      ...this.dungeon,
+      nodes: this.showCorruptedPaths || this.player.corruption >= 15
+        ? this.dungeon.nodes
+        : this.dungeon.nodes.filter(n => !n.isCorrupted)
+    };
+
+    this.renderer.render(visibleDungeon, this.player);
+  }
+
+  updateUI() {
+    document.getElementById('nodeCount').textContent = this.dungeon.nodes.length;
+    document.getElementById('playerPos').textContent = `${this.player.x.toFixed(1)}, ${this.player.y.toFixed(1)}`;
+    document.getElementById('corruption').textContent = `${this.player.corruption}%`;
+    document.getElementById('zoomLevel').textContent = `${this.renderer.camera.zoom.toFixed(1)}x`;
+    document.getElementById('fps').textContent = Math.round(this.fps);
+  }
+
+  gameLoop() {
+    const now = performance.now();
+    const deltaTime = (now - this.lastTime) / 1000;
+    this.lastTime = now;
+
+    // FPS
+    this.fps = 1 / deltaTime;
+
+    // Update
+    this.update(deltaTime);
+
+    // Render
+    this.render();
+
+    // Continue
+    requestAnimationFrame(() => this.gameLoop());
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DÉMARRAGE
+// ═══════════════════════════════════════════════════════════════
+
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('🏰 Démarrage de The Last Covenant - Donjon Isométrique');
+  const game = new DungeonGame();
+  window.game = game; // Pour debug console
+});
+</script>
+
+</body>
+</html>

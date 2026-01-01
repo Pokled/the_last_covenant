@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LAST COVENANT</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main-menu.css">
+    <link rel="stylesheet" href="css/character-select.css">
+</head>
+<body>
+
+    <!-- ====================================
+         TITLE SCREEN (Press Any Key)
+         ==================================== -->
+    <div id="titleScreen" class="title-screen active">
+        <div class="title-background"></div>
+        <div class="title-particles" id="titleParticles"></div>
+
+        <div class="title-content">
+            <h1 class="game-logo">
+                <span class="logo-the">THE</span>
+                <span class="logo-last">LAST</span>
+                <span class="logo-covenant">COVENANT</span>
+            </h1>
+
+            <p class="tagline">
+                Sept Dieux sont morts.<br>
+                Un pacte éternel.<br>
+                Ton destin t'attend.
+            </p>
+
+            <div class="press-any-key">
+                <span class="press-text">Appuie sur n'importe quelle touche</span>
+                <span class="press-blink">_</span>
+            </div>
+        </div>
+
+        <div class="title-footer">
+            <p class="version">Version 0.2 Alpha | THE LAST COVENANT © 2025</p>
+        </div>
+    </div>
+
+    <!-- ====================================
+         MAIN MENU
+         ==================================== -->
+    <div id="mainMenu" class="main-menu">
+        <div class="menu-background"></div>
+        <div class="menu-particles" id="menuParticles"></div>
+        <div class="menu-vignette"></div>
+
+        <!-- Logo (plus petit qu'en title screen) -->
+        <div class="menu-logo">
+            <h2 class="menu-game-title">THE LAST COVENANT</h2>
+        </div>
+
+        <!-- Menu Items -->
+        <nav class="menu-nav">
+            <button class="menu-item" id="menuNewGame" data-action="new-game">
+                <span class="menu-icon">⚔️</span>
+                <span class="menu-label">Nouvelle Partie</span>
+                <span class="menu-hint">Commencer une nouvelle histoire</span>
+            </button>
+
+            <button class="menu-item" id="menuContinue" data-action="continue" disabled>
+                <span class="menu-icon">📖</span>
+                <span class="menu-label">Continuer</span>
+                <span class="menu-hint">Reprendre la dernière partie sauvegardée</span>
+            </button>
+
+            <button class="menu-item" id="menuBestiary" data-action="bestiary">
+                <span class="menu-icon">👹</span>
+                <span class="menu-label">Bestiaire</span>
+                <span class="menu-hint">Découvrir les créatures du donjon</span>
+            </button>
+
+            <button class="menu-item" id="menuOptions" data-action="options">
+                <span class="menu-icon">⚙️</span>
+                <span class="menu-label">Options</span>
+                <span class="menu-hint">Réglages audio, vidéo et gameplay</span>
+            </button>
+
+            <button class="menu-item" id="menuCredits" data-action="credits">
+                <span class="menu-icon">📜</span>
+                <span class="menu-label">Crédits</span>
+                <span class="menu-hint">Les créateurs du Last Covenant</span>
+            </button>
+
+            <button class="menu-item menu-item-quit" id="menuQuit" data-action="quit">
+                <span class="menu-icon">🚪</span>
+                <span class="menu-label">Quitter</span>
+                <span class="menu-hint">Fermer le jeu</span>
+            </button>
+        </nav>
+
+        <!-- Saves Preview (si saves existent) -->
+        <div class="saves-preview" id="savesPreview" style="display: none;">
+            <h3 class="saves-title">Parties Sauvegardées</h3>
+            <div class="saves-list" id="savesList">
+                <!-- Injecté dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Footer info -->
+        <div class="menu-footer">
+            <p class="footer-quote">"Les Dés observent. Choisis sagement."</p>
+            <p class="footer-version">v0.2 Alpha</p>
+        </div>
+    </div>
+
+    <!-- ====================================
+         MODALS
+         ==================================== -->
+
+    <!-- Options Modal -->
+    <div id="optionsModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <button class="modal-close" id="closeOptions">✕</button>
+
+            <h2 class="modal-title">⚙️ Options</h2>
+
+            <div class="options-content">
+                <!-- Audio -->
+                <div class="option-section">
+                    <h3 class="option-section-title">🎵 Audio</h3>
+
+                    <div class="option-row">
+                        <label for="volumeMusic">Musique</label>
+                        <input type="range" id="volumeMusic" min="0" max="100" value="70">
+                        <span id="volumeMusicValue">70%</span>
+                    </div>
+
+                    <div class="option-row">
+                        <label for="volumeSFX">Effets Sonores</label>
+                        <input type="range" id="volumeSFX" min="0" max="100" value="80">
+                        <span id="volumeSFXValue">80%</span>
+                    </div>
+                </div>
+
+                <!-- Vidéo -->
+                <div class="option-section">
+                    <h3 class="option-section-title">🎨 Vidéo</h3>
+
+                    <div class="option-row">
+                        <label for="particlesQuality">Qualité Particules</label>
+                        <select id="particlesQuality">
+                            <option value="low">Faible</option>
+                            <option value="medium" selected>Moyenne</option>
+                            <option value="high">Élevée</option>
+                            <option value="ultra">Ultra</option>
+                        </select>
+                    </div>
+
+                    <div class="option-row">
+                        <label for="screenShake">Screen Shake</label>
+                        <input type="checkbox" id="screenShake" checked>
+                    </div>
+
+                    <div class="option-row">
+                        <label for="bloodEffects">Effets de Sang</label>
+                        <input type="checkbox" id="bloodEffects" checked>
+                    </div>
+                </div>
+
+                <!-- Gameplay -->
+                <div class="option-section">
+                    <h3 class="option-section-title">🎮 Gameplay</h3>
+
+                    <div class="option-row">
+                        <label for="combatSpeed">Vitesse Combat</label>
+                        <select id="combatSpeed">
+                            <option value="slow">Lent</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="fast">Rapide</option>
+                        </select>
+                    </div>
+
+                    <div class="option-row">
+                        <label for="autoSave">Sauvegarde Auto</label>
+                        <input type="checkbox" id="autoSave" checked>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" id="resetOptions">Réinitialiser</button>
+                <button class="btn-primary" id="saveOptions">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credits Modal -->
+    <div id="creditsModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-credits">
+            <button class="modal-close" id="closeCredits">✕</button>
+
+            <h2 class="modal-title">📜 Crédits</h2>
+
+            <div class="credits-content">
+                <div class="credit-section">
+                    <h3>THE LAST COVENANT</h3>
+                    <p class="credit-role">Un jeu dark fantasy roguelike</p>
+                </div>
+
+                <div class="credit-section">
+                    <h3>Design & Développement</h3>
+                    <p>Votre Studio</p>
+                </div>
+
+                <div class="credit-section">
+                    <h3>Narrative Design</h3>
+                    <p>Claude Sonnet 4.5</p>
+                    <p class="credit-small">Lore, Classes, Bestiaire, Systèmes</p>
+                </div>
+
+                <div class="credit-section">
+                    <h3>Inspirations</h3>
+                    <p class="credit-small">
+                        Dark Souls • Hades • Darkest Dungeon<br>
+                        Vampire Survivors • Slay the Spire • Inscryption
+                    </p>
+                </div>
+
+                <div class="credit-section">
+                    <h3>Remerciements Spéciaux</h3>
+                    <p>Aux Sept Dieux Morts</p>
+                    <p class="credit-small">Morwyn • Vyr • Sylthara • Ael'mora<br>Noxar • Krovax • Thalys</p>
+                </div>
+
+                <div class="credit-section credit-final">
+                    <p class="credit-quote">
+                        "Dans THE LAST COVENANT, rien n'est arbitraire.<br>
+                        Chaque système est une manifestation du cosmos brisé."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/safe-utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/character-select.js"></script>
+    <script src="js/main-menu.js"></script>
+
+</body>
+</html>

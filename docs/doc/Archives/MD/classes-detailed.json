@@ -1,0 +1,1400 @@
+{
+  "CLASSES": {
+    "SHATTERED_KNIGHT": {
+      "id": "SHATTERED_KNIGHT",
+      "name": "Chevalier Brisé",
+      "nameEN": "Shattered Knight",
+      "icon": "🛡️",
+      "godAffinity": "MORWYN",
+      "godName": "Morwyn, Scelleur de l'Ordre",
+      "godStatus": "Dévoré en premier. Ses lois persistent, autonomes.",
+
+      "lore": {
+        "short": "Dernier de l'Ordre Sacré. Protège un roi mort depuis 200 ans.",
+        "full": "Tu es le dernier.\n\nL'Ordre Sacré de Morwyn comptait 10 000 chevaliers. Tous morts. Tous oubliés.\n\nTu patrouilles encore les ruines du château. Tu montes la garde devant un trône vide. Tu attends des ordres d'un roi dont les os sont poussière.\n\nPourquoi?\n\nParce que l'Ordre demeure. Morwyn est mort, mais ses Lois... elles, vivent encore.\n\nTu es le dernier. Quand tu tomberas, qui se souviendra?\n\nPeut-être personne. Peut-être que c'est ça, l'honneur.",
+        "backstory": "Tu as juré de protéger le Roi Aldric III. Il est mort il y a 200 ans, assassiné pendant que tu dormais. Tu n'as pas dormi depuis."
+      },
+
+      "playStyle": {
+        "archetype": "Tank défensif avec mécaniques de serment",
+        "difficulty": "Moyen",
+        "strengths": ["Haute défense", "Protège alliés", "Serments donnent buffs puissants"],
+        "weaknesses": ["Faible DPS", "Lent", "Briser serments = pénalités sévères"]
+      },
+
+      "baseStats": {
+        "hp": 150,
+        "attack": 12,
+        "defense": 25,
+        "speed": 8,
+        "critChance": 5,
+        "luck": 10
+      },
+
+      "mechanics": {
+        "SACRED_OATH": {
+          "name": "Serment Sacré",
+          "type": "Passive Core",
+          "desc": "Au début de chaque étage, choisir 1 serment parmi 3",
+          "options": {
+            "OATH_PROTECT": {
+              "name": "Serment de Protection",
+              "effect": "Alliés +30% def, toi -20% atk",
+              "loreReason": "Morwyn enseignait : protéger est plus noble qu'attaquer",
+              "breakCondition": "Un allié meurt sous ta protection",
+              "penalty": "+10% corruption, lose serment, -5% def permanent"
+            },
+            "OATH_PUNISH": {
+              "name": "Serment de Punition",
+              "effect": "Enemies tués en <3 tours : +50% dmg sur prochain ennemi (stack)",
+              "loreReason": "La justice doit être rapide et absolue",
+              "breakCondition": "Combat dure >5 tours",
+              "penalty": "+5% corruption, lose stacks"
+            },
+            "OATH_ENDURE": {
+              "name": "Serment d'Endurance",
+              "effect": "Ne pas heal pendant 5 combats : unlock Morwyn's Blessing (+50 max HP, +10 def)",
+              "loreReason": "La souffrance forge les champions",
+              "breakCondition": "Utiliser heal ou potion",
+              "penalty": "Lose tous stacks, recommencer"
+            }
+          },
+          "special": "Si corruption < 20%, peut tenir 2 serments simultanément"
+        },
+
+        "LAST_STAND": {
+          "name": "Dernier Rempart",
+          "type": "Active Skill",
+          "unlock": "Level 3",
+          "trigger": "PV ≤ 10%",
+          "effect": "Invincible 1 tour, puis heal 50% PV",
+          "cost": "+15% corruption",
+          "cooldown": "1 per combat",
+          "loreReason": "Morwyn protège encore ses champions. Chaque miracle a un prix.",
+          "visual": "Spectral armor of Morwyn appears, golden aura",
+          "dialogue": "Une voix lointaine : 'Lève-toi, champion. L'Ordre demeure.'"
+        },
+
+        "SHIELD_WALL": {
+          "name": "Mur de Boucliers",
+          "type": "Active Skill",
+          "unlock": "Level 5",
+          "effect": "Block next attack (100%), riposte +80% dmg",
+          "cost": "20 stamina",
+          "cooldown": "3 tours",
+          "upgrade": {
+            "level7": "Block aussi AOE",
+            "level10": "Riposte hit tous enemies dans 2m radius"
+          }
+        },
+
+        "MORWYN_JUDGMENT": {
+          "name": "Jugement de Morwyn",
+          "type": "Ultimate",
+          "unlock": "Level 10",
+          "effect": "AOE divine dmg, +200% vs corrupted enemies, purify 1 enemy (remove corruption, devient ally 3 tours)",
+          "cost": "100% stamina + 1 serment actif consumed",
+          "cooldown": "1 per floor",
+          "loreReason": "Morwyn jugeait avec sagesse. Punir ou pardonner.",
+          "visual": "Pillar of light, spectral Morwyn judges",
+          "corruption": {
+            "pure": "Purify dure 5 tours au lieu de 3",
+            "corrupted": "Cannot purify, only dmg, +50% guilt corruption"
+          }
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Chevalier Pur",
+          "visualChange": "Armor shines, white aura",
+          "effects": [
+            "Serments +50% effet",
+            "+20% dmg vs corrupted enemies",
+            "NPCs trust you (+20% shop discount)"
+          ],
+          "dialogue": "Tu es resté pur. Morwyn serait fier. Où qu'il soit."
+        },
+
+        "GREY": {
+          "range": [26, 75],
+          "name": "Chevalier Gris",
+          "visualChange": "Armor tarnished, eyes darker",
+          "effects": [
+            "Peut briser serments volontairement pour bonus temporaire (+100% atk 2 tours)",
+            "Serments normaux, pas bonus",
+            "Unlock skill 'Flexible Honor' - change serment mid-floor"
+          ],
+          "dialogue": "L'honneur absolu est un luxe. Parfois, survivre suffit."
+        },
+
+        "FALLEN": {
+          "range": [76, 100],
+          "name": "Chevalier Déchu",
+          "visualChange": "Armor black, red eyes, demonic aura",
+          "effects": [
+            "Serments inversés (protéger = +dmg, punir = +heal, endurer = +speed)",
+            "+100% all stats, -50% max HP",
+            "NPCs terrifiés, enemies parfois fuient"
+          ],
+          "dialogue": "Tu es devenu ce que tu combattais. Morwyn te maudit. Ou te plaint.",
+          "uniqueSkill": {
+            "FALLEN_OATH": {
+              "name": "Serment Brisé",
+              "effect": "Consume tous serments : +500% dmg 1 hit, puis lose 90% def 3 tours",
+              "lore": "Briser tout ce que tu étais. Pour un instant de puissance absolue."
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 150, "atk": 12, "def": 25, "unlock": "Sacred Oath" },
+        "level3": { "hp": 180, "atk": 15, "def": 30, "unlock": "Last Stand" },
+        "level5": { "hp": 220, "atk": 18, "def": 38, "unlock": "Shield Wall" },
+        "level7": { "hp": 270, "atk": 22, "def": 48, "unlock": "Shield Wall Upgrade" },
+        "level10": { "hp": 350, "atk": 28, "def": 65, "unlock": "Morwyn Judgment" }
+      },
+
+      "uniqueDialogue": [
+        "Mon roi est mort. Je le sais. Mais l'ordre demeure.",
+        "Morwyn nous a abandonnés. Mais nos serments, eux, sont éternels.",
+        "Je suis le dernier. Quand je tomberai, qui se souviendra de l'Ordre?",
+        "200 ans. J'ai veillé 200 ans. Est-ce de la fidélité... ou de la folie?",
+        "Parfois, je rêve. De déposer mon bouclier. De dormir. Vraiment dormir."
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "BROKEN_OATH": "Quest unlock 'Réparer le Serment'",
+          "KINGS_CROWN": "Dialogue: 'La couronne de mon roi. Je l'ai échoué une fois. Jamais plus.'"
+        },
+        "enemies": {
+          "SKELETON_WARRIOR": "Mutual respect, combat +10% XP",
+          "CORRUPTED_KNIGHT": "Dialogue: 'Frère... qu'es-tu devenu?'"
+        },
+        "npcs": {
+          "BLACKSMITH": "Discount 30% si corruption < 20%",
+          "PRIEST": "Propose absolution gratuite (reduce corruption -5%)"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Rusty Longsword (10 dmg)",
+        "armor": "Tarnished Plate (15 def)",
+        "accessory": "Oath Ring (Serments +10% effet)"
+      }
+    },
+
+    "WITCH_OF_ASHES": {
+      "id": "WITCH_OF_ASHES",
+      "name": "Sorcière des Cendres",
+      "nameEN": "Witch of Ashes",
+      "icon": "🔥",
+      "godAffinity": "VYR",
+      "godName": "Vyr, Scelleuse de la Magie Primordiale",
+      "godStatus": "S'est consumée elle-même. Sa magie erre sans maître.",
+
+      "lore": {
+        "short": "A brûlé son village pour le sauver. 400 morts. 19 ans.",
+        "full": "La peste démoniaque.\n\nTon village. 400 âmes. Tous infectés. Tu as vu les premiers signes : yeux noirs, peau grise, murmures du Vide.\n\nDans 3 jours, ils deviendraient des Hybrids. Monstres. Perdus à jamais.\n\nTu avais 19 ans. Apprentie sorcière. Tu connaissais UN sort : Flamme.\n\nAlors tu as fait ce que personne d'autre n'osait.\n\nTu as brûlé. Tout. Tous.\n\n400 hurlements. Puis silence. Puis cendres.\n\nIls disent que tu les as sauvés. Toi, tu entends leurs cris. Chaque nuit.\n\nPeut-être que c'est ça, sauver. Peut-être que c'est juste tuer proprement.",
+        "backstory": "Le village s'appelait Ashveil. Maintenant, c'est juste... cendres. Tu portes un collier avec 400 petites perles. Une pour chacun. Tu connais leurs noms."
+      },
+
+      "playStyle": {
+        "archetype": "Glass cannon avec ressource Cendres",
+        "difficulty": "Difficile",
+        "strengths": ["DPS explosif", "AOE puissant", "Scaling via Cendres"],
+        "weaknesses": ["Très faible HP", "Self-damage", "Gestion ressource complexe"]
+      },
+
+      "baseStats": {
+        "hp": 80,
+        "attack": 8,
+        "magicPower": 35,
+        "defense": 10,
+        "speed": 12,
+        "critChance": 18,
+        "luck": 8
+      },
+
+      "mechanics": {
+        "ASH_RESOURCE": {
+          "name": "Cendres",
+          "type": "Resource System",
+          "max": 100,
+          "generation": {
+            "killEnemy": "+10 Cendres",
+            "takeDamage": "+5 Cendres",
+            "allyDies": "+30 Cendres (si Cage companion présent)",
+            "burnSelf": "+15 Cendres (via Immolation)"
+          },
+          "consumption": "Spells coûtent Cendres ET mana",
+          "loreReason": "La mort nourrit le feu. Vyr l'a compris trop tard."
+        },
+
+        "IMMOLATION": {
+          "name": "Immolation",
+          "type": "Active Skill (Core)",
+          "unlock": "Level 1",
+          "cost": "30% PV actuels + 20 Cendres",
+          "effect": "Next spell x3 damage, AOE radius x2",
+          "visual": "Flames erupt from body, skin cracks glowing",
+          "loreReason": "Tu te brûles comme Vyr. Peut-être trouveras-tu ce qu'elle cherchait.",
+          "dialogue": "Ça brûle. Tellement. Mais c'est... familier. Comme rentrer chez soi.",
+          "corruption": "+2% per use"
+        },
+
+        "FIREBALL": {
+          "name": "Boule de Feu",
+          "type": "Active Spell",
+          "unlock": "Level 1",
+          "cost": "20 mana + 15 Cendres",
+          "damage": "40 fire dmg + (Cendres/10)",
+          "cooldown": "2 tours",
+          "upgrade": {
+            "level3": "+10 dmg",
+            "level5": "AOE 2m radius",
+            "level7": "Si enemy <30% HP, instant kill (consume +30 Cendres)"
+          }
+        },
+
+        "PHOENIX_REBIRTH": {
+          "name": "Renaissance du Phénix",
+          "type": "Passive Ultimate",
+          "unlock": "Level 7",
+          "trigger": "Mourir avec 100 Cendres",
+          "effect": "Ressusciter avec 30% PV, explosion AOE 200 fire dmg",
+          "cost": "Consume 100 Cendres + 25% corruption",
+          "cooldown": "1 per run",
+          "loreReason": "Vyr est morte. Mais le feu, lui, est éternel.",
+          "visual": "Phoenix of flame rises from ashes, screams of 400 souls",
+          "dialogue": "Tu renais. Comme Vyr aurait dû. Mais à quel prix? Les 400 pleurent.",
+          "special": "Si corruption > 70%, phoenix devient Black Phoenix (+50% dmg mais allies prennent fire dmg)"
+        },
+
+        "ASHEN_RAIN": {
+          "name": "Pluie de Cendres",
+          "type": "Ultimate AOE",
+          "unlock": "Level 10",
+          "cost": "80 Cendres + 50 mana",
+          "effect": "AOE screen-wide, 80 dmg/sec pendant 5 sec, enemies -50% vision",
+          "loreReason": "Les cendres du village tombent encore. Partout où tu vas.",
+          "visual": "Ash falls from sky, whispers of names audible",
+          "dialogue": "Aldrin. Mira. Thomas. Elena. Sarah... (400 noms, aléatoires)"
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Pyromancienne Contrôlée",
+          "visualChange": "Flames orange/yellow, controlled",
+          "effects": [
+            "Immolation coûte 15% HP au lieu de 30%",
+            "Spell dmg -20%",
+            "+Unlock 'Healing Flame' spell (rare fire heal)"
+          ],
+          "dialogue": "Tu contrôles le feu. Il ne te contrôle pas. Vyr serait... soulagée?"
+        },
+
+        "BALANCED": {
+          "range": [26, 75],
+          "name": "Sorcière Équilibrée",
+          "visualChange": "Flames red/orange, flickering",
+          "effects": [
+            "Balance normale damage/cost",
+            "Unlock 'Controlled Burn' - dépenser Cendres pour heal (50 Cendres = 30% HP)"
+          ],
+          "dialogue": "Le feu donne. Le feu prend. Tu as appris l'équilibre."
+        },
+
+        "CORRUPTED": {
+          "range": [76, 100],
+          "name": "Flamme Vivante",
+          "visualChange": "Flames black/purple, body half-burned, eyes ember",
+          "effects": [
+            "Tous spells +200% dmg",
+            "Tous spells coûtent 50% PV actuels (no mana cost)",
+            "Passive : enemies dans 3m prennent 10 dmg/sec",
+            "Alliés aussi prennent dmg (danger)"
+          ],
+          "dialogue": "Tu n'es plus sorcière. Tu ES le feu. Vyr te regarde. Terrifiée. Fière.",
+          "uniqueSkill": {
+            "BECOME_FLAME": {
+              "name": "Devenir Flamme",
+              "effect": "Transform en flamme pure 10 sec : invincible, +1000% dmg, cannot control direction",
+              "cost": "80% current HP",
+              "loreReason": "Vyr a fait ça. Une fois. Elle ne s'est jamais reformée."
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 80, "mgc": 35, "def": 10, "unlock": "Ash Resource + Immolation + Fireball" },
+        "level3": { "hp": 95, "mgc": 45, "def": 12, "unlock": "Fireball upgrade" },
+        "level5": { "hp": 110, "mgc": 60, "def": 14, "unlock": "Fireball AOE" },
+        "level7": { "hp": 130, "mgc": 80, "def": 16, "unlock": "Phoenix Rebirth" },
+        "level10": { "hp": 160, "mgc": 110, "def": 20, "unlock": "Ashen Rain" }
+      },
+
+      "uniqueDialogue": [
+        "Ils me pardonnent, disent-ils. Les 400. Mais je ne me pardonnerai jamais.",
+        "J'avais 19 ans. Une nuit. Un choix. 400 morts. C'est ça, grandir?",
+        "Parfois, j'entends leurs voix. 'Tu as bien fait.' Mais... ai-je vraiment?",
+        "Le feu purifie, disait Vyr. Mensonge. Le feu... détruit. C'est tout.",
+        "Mira avait 8 ans. Elle m'appelait 'grande sœur'. J'ai brûlé sa maison en premier. Pour qu'elle ne souffre pas longtemps."
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "VILLAGE_ASHES_CLOAK": "Dialogue avec les 400, unlock ending variant",
+          "VILLAGE_FLAME": "Double Cendres generation"
+        },
+        "enemies": {
+          "FIRE_ELEMENTAL": "Ne t'attaque pas si corruption > 60% (te reconnaît)",
+          "DEMON": "Si tu utilises Immolation, demons hésitent 1 tour (smell kin)"
+        },
+        "zones": {
+          "BURNED_VILLAGE": "Flashbacks, -10% corruption si tu pries à l'église ruinée"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Charred Staff (15 magic dmg)",
+        "armor": "Ash Robes (8 def, +20 max Cendres)",
+        "accessory": "400 Souls Necklace (+5% Cendres generation, hear whispers)"
+      }
+    },
+
+    "HOLLOW_ROGUE": {
+      "id": "HOLLOW_ROGUE",
+      "name": "Voleur Creux",
+      "nameEN": "Hollow Rogue",
+      "icon": "🗡️",
+      "godAffinity": "SYLTHARA",
+      "godName": "Sylthara, Scelleuse des Destinées Tissées",
+      "godStatus": "S'est effilochée. Ses fils pendent dans le Vide.",
+
+      "lore": {
+        "short": "A volé la Mort elle-même. Ne peut ni mourir ni vivre. Creux.",
+        "full": "Tu es descendu dans les Abysses les plus profondes.\n\nPas pour l'or. Pas pour la gloire.\n\nPour voler à la Mort elle-même.\n\nTu as trouvé le fil de ton destin, tissé par Sylthara il y a mille ans. Tu l'as coupé.\n\nDepuis, tu es... creux.\n\nTu ne peux pas mourir. Mais tu ne vis pas vraiment non plus.\n\nLa faim ne te touche plus. La soif, non plus. La joie? La peur? Oubliées.\n\nTu es vide. Entre deux états. Voleur même de ta propre existence.\n\nSylthara te regarde, effilochée. Elle rit. Ou pleure. Difficile à dire.",
+        "backstory": "Avant, tu avais un nom. Une famille. Des peurs, des espoirs. Mais quand tu as coupé ton fil... tu as oublié. Tu es juste... le Creux."
+      },
+
+      "playStyle": {
+        "archetype": "High risk high reward, dodge-based",
+        "difficulty": "Très difficile",
+        "strengths": ["Esquive parfaite", "Burst dmg énorme", "Vol de buffs/debuffs"],
+        "weaknesses": ["Cannot heal normalement", "Faible HP", "Un coup = mort si fail dodge"]
+      },
+
+      "baseStats": {
+        "hp": 100,
+        "attack": 20,
+        "defense": 8,
+        "speed": 18,
+        "critChance": 30,
+        "critDamage": 200,
+        "luck": 15,
+        "dodge": 25
+      },
+
+      "mechanics": {
+        "STOLEN_FATES": {
+          "name": "Destins Volés",
+          "type": "Resource System (Core)",
+          "max": 3,
+          "recharge": {
+            "killBoss": "+1 Destin Volé",
+            "sacrificeCompanion": "+1 Destin Volé (+25% corruption)",
+            "cageChoice": "+1 si tu choisis 'Voler les deux' (secret option, 60% corruption)"
+          },
+          "usage": "Consommer 1 charge = esquive parfaite (100% dodge) next hit",
+          "loreReason": "Tu voles le destin d'autrui. Sylthara tisse encore, mais pour toi.",
+          "cost": "+3% corruption per use"
+        },
+
+        "HOLLOWNESS": {
+          "name": "Vacuité",
+          "type": "Passive (Core)",
+          "effect": {
+            "negative": "Cannot heal via potions, shrines, spells",
+            "positive": "Lifesteal 30% sur toutes attaques",
+            "immune": "Poison, disease, bleeding (tu es creux, rien ne coule)"
+          },
+          "loreReason": "Tu es creux. Seul ce que tu prends peut te remplir.",
+          "visual": "Health bar = grey outline, fills red only via lifesteal"
+        },
+
+        "THREAD_CUT": {
+          "name": "Couper le Fil",
+          "type": "Active Execute",
+          "unlock": "Level 3",
+          "cost": "1 Destin Volé",
+          "effect": "Instant kill si enemy PV < 40%",
+          "failPenalty": "Si > 40% PV, toi -50% PV actuels",
+          "loreReason": "Sylthara coupait les fils avec certitude. Toi, tu devines.",
+          "visual": "Silver thread appears, scissors cut, enemy dissolves",
+          "dialogue": {
+            "success": "Le fil se coupe. Une vie... terminée. Tu ne sens rien.",
+            "fail": "Tu rates. Le fil se rétracte. Il te coupe. Ça... fait mal? Tu ne sais plus."
+          }
+        },
+
+        "SHADOW_STEP": {
+          "name": "Pas d'Ombre",
+          "type": "Active Mobility",
+          "unlock": "Level 5",
+          "cost": "30 stamina",
+          "effect": "Teleport 5m, next attack +100% dmg, untargetable 1 sec",
+          "cooldown": "4 tours",
+          "upgrade": {
+            "level7": "Can teleport to any shadow in vision",
+            "level10": "Leave shadow clone (taunts enemies 3 sec)"
+          }
+        },
+
+        "STEAL_EXISTENCE": {
+          "name": "Voler l'Existence",
+          "type": "Ultimate",
+          "unlock": "Level 10",
+          "cost": "All 3 Destins Volés",
+          "effect": "Swap PV% avec enemy target (si enemy 80% HP, tu deviens 80%, lui devient ton %)",
+          "special": "Vole aussi 1 buff permanent de l'ennemi",
+          "cooldown": "1 per floor",
+          "loreReason": "Tu voles même l'existence. Sylthara te regarde. Horrifiée. Admirative.",
+          "corruption": "+20% corruption"
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Voleur Réticent",
+          "visualChange": "Normal appearance, faint grey eyes",
+          "effects": [
+            "Lifesteal reduced to 20%",
+            "Destins Volés regenerent lentement (1 per 3 floors)",
+            "Peut heal via companion proximity (+5 HP/sec si companion near)"
+          ],
+          "dialogue": "Tu résistes. Tu ne veux pas voler. Mais... c'est la seule façon de survivre."
+        },
+
+        "BALANCED": {
+          "range": [26, 75],
+          "name": "Ombre Équilibrée",
+          "visualChange": "Half-transparent, eyes silver",
+          "effects": [
+            "Lifesteal normal (30%)",
+            "Unlock 'Borrow Fate' - prendre temporairement Destin d'ally (ally -1, toi +1, dure 1 floor)"
+          ],
+          "dialogue": "Tu prends. Tu rends. Parfois. L'équilibre du Vide."
+        },
+
+        "CORRUPTED": {
+          "range": [76, 100],
+          "name": "Vide Ambulant",
+          "visualChange": "Fully transparent, only outline visible, eyes = black holes",
+          "effects": [
+            "Lifesteal +60%",
+            "Destins Volés max = 5 (au lieu de 3)",
+            "Passive: Enemies dans 2m lose 1% max HP/sec (tu voles leur existence passivement)",
+            "Alliés uncomfortable (-10 morale si trop proche)"
+          ],
+          "dialogue": "Tu n'es plus rien. Juste un trou. Un vide qui aspire. Sylthara pleure. Toi... rien.",
+          "uniqueSkill": {
+            "BECOME_VOID": {
+              "name": "Devenir le Vide",
+              "effect": "Invincible 5 sec, cannot attack, absorbe ALL dmg in 5m radius (heal toi)",
+              "cost": "3 Destins Volés + 30% corruption",
+              "danger": "Allies aussi absorbés si trop proches"
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 100, "atk": 20, "def": 8, "unlock": "Stolen Fates + Hollowness" },
+        "level3": { "hp": 115, "atk": 28, "def": 10, "unlock": "Thread Cut" },
+        "level5": { "hp": 135, "atk": 38, "def": 12, "unlock": "Shadow Step" },
+        "level7": { "hp": 160, "atk": 50, "def": 15, "unlock": "Shadow Step upgrade" },
+        "level10": { "hp": 200, "atk": 70, "def": 20, "unlock": "Steal Existence" }
+      },
+
+      "uniqueDialogue": [
+        "Je ne me souviens plus de mon nom. Était-ce important?",
+        "Sylthara m'a regardé couper mon fil. Elle n'a rien dit. Peut-être qu'elle comprenait.",
+        "Vivre sans mourir. Mourir sans vivre. C'est ça, être creux.",
+        "Parfois, je crois sentir quelque chose. Joie? Peur? Puis rien. Toujours rien.",
+        "Ils me craignent. Les vivants. Ils sentent le Vide. Ils ont raison."
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "HOLLOW_EDGE": "Reconnaissance, +10% crit permanent",
+          "THREAD_RING": "Max Destins Volés +1"
+        },
+        "enemies": {
+          "VOID_SPAWN": "Ne t'attaque pas (te reconnaît comme kin)",
+          "SYLTHARA_ECHO": "Boss spécial, dialogue: 'Tu as coupé... comme moi.'"
+        },
+        "ending": {
+          "special": "Si corruption exactement 50%, Sylthara te retisse un nouveau fil (second chance)"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Fate's Edge (18 dmg, +15% lifesteal)",
+        "armor": "Hollow Cloak (6 def, +10% dodge)",
+        "accessory": "Cut Thread (Start with 3 Destins Volés)"
+      }
+    },
+
+    "PENITENT": {
+      "id": "PENITENT",
+      "name": "Pénitent",
+      "nameEN": "Penitent",
+      "icon": "🙏",
+      "godAffinity": "AEL_MORA",
+      "godName": "Ael'mora, Scelleuse de la Fin Douce",
+      "godStatus": "A choisi de disparaître. Aucune trace. Le seul dieu libre.",
+
+      "lore": {
+        "short": "A prié 40 jours pour que les dieux reviennent. Le 41e jour, elle s'est répondu elle-même.",
+        "full": "40 jours. 40 nuits. Sans eau. Sans nourriture. Juste... la prière.\n\n'Ael'mora, déesse de la Fin Douce, reviens. Nous avons besoin de toi.'\n\nSilence.\n\n'Morwyn, dieu de l'Ordre, guide-nous. Nous sommes perdus.'\n\nSilence.\n\n'N'importe qui. N'importe quel dieu. Répondez.'\n\nSilence.\n\nLe 40e jour, tu ne pouvais plus te lever. Les chaînes de pénitence trop lourdes. Le corps brisé.\n\nLe 41e jour, une voix répondit.\n\nMais ce n'était pas un dieu.\n\nC'était toi.\n\n'Si les dieux ne répondent pas... je répondrai moi-même.'",
+        "backstory": "Tu portais 40 chaînes. Une par jour de prière. Le 41e jour, tu les as toutes brisées. Toutes... sauf une. Celle de l'espoir."
+      },
+
+      "playStyle": {
+        "archetype": "Support/healer avec mécaniques de foi paradoxale",
+        "difficulty": "Moyen",
+        "strengths": ["Heals puissants", "Buffs alliés", "Balance corruption naturellement"],
+        "weaknesses": ["Faible DPS direct", "Dépend de patience", "Vulnérable si seul"]
+      },
+
+      "baseStats": {
+        "hp": 120,
+        "attack": 10,
+        "magicPower": 25,
+        "defense": 15,
+        "speed": 10,
+        "healPower": 40,
+        "luck": 12
+      },
+
+      "mechanics": {
+        "SILENT_FAITH": {
+          "name": "Foi Silencieuse",
+          "type": "Core Passive",
+          "desc": "Plus tu restes sans attaquer, plus tu es fort",
+          "mechanic": "Chaque tour sans action offensive : +1 stack Foi (max 10)",
+          "benefits": {
+            "perStack": "+10% heal power, +5% def",
+            "at5Stacks": "Unlock 'Divine Shield' (absorb 100 dmg)",
+            "at10Stacks": "Unlock 'Revelation' (AOE heal 50% + cleanse)"
+          },
+          "release": {
+            "trigger": "Attaquer consume tous stacks",
+            "effect": "Burst holy dmg = 50 + (stacks × 30)",
+            "visual": "Pillar of light, angelic sound"
+          },
+          "loreReason": "Ael'mora a trouvé la puissance dans l'absence. Toi aussi."
+        },
+
+        "MARTYRDOM": {
+          "name": "Martyre",
+          "type": "Active Skill",
+          "unlock": "Level 3",
+          "effect": "Transférer damage reçus à un allié (companion ou NPC)",
+          "mechanic": "Next hit sur toi = absorbed by target ally",
+          "cost": {
+            "ally": "-50% HP de l'allié",
+            "corruption": "+10%",
+            "guilt": "Si allié meurt à cause de ça, +25% corruption"
+          },
+          "cooldown": "3 tours",
+          "loreReason": "Ael'mora a sacrifié sa divinité. Tu sacrifies ceux qui te font confiance.",
+          "dialogue": {
+            "use": "Pardonne-moi. C'est pour le bien de tous.",
+            "allyDeath": "Je... je ne voulais pas... pardon..."
+          }
+        },
+
+        "PRAYER_OF_AEL_MORA": {
+          "name": "Prière de Ael'mora",
+          "type": "Active Heal",
+          "unlock": "Level 1",
+          "cost": "30 mana",
+          "effect": "Heal ally 40% HP + remove 1 debuff",
+          "channel": "2 secondes (interruptible)",
+          "upgrade": {
+            "level5": "Heal +60%, remove all debuffs",
+            "level7": "AOE 5m radius",
+            "level10": "Resurrect ally si mort <5 sec ago (1/floor, +30% corruption)"
+          }
+        },
+
+        "THE_THIRD_WAY": {
+          "name": "La Troisième Voie",
+          "type": "Ultimate Secret",
+          "unlock": "Corruption exactement 50% (±2%) en fin de run",
+          "effect": "Access to True Ending (Ending C)",
+          "loreReason": "Ael'mora a refusé de dévorer ou être dévorée. L'équilibre parfait.",
+          "dialogue": "Ni pur ni corrompu. Ni vivant ni mort. Juste... en équilibre. Ael'mora sourit.",
+          "reward": "Secret ending path, dialogue avec Ael'mora elle-même"
+        },
+
+        "BURDEN_BEARER": {
+          "name": "Porteur de Fardeaux",
+          "type": "Passive",
+          "unlock": "Level 7",
+          "effect": "Absorbe 20% corruption des alliés proches",
+          "mechanic": "Chaque repos, absorbe corruption de companions (max 10%/ally)",
+          "cost": "Tu gagnes leur corruption",
+          "benefit": "Alliés purifiés, +20% stats",
+          "danger": "Peut te pousser vers seuils de corruption",
+          "loreReason": "Tu portes les péchés d'autrui. Comme Ael'mora portait les dieux."
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Sainte Pure",
+          "visualChange": "White robes glow, halo subtle",
+          "effects": [
+            "Heals +50% power",
+            "Immune à corruption passive des zones",
+            "NPCs trust +40%",
+            "Unlock 'Miracle' skill (resurrect ally, 1/run, 0 corruption cost)"
+          ],
+          "dialogue": "Tu es restée pure. Ael'mora te regarde. Elle pleure. De joie."
+        },
+
+        "BALANCED": {
+          "range": [26, 75],
+          "name": "Pénitente Équilibrée",
+          "visualChange": "Robes grey, eyes calm",
+          "effects": [
+            "Heals standard",
+            "Peut alterner purify/corrupt allies (strategic)",
+            "Unlock 'Balance' aura (alliés dans 5m = forced 50% corruption)"
+          ],
+          "dialogue": "Ni sainte ni damné. Tu marches sur le fil. Ael'mora approuve."
+        },
+
+        "CORRUPTED": {
+          "range": [76, 100],
+          "name": "Prophète Sombre",
+          "visualChange": "Robes black, eyes void, dark halo",
+          "effects": [
+            "Heals deviennent 'Dark Heals' (heal + damage enemies nearby)",
+            "Prayer of Ael'mora → Prayer of the Void (heal + corrupt)",
+            "Martyrdom tue l'allié instantanément, heal toi 100%",
+            "Allies terrifiés, -30 morale village"
+          ],
+          "dialogue": "Tu as prié les dieux morts. Ils t'ont répondu. Mais c'étaient des démons.",
+          "uniqueSkill": {
+            "FALSE_PROPHET": {
+              "name": "Faux Prophète",
+              "effect": "Convince enemy to worship you (charm permanent, devient ally)",
+              "cost": "+20% corruption per enemy converted",
+              "danger": "Si >5 enemies converted, unlock Ending B variant (cult leader)"
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 120, "heal": 40, "def": 15, "unlock": "Silent Faith + Prayer" },
+        "level3": { "hp": 140, "heal": 50, "def": 18, "unlock": "Martyrdom" },
+        "level5": { "hp": 165, "heal": 65, "def": 22, "unlock": "Prayer upgrade" },
+        "level7": { "hp": 195, "heal": 85, "def": 28, "unlock": "Burden Bearer" },
+        "level10": { "hp": 240, "heal": 120, "def": 35, "unlock": "Resurrection" }
+      },
+
+      "uniqueDialogue": [
+        "J'ai prié 40 jours. Personne n'a répondu. Le 41e jour, j'ai compris : je suis la réponse.",
+        "Ael'mora n'est pas morte. Elle a choisi le silence. Il y a une différence.",
+        "Porter les chaînes, c'est facile. Les briser... ça, c'est la vraie foi.",
+        "Parfois, je l'entends. Ael'mora. Elle murmure : 'Continue.'",
+        "Les dieux sont morts. Mais l'espoir... l'espoir, lui, vit encore."
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "PENITENT_CHAINS": "Dialogue spécial, unlock Ael'mora vision si 50% corruption",
+          "AEL_MORA_TEAR": "Double effect si Pénitent équipe"
+        },
+        "zones": {
+          "AEL_MORA_SHRINE": "Prière donne -15% corruption au lieu de -5%"
+        },
+        "ending": {
+          "ENDING_C": "Pénitent a le plus facile accès (faith = balance naturel)"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Prayer Beads (12 magic dmg, +10 heal power)",
+        "armor": "Penitent Chains (13 def, +1 stack Foi/tour)",
+        "accessory": "Hope's Last Thread (Start Faith stacks at 3)"
+      }
+    },
+
+    "BLOODBOUND": {
+      "id": "BLOODBOUND",
+      "name": "Sanguelié",
+      "nameEN": "Bloodbound",
+      "icon": "🩸",
+      "godAffinity": "NOXAR",
+      "godName": "Noxar, Scelleur de la Mort et Passeur d'Âmes",
+      "godStatus": "Dévoré en dernier. Son essence hante chaque cadavre.",
+
+      "lore": {
+        "short": "7e génération d'une lignée maudite. Chaque descendant paie le prix du pacte.",
+        "full": "Il y a 200 ans, ton ancêtre a fait un pacte avec un démon.\n\nPouvoir. Richesse. Victoire éternelle. Le prix? 'Rien. Juste une petite... garantie.'\n\nLa garantie : chaque génération, un descendant porte la malédiction. Le sang démoniaque.\n\nTon arrière-arrière-arrière-arrière-grand-père. Mort fou, à 30 ans.\nTon arrière-arrière-arrière-grand-père. Massacré son village, exécuté.\nTon arrière-arrière-grand-père. Suicide.\nTon arrière-grand-père. Disparu dans les Abysses.\nTon grand-père. Tué par l'Église.\nTon père. Mort en te donnant naissance.\n\nEt maintenant... toi.\n\n7e génération. Le sang est plus fort. Plus sombre. Plus... vivant.\n\nParfois, tu l'entends. L'ancêtre. Dans ton sang. Il murmure : 'Bientôt. Très bientôt.'",
+        "backstory": "Tu as essayé de résister. Prières. Exorcismes. Méditation. Rien ne marche. Le sang appelle. Toujours."
+      },
+
+      "playStyle": {
+        "archetype": "Berserker avec mécaniques de sang et sacrifice",
+        "difficulty": "Moyen",
+        "strengths": ["Scaling insane via low HP", "Lifesteal puissant", "Transformation démoniaque"],
+        "weaknesses": ["Danger constant (low HP = death)", "Contrôle limité en forme démon", "Corruption monte vite"]
+      },
+
+      "baseStats": {
+        "hp": 130,
+        "attack": 18,
+        "defense": 12,
+        "speed": 14,
+        "critChance": 20,
+        "lifesteal": 15,
+        "luck": 8
+      },
+
+      "mechanics": {
+        "BLOOD_PRICE": {
+          "name": "Prix du Sang",
+          "type": "Core Passive",
+          "desc": "Plus tu perds PV, plus tu es fort",
+          "scaling": "Chaque 10% PV perdus = +15% damage",
+          "breakpoints": {
+            "90-100_HP": "+0% dmg (safe)",
+            "70-89_HP": "+30% dmg",
+            "50-69_HP": "+60% dmg",
+            "30-49_HP": "+90% dmg",
+            "10-29_HP": "+135% dmg (danger zone)",
+            "1-9_HP": "+180% dmg (1 hit = death)"
+          },
+          "loreReason": "Noxar exige le sang. Le tien ou celui d'autrui.",
+          "visual": "Eyes glow red as HP decreases, veins visible, aura darkens"
+        },
+
+        "BLOOD_SACRIFICE": {
+          "name": "Sacrifice Sanguin",
+          "type": "Active Skill",
+          "unlock": "Level 1",
+          "cost": "20% max HP",
+          "effect": "Next attack +200% dmg, lifesteal +30% (1 attack)",
+          "cooldown": "4 tours",
+          "upgrade": {
+            "level5": "Cost 30% HP, +300% dmg, AOE 3m",
+            "level10": "Cost 50% HP, +500% dmg, screen AOE, 50% chance instant kill <40% HP enemies"
+          },
+          "danger": "Can kill yourself if not careful"
+        },
+
+        "DEMONIC_ANCESTOR": {
+          "name": "Ancêtre Démoniaque",
+          "type": "Passive/Active Transformation",
+          "trigger": "HP ≤ 25%",
+          "effect": {
+            "automatic": "L'ancêtre prend contrôle (3 tours, cannot cancel)",
+            "stats": "+200% all offensive stats, invincible, lifesteal 100%",
+            "ai": "Auto-combat, attaque nearest target (même alliés si présents)",
+            "visual": "Horns sprout, skin cracks red, demonic roar"
+          },
+          "cost": "+20% corruption",
+          "cooldown": "1 per combat",
+          "loreReason": "Il n'est pas mort. Il attend. Dans ton sang. Et parfois... il se réveille.",
+          "dialogue": {
+            "takeover": "UNE VOIX AUTRE : 'ENFIN! MA CHAIR! MON SANG! À MOI!'",
+            "during": "DÉCHIRE! DÉVORE! SAIGNE!",
+            "after": "...qu'est-ce que... j'ai fait...?"
+          }
+        },
+
+        "BLOOD_PACT": {
+          "name": "Pacte de Sang",
+          "type": "Active Ultimate",
+          "unlock": "Level 7",
+          "cost": "50% current HP",
+          "effect": "Summon Demon Ancestor as separate entity (companion, 30 sec)",
+          "stats": "HP = ton max HP, atk = ton atk × 1.5, AI controlled",
+          "benefit": "Fights for you, tanks dmg",
+          "danger": {
+            "corruption": "+15%",
+            "chance": "10% l'ancêtre refuse de partir (devient ennemi, must kill, +40% corruption)"
+          },
+          "cooldown": "1 per floor"
+        },
+
+        "BLOOD_TRAIL": {
+          "name": "Traînée de Sang",
+          "type": "Passive",
+          "unlock": "Level 5",
+          "effect": "Chaque ennemi tué laisse blood pool au sol",
+          "mechanic": "Marcher sur blood pool = heal 10% HP, +5% dmg 10 sec (stack 3x)",
+          "visual": "Blood splatters everywhere, gothic aesthetic",
+          "corruption": "+1% per pool absorbed"
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Sang Résistant",
+          "visualChange": "Normal skin, eyes normal, faint red veins",
+          "effects": [
+            "Demonic Ancestor trigger à 15% HP au lieu de 25% (plus de contrôle)",
+            "Blood Price scaling -20% (safer mais moins puissant)",
+            "Peut exorciser l'ancêtre (skill: permanent -30% corruption, lose transformation)"
+          ],
+          "dialogue": "Tu résistes. Le sang hurle. L'ancêtre rage. Mais tu... tiens bon."
+        },
+
+        "BALANCED": {
+          "range": [26, 75],
+          "name": "Sang Équilibré",
+          "visualChange": "Red eyes occasionnels, veins visible sous stress",
+          "effects": [
+            "Blood Price standard",
+            "Demonic Ancestor contrôlable (50% chance, can direct attacks)",
+            "Unlock 'Negotiate' avec ancêtre (dialogue trees, buffs/malus)"
+          ],
+          "dialogue": "Toi et l'ancêtre... coexistez. Ni maître ni esclave. Partenaires. Dangereux."
+        },
+
+        "CORRUPTED": {
+          "range": [76, 100],
+          "name": "Héritier Démoniaque",
+          "visualChange": "Permanent horns, red skin, claws, tail, eyes black/red",
+          "effects": [
+            "Blood Price +50% bonus dmg",
+            "Demonic Ancestor permanent (partial transformation passive)",
+            "Lifesteal +50%",
+            "NPCs terrifiés, certains fuient, Église hostile",
+            "Unlock 'Full Possession' (become demon 100%, lose control, 60 sec rampage)"
+          ],
+          "dialogue": "L'ancêtre : 'Enfin. Nous ne faisons qu'un. Magnifique.' Toi : '...' Il n'y a plus vraiment de 'toi'.",
+          "uniqueSkill": {
+            "DEMONIC_ASCENSION": {
+              "name": "Ascension Démoniaque",
+              "effect": "Permanent demon form, +500% all stats, cannot return to human",
+              "cost": "Instant 100% corruption, Ending B path forced",
+              "loreReason": "L'ancêtre a gagné. Tu es lui. Il est toi. Le pacte accompli."
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 130, "atk": 18, "lifesteal": 15, "unlock": "Blood Price + Blood Sacrifice" },
+        "level3": { "hp": 155, "atk": 25, "lifesteal": 20, "unlock": "Demonic Ancestor" },
+        "level5": { "hp": 185, "atk": 34, "lifesteal": 25, "unlock": "Blood Trail" },
+        "level7": { "hp": 220, "atk": 46, "lifesteal": 30, "unlock": "Blood Pact" },
+        "level10": { "hp": 270, "atk": 65, "lifesteal": 40, "unlock": "Controlled Ancestor" }
+      },
+
+      "uniqueDialogue": [
+        "Le sang se souvient. De tout. Des 7 générations. De tous les péchés.",
+        "Parfois, je rêve de ses souvenirs. L'ancêtre. Le pacte. La damnation. Étais-je là?",
+        "Mon père m'a dit, avant de mourir : 'Pardonne-moi.' Pour quoi? D'avoir vécu? D'avoir eu un enfant?",
+        "L'Église dit que je suis maudit. Ils ont raison. Mais... suis-je responsable du pacte d'un autre?",
+        "Il murmure, dans mes veines : 'Bientôt, mon enfant. Bientôt, nous serons libres.' Libres... ou perdus?"
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "DEMON_HEART_PRESERVED": "Double effect, ancêtre reconnaît 'famille'",
+          "NOXAR_WHISPER": "Peut parler à Noxar, demander comment briser malédiction"
+        },
+        "enemies": {
+          "MINOR_DEMON": "+30% dmg vs demons (vengeance familiale)",
+          "VOID_SPAWN": "Demons recognize bloodline, sometimes hesitate"
+        },
+        "ending": {
+          "secret": "Si corruption exactement 66.6%, unlock 'Break the Pact' ending variant (kill ancestor's essence)"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Bloodied Axe (16 dmg, +10% lifesteal)",
+        "armor": "Cursed Leather (10 def, Blood Price +5% per tier)",
+        "accessory": "Ancestor's Mark (Demonic Ancestor +1 tour duration)"
+      }
+    },
+
+    "SILENT_ARCHER": {
+      "id": "SILENT_ARCHER",
+      "name": "Archer Silencieuse",
+      "nameEN": "Silent Archer",
+      "icon": "🏹",
+      "godAffinity": "KROVAX",
+      "godName": "Krovax, Scelleur de la Guerre Juste",
+      "godStatus": "S'est dévoré lui-même en combattant son reflet.",
+
+      "lore": {
+        "short": "A tué son roi d'une flèche. S'est arraché la langue pour ne jamais révéler pourquoi.",
+        "full": "Cathédrale. Toit. 300 mètres. Vent d'ouest. Pluie fine.\n\nLe Roi Malachai lève son verre. Célèbre la victoire. 10 000 rebelles morts. Hommes. Femmes. Enfants.\n\nTu étais la meilleure archère du royaume. Élite royale. Sa garde personnelle.\n\nTu vises. 3 secondes. Respire. Vise le cœur.\n\nLa flèche part.\n\nTraverse la pluie. Le vent. Le temps.\n\nTrouve son cœur.\n\nLe roi tombe. Les gardes hurlent. Le chaos.\n\nTu descends. Calmement. Rentres chez toi. Prends un couteau.\n\nEt t'arraches la langue. Avec tes propres mains.\n\nPourquoi?\n\nParce que certains secrets... méritent le silence éternel.\n\nLe roi était ton père.\n\nTu l'aimais.\n\nMais 10 000 innocents...\n\nL'amour ne suffit pas.",
+        "backstory": "Personne ne sait. Personne ne saura jamais. Le secret est mort avec ta voix."
+      },
+
+      "playStyle": {
+        "archetype": "Precision sniper avec mécaniques de silence",
+        "difficulty": "Difficile",
+        "strengths": ["Burst dmg énorme", "Stealth élevée", "1-shot capabilities"],
+        "weaknesses": ["Fragile HP", "Silence = no dialogue/hints", "Charge time vulnérable"]
+      },
+
+      "baseStats": {
+        "hp": 95,
+        "attack": 15,
+        "rangedDamage": 40,
+        "defense": 8,
+        "speed": 16,
+        "critChance": 35,
+        "critDamage": 250,
+        "stealth": 30,
+        "luck": 14
+      },
+
+      "mechanics": {
+        "VOW_OF_SILENCE": {
+          "name": "Vœu de Silence",
+          "type": "Core Passive",
+          "effect": {
+            "noDialogue": "Aucun dialogue vocal, aucun son émis par player",
+            "stealth": "Enemies +1 tour avant alerte, +30% crit dmg",
+            "break": "Si utilise item bruyant (grenades, bombs), lose bonus jusqu'à prochain repos"
+          },
+          "loreReason": "Le silence est ton serment. Krovax comprenait la discipline.",
+          "visual": "No voice lines, only text, subtitles, gestures",
+          "NPCReaction": "NPCs mal à l'aise (elle ne parle jamais), certains pensent tu es fantôme"
+        },
+
+        "KINGSLAYER_ARROW": {
+          "name": "Flèche Tueuse de Roi",
+          "type": "Active Ultimate",
+          "unlock": "Level 1",
+          "frequency": "1 flèche parfaite par étage",
+          "mechanic": {
+            "activation": "Enter aim mode (ralenti temps, 3 sec window)",
+            "targeting": "Viser précisément (cursor, wind calculation, distance)",
+            "effect": {
+              "nonBoss": "Instant kill any enemy",
+              "boss": "80% current HP damage"
+            }
+          },
+          "cost": "Consomme la flèche unique de l'étage",
+          "loreReason": "Une flèche a tué un roi. Une flèche peut tuer un dieu.",
+          "visual": "Slow-mo, arrow glows white, trail of light, impact freeze-frame",
+          "dialogue": "...(silence. Juste le sifflement de la flèche.)"
+        },
+
+        "SHADOW_HUNTER": {
+          "name": "Chasseuse d'Ombres",
+          "type": "Passive Stealth",
+          "unlock": "Level 3",
+          "effect": {
+            "stealth": "Invisibilité si immobile 3 sec",
+            "bonus": "First attack from stealth +150% dmg, guaranteed crit",
+            "detection": "Enemies detect 50% plus lent"
+          },
+          "combo": "Chain stealth kills (+10% dmg per kill, stack 5x)"
+        },
+
+        "PRECISE_SHOT": {
+          "name": "Tir Précis",
+          "type": "Active Skill",
+          "unlock": "Level 5",
+          "cost": "30 focus",
+          "effect": "Charge 2 sec, 100% crit chance, +100% crit dmg, pierce 2 enemies",
+          "upgrade": {
+            "level7": "Charge 1 sec, pierce 3 enemies",
+            "level10": "No charge, pierce all enemies in line, knockback"
+          },
+          "cooldown": "5 tours"
+        },
+
+        "SILENT_STEP": {
+          "name": "Pas Silencieux",
+          "type": "Active Mobility",
+          "unlock": "Level 7",
+          "cost": "20 stamina",
+          "effect": "Teleport to shadow within 10m, leave no trace, reset stealth",
+          "visual": "Dissolve into shadow, reappear",
+          "combo": "Can teleport → Kingslayer Arrow combo"
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Justicière Silencieuse",
+          "visualChange": "White cloak, bow silver-white, calm eyes",
+          "effects": [
+            "Kingslayer Arrow recharge 2/étage au lieu de 1",
+            "Silence aura étendue (alliés aussi +stealth)",
+            "+40% dmg vs tyrans/corrupted leaders",
+            "Vow of Silence peut être brisé si needed (regain voice, lose buffs)"
+          ],
+          "dialogue": "...(Toujours silence. Mais c'est un silence... paisible.)"
+        },
+
+        "BALANCED": {
+          "range": [26, 75],
+          "name": "Ombre Équilibrée",
+          "visualChange": "Grey cloak, bow obsidian, eyes sharp",
+          "effects": [
+            "Standard abilities",
+            "Unlock 'Whisper' (1 dialogue par étage, choose words carefully)",
+            "Can toggle silence ON/OFF (strategic)"
+          ],
+          "dialogue": "...(Parfois, un mot. Un seul. Lourd de sens.)"
+        },
+
+        "CORRUPTED": {
+          "range": [76, 100],
+          "name": "Faucheuse Silencieuse",
+          "visualChange": "Black cloak, bow demonic, eyes red, aura death",
+          "effects": [
+            "Kingslayer Arrow tue AUSSI boss (instant kill si <50% HP)",
+            "Stealth kills absorbent soul (+corruption but +permanent stats)",
+            "Silence devient 'Death Aura' (enemies dans 5m -20% HP/sec)",
+            "NPCs fuient, certains pensent tu es la Mort elle-même"
+          ],
+          "dialogue": "...(Silence absolu. Vide. Terrifiant.)",
+          "uniqueSkill": {
+            "DEATH_SENTENCE": {
+              "name": "Sentence de Mort",
+              "effect": "Mark 1 enemy. Next arrow instant kill REGARDLESS of HP/boss status",
+              "cost": "+30% corruption, consume Kingslayer Arrow",
+              "visual": "Red mark appears on enemy head, doomed"
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 95, "rng": 40, "crit": 35, "unlock": "Vow of Silence + Kingslayer Arrow" },
+        "level3": { "hp": 110, "rng": 52, "crit": 42, "unlock": "Shadow Hunter" },
+        "level5": { "hp": 130, "rng": 68, "crit": 50, "unlock": "Precise Shot" },
+        "level7": { "hp": 155, "rng": 88, "crit": 60, "unlock": "Silent Step" },
+        "level10": { "hp": 190, "rng": 115, "crit": 75, "unlock": "Multi-Pierce" }
+      },
+
+      "uniqueDialogue": [
+        "...",
+        "...(geste: montre le ciel, puis le sol)",
+        "...(écrit sur papier: 'Justice.')",
+        "...(regard intense, hoche la tête)",
+        "...(silence. Toujours le silence.)"
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "KINGS_LAST_BREATH": "Reconnaissance, dialogue spécial (écrit), unlock quête pardon",
+          "BETRAYER_CROWN": "Vision du roi Malachai, confrontation silencieuse"
+        },
+        "enemies": {
+          "BETRAYER_KING": "Recognition, forgiveness dialogue (boss variant)",
+          "SKELETON_WARRIOR": "Mutual respect, salute sans mots"
+        },
+        "zones": {
+          "THRONE_ROOM": "Flashback, voir le meurtre du roi, -15% corruption si refus regret"
+        },
+        "ending": {
+          "special": "Si corruption < 15%, roi fantôme apparaît, pardonne avec dernier souffle"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Silent Bow (35 rng dmg, +20% stealth)",
+        "armor": "Shadow Cloak (7 def, invisibility 3 sec immobile)",
+        "accessory": "Severed Tongue (Morbid. Vow of Silence +10% crit dmg)"
+      }
+    },
+
+    "DEMONIST": {
+      "id": "DEMONIST",
+      "name": "Démoniste",
+      "nameEN": "Demonist",
+      "icon": "👹",
+      "godAffinity": "THALYS",
+      "godName": "Thalys, Scelleur des Hasards Contrôlés",
+      "godStatus": "Transformé en les Dés du Destin. Conscient. Observe tout.",
+
+      "lore": {
+        "short": "Érudit qui étudie les démons sans les comprendre. Invoque ce qu'il ne maîtrise pas.",
+        "full": "Tu as lu tous les livres. Étudié tous les grimoires. Déchiffré tous les glyphes.\n\nLes démons. Le Vide. Les Abysses. Les Hybrids.\n\nTu SAIS tout.\n\nMais savoir n'est pas comprendre.\n\nTu peux invoquer un démon. Parfait. Mais... l'obéira-t-il?\n\nTu peux ouvrir un portail au Vide. Parfait. Mais... le refermeras-tu?\n\nTu peux lire les vrais noms des Anciens. Parfait. Mais... survivras-tu à leur attention?\n\nTon maître t'a dit, avant de disparaître dans un portail raté:\n\n'La différence entre un érudit et un sage? L'érudit sait. Le sage comprend. Et l'imbécile... invoque.'\n\nTu n'as pas écouté.\n\nMaintenant, tu invoques. Encore et encore. Espérant qu'un jour... tu comprendras.\n\nOu que les démons te tueront avant.",
+        "backstory": "Tu as invoqué ton premier démon à 12 ans. Par accident. Il a tué ton chien. Tu as pleuré. Puis... tu as réessayé."
+      },
+
+      "playStyle": {
+        "archetype": "Summoner chaotique avec RNG extrême",
+        "difficulty": "Très difficile",
+        "strengths": ["Summons très puissants si chanceux", "Versatilité extrême", "Scaling via RNG mastery"],
+        "weaknesses": ["RNG peut te tuer", "Summons peuvent se retourner contre toi", "Fragile sans summon"]
+      },
+
+      "baseStats": {
+        "hp": 100,
+        "attack": 8,
+        "magicPower": 30,
+        "defense": 10,
+        "speed": 11,
+        "summonSlots": 2,
+        "luck": 20
+      },
+
+      "mechanics": {
+        "RANDOM_SUMMON": {
+          "name": "Invocation Aléatoire",
+          "type": "Core Active",
+          "unlock": "Level 1",
+          "cost": "40 mana",
+          "mechanic": "Roll 1d6, invoque créature selon résultat",
+          "table": {
+            "1": {
+              "summon": "Imp (faible)",
+              "stats": "20 HP, 10 atk, 100% loyal",
+              "lore": "Petit. Stupide. Obéissant. Parfait."
+            },
+            "2": {
+              "summon": "Void Spawn (moyen)",
+              "stats": "50 HP, 20 atk, 70% loyal",
+              "risk": "30% chance attaque toi au lieu d'enemy",
+              "lore": "Né du Vide. Confus. Agressif. Dangereux."
+            },
+            "3": {
+              "summon": "Void Spawn (variant)",
+              "stats": "40 HP, 25 atk, 70% loyal",
+              "same": "Résultat 2 variant"
+            },
+            "4": {
+              "summon": "Demon Warrior (fort)",
+              "stats": "80 HP, 35 atk, 60% loyal",
+              "risk": "40% chance désobéit, 10% chance kill toi",
+              "lore": "Puissant. Fier. Te méprise. Sers par... amusement?"
+            },
+            "5": {
+              "summon": "Demon Warrior (variant)",
+              "stats": "70 HP, 40 atk, 60% loyal",
+              "same": "Résultat 4 variant"
+            },
+            "6": {
+              "summon": "Elder Horror (overpowered)",
+              "stats": "150 HP, 60 atk, 30% loyal",
+              "risk": "70% chance rogue, 30% chance kill toi instantly",
+              "reward": "Si loyal: +50% all dmg, AOE fears enemies",
+              "corruption": "+15% corruption per summon",
+              "lore": "Tu as invoqué... QUOI?! Même toi tu ne sais pas! COURS!"
+            }
+          },
+          "loreReason": "Thalys contrôlait le hasard. Toi, tu le subis. À chaque invocation.",
+          "cooldown": "3 tours"
+        },
+
+        "BARGAIN_WITH_DICE": {
+          "name": "Négocier avec les Dés",
+          "type": "Active Meta-Skill",
+          "unlock": "Level 5",
+          "effect": "Avant summon, négocier avec Thalys pour contrôler le d6",
+          "offers": {
+            "sacrificeHP": {
+              "cost": "30% max HP",
+              "effect": "Choisir exact résultat 1-6"
+            },
+            "sacrificeCorruption": {
+              "cost": "+20% corruption",
+              "effect": "Reroll si résultat non désiré"
+            },
+            "sacrificeItem": {
+              "cost": "Détruire 1 item rare+",
+              "effect": "Force résultat 6 (Elder Horror)"
+            },
+            "sacrificeCompanion": {
+              "cost": "Kill companion instantly",
+              "effect": "Summon devient 100% loyal, permanent (no despawn)",
+              "corruption": "+40%"
+            }
+          },
+          "thalysDialogue": [
+            "'Un marché? Intéressant. Que m'offres-tu?'",
+            "'Le hasard a un prix. Es-tu prêt à payer?'",
+            "'Très bien. Mais souviens-toi... je n'oublie jamais.'"
+          ],
+          "loreReason": "Les Dés parlent. Si tu écoutes. Si tu oses négocier.",
+          "danger": "Thalys se souvient de tes dettes. Consequences futures possibles."
+        },
+
+        "ELDRITCH_KNOWLEDGE": {
+          "name": "Savoir Interdit",
+          "type": "Passive",
+          "unlock": "Level 3",
+          "effect": {
+            "summonStats": "Tous summons +20% stats",
+            "loyalty": "+10% loyalty chance",
+            "insight": "Voir les vraies formes des démons (sanity risk)"
+          },
+          "cost": "+1% corruption per summon actif",
+          "loreReason": "Plus tu comprends les démons... plus tu deviens comme eux."
+        },
+
+        "VOID_PORTAL": {
+          "name": "Portail du Vide",
+          "type": "Active Ultimate",
+          "unlock": "Level 10",
+          "cost": "80 mana + 30% current HP",
+          "effect": "Ouvrir portail, summon 3 creatures aléatoires (3d6 rolls)",
+          "duration": "Portail reste ouvert 10 sec",
+          "danger": {
+            "rogue": "Summons peuvent s'entre-tuer",
+            "corruption": "+25% corruption",
+            "voidLeak": "5% chance portail ne se ferme pas → void invasion (event)"
+          },
+          "reward": "Si succès: 3 summons loyal = army",
+          "cooldown": "1 per floor"
+        },
+
+        "DEMONIC_CONTRACT": {
+          "name": "Contrat Démoniaque",
+          "type": "Passive Progression",
+          "unlock": "Level 7",
+          "effect": "Signer contrat avec 1 summon type pour le rendre permanent",
+          "choice": {
+            "IMP": "Toujours summon 2 Imps au lieu de 1, 100% loyal, faible",
+            "DEMON": "1 Demon Warrior permanent, 80% loyal, fort",
+            "HORROR": "1 Elder Horror contrôlable, 50% loyal, overpowered"
+          },
+          "cost": "+30% corruption permanent",
+          "cannot": "Cannot change contract (permanent choice)"
+        }
+      },
+
+      "corruptionPath": {
+        "PURE": {
+          "range": [0, 25],
+          "name": "Érudit Prudent",
+          "visualChange": "Robes académiques, livres, yeux normaux",
+          "effects": [
+            "Summons loyalty +20%",
+            "Random Summon table biaisé vers 1-3 (safer summons)",
+            "Peut 'release' summon sans penalty",
+            "Démons te respectent (scholar, pas master)"
+          ],
+          "dialogue": "J'étudie. Je comprends. Mais je ne... deviens pas."
+        },
+
+        "BALANCED": {
+          "range": [26, 75],
+          "name": "Démoniste Équilibré",
+          "visualChange": "Robes sombres, yeux parfois luisent, runes sur peau",
+          "effects": [
+            "Random Summon standard table",
+            "Bargain with Dice coûts -20%",
+            "Unlock 'Fusion' (merge 2 summons → 1 stronger)"
+          ],
+          "dialogue": "Je marche sur le fil. Entre érudit et démon. Contrôle... précaire."
+        },
+
+        "CORRUPTED": {
+          "range": [76, 100],
+          "name": "Maître du Vide",
+          "visualChange": "Robes void-black, yeux vides, horns small, aura démoniaque",
+          "effects": [
+            "Random Summon table biaisé vers 4-6 (stronger mais rogue)",
+            "Void Portal summon 5 creatures au lieu de 3",
+            "Summons rogue attaquent enemies (pas toi) si corruption >80%",
+            "Démons te craignent OU adorent (50/50)",
+            "NPCs terrifiés, Église hostile, village -40 morale"
+          ],
+          "dialogue": "Je ne suis plus érudit. Je suis... quelque chose d'autre. Maître? Esclave? Qui sait.",
+          "uniqueSkill": {
+            "BECOME_VOID": {
+              "name": "Devenir le Vide",
+              "effect": "Transform en Void Lord (60 sec), +1000% stats, summon unlimited",
+              "cost": "90% corruption instant (quasi Ending B)",
+              "danger": "Cannot return to human si >95% corruption",
+              "visual": "Body dissolves, pure void energy, eldritch form"
+            }
+          }
+        }
+      },
+
+      "progression": {
+        "level1": { "hp": 100, "mgc": 30, "summon": 2, "unlock": "Random Summon" },
+        "level3": { "hp": 115, "mgc": 42, "summon": 2, "unlock": "Eldritch Knowledge" },
+        "level5": { "hp": 135, "mgc": 58, "summon": 3, "unlock": "Bargain with Dice" },
+        "level7": { "hp": 160, "mgc": 78, "summon": 3, "unlock": "Demonic Contract" },
+        "level10": { "hp": 200, "mgc": 105, "summon": 4, "unlock": "Void Portal" }
+      },
+
+      "uniqueDialogue": [
+        "J'ai lu 1000 livres sur les démons. Aucun n'explique pourquoi ils... sourient quand je les invoque.",
+        "Mon maître a disparu dans un portail. Parfois, j'entends sa voix. 'Ferme-le. Ferme-le. FERME-LE.'",
+        "Les Dés me parlent. Thalys. Il dit : 'Tu invoques sans comprendre. Fascinant. Continue.'",
+        "Un jour, j'invoquerai quelque chose que je ne pourrai pas contrôler. Mais ce jour... est-ce aujourd'hui?",
+        "Savoir n'est pas pouvoir. Savoir est... malédiction. Mais je ne peux pas... arrêter d'apprendre."
+      ],
+
+      "specialInteractions": {
+        "items": {
+          "THALYS_BROKEN_TOOTH": "Bargain with Dice devient gratuit (1/floor)",
+          "DEMON_HEART_PRESERVED": "Summons reconnaissent le cœur, +10% loyalty"
+        },
+        "enemies": {
+          "MINOR_DEMON": "Peut tenter de recruter (50% chance devient summon)",
+          "VOID_SPAWN": "Already summoned Void Spawns reconnaissent, neutral"
+        },
+        "boss": {
+          "THE_DICE_ITSELF": "Thalys dialogue spécial: 'Tu as invoqué tant de fois. As-tu enfin compris?'"
+        }
+      },
+
+      "startingGear": {
+        "weapon": "Grimoire Interdit (20 magic dmg, +1 summon slot)",
+        "armor": "Scholar Robes (9 def, -10% summon mana cost)",
+        "accessory": "Void Shard (+10% summon loyalty, +5% corruption/summon)"
+      }
+    }
+  },
+
+  "META": {
+    "totalClasses": 7,
+    "implemented": 7,
+    "remaining": [],
+    "allClasses": [
+      "SHATTERED_KNIGHT (Morwyn) - Tank défensif",
+      "WITCH_OF_ASHES (Vyr) - Glass cannon pyro",
+      "HOLLOW_ROGUE (Sylthara) - High risk dodge",
+      "PENITENT (Ael'mora) - Support/healer",
+      "BLOODBOUND (Noxar) - Berserker blood",
+      "SILENT_ARCHER (Krovax) - Precision sniper",
+      "DEMONIST (Thalys) - Summoner chaotique"
+    ],
+    "corruptionSystem": "Chaque classe a 3 paths selon corruption 0-25, 26-75, 76-100",
+    "godAffinityBonus": "Items du même dieu donnent +20% stats",
+    "difficulty": {
+      "easy": ["SHATTERED_KNIGHT"],
+      "medium": ["BLOODBOUND", "PENITENT"],
+      "hard": ["WITCH_OF_ASHES", "SILENT_ARCHER", "DEMONIST"],
+      "veryHard": ["HOLLOW_ROGUE"]
+    }
+  }
+}

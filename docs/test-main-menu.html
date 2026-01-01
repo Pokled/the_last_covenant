@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 The Last Covenant - Menu Principal</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Crimson Text', serif;
+            --font-ui: 'Inter', sans-serif;
+            --gold-bright: #f4d03f;
+            --gold-dim: #d4af37;
+            --parchment: #f4e8d0;
+            --blood-red: #8b0000;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-body);
+            color: var(--parchment);
+            background: #0a0a0f;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* BACKGROUND AVEC IMAGE */
+        /* ═══════════════════════════════════════════════════════ */
+        .menu-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(10, 10, 15, 0.6) 0%, 
+                    rgba(10, 10, 15, 0.3) 30%, 
+                    rgba(10, 10, 15, 0.2) 50%, 
+                    rgba(10, 10, 15, 0.4) 70%, 
+                    rgba(10, 10, 15, 0.7) 100%
+                ),
+                url('assets/images/background/Background_menu.png') center center / cover no-repeat;
+            background-attachment: fixed;
+            animation: backgroundBreathing 25s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundBreathing {
+            0% { 
+                transform: scale(1); 
+                filter: brightness(0.75) contrast(1.1);
+            }
+            100% { 
+                transform: scale(1.03); 
+                filter: brightness(0.85) contrast(1.15);
+            }
+        }
+
+        /* LUEUR CENTRALE MYSTIQUE */
+        #main-menu::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 700px;
+            height: 700px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(
+                circle,
+                rgba(212, 175, 55, 0.06) 0%,
+                rgba(212, 175, 55, 0.03) 35%,
+                transparent 65%
+            );
+            pointer-events: none;
+            z-index: 2;
+            animation: centralGlow 7s ease-in-out infinite alternate;
+        }
+
+        @keyframes centralGlow {
+            0% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0.85;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        /* BRUME FLOTTANTE */
+        #main-menu::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 25% 35%, rgba(90, 77, 58, 0.12) 0%, transparent 40%),
+                radial-gradient(ellipse at 75% 65%, rgba(61, 52, 38, 0.1) 0%, transparent 35%),
+                radial-gradient(ellipse at 50% 85%, rgba(42, 36, 25, 0.08) 0%, transparent 45%);
+            pointer-events: none;
+            z-index: 3;
+            animation: floatingMist 45s ease-in-out infinite;
+        }
+
+        @keyframes floatingMist {
+            0% {
+                transform: translate(-10%, -10%) rotate(0deg);
+                opacity: 0.7;
+            }
+            33% {
+                transform: translate(-5%, -15%) rotate(3deg);
+                opacity: 0.85;
+            }
+            66% {
+                transform: translate(-15%, -5%) rotate(-3deg);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-10%, -10%) rotate(0deg);
+                opacity: 0.7;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* PARTICULES CANVAS */
+        /* ═══════════════════════════════════════════════════════ */
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            animation: particlesFadeIn 2s ease-out 0.5s forwards;
+        }
+
+        @keyframes particlesFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 0.7; }
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* CONTENT LAYOUT - STYLE DIVINITY OS2 (DROITE-BAS) */
+        /* ═══════════════════════════════════════════════════════ */
+        .menu-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-end;
+            height: 100%;
+            padding: 0 80px 0 0; /* Encore descendu de 70px (30 - 70 = -40, donc on met 0 + marge en bas) */
+            padding-bottom: calc(30px - 70px); /* Descendre de 70px supplémentaires */
+            transform: translateY(70px); /* Méthode propre pour descendre */
+            animation: contentFadeIn 1.5s ease-out;
+        }
+
+        @keyframes contentFadeIn {
+            0% { 
+                opacity: 0; 
+                transform: translateX(30px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+
+        /* LOGO AU-DESSUS DU MENU */
+        .menu-logo {
+            position: relative;
+            margin-bottom: 40px;
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            text-shadow: 
+                0 0 20px rgba(212, 175, 55, 0.7),
+                0 0 40px rgba(212, 175, 55, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.2em;
+            animation: logoGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { 
+                text-shadow: 
+                    0 0 20px rgba(212, 175, 55, 0.7),
+                    0 0 40px rgba(212, 175, 55, 0.4),
+                    0 2px 4px rgba(0, 0, 0, 0.9);
+            }
+            100% { 
+                text-shadow: 
+                    0 0 30px rgba(212, 175, 55, 0.9),
+                    0 0 60px rgba(212, 175, 55, 0.6),
+                    0 2px 4px rgba(0, 0, 0, 0.9);
+            }
+        }
+
+        /* TAGLINE SOUS LE LOGO - SUPPRIMÉE */
+        .menu-tagline {
+            display: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* MENU BUTTONS (Style Divinity OS2 - Propre & Épuré) */
+        /* ═══════════════════════════════════════════════════════ */
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .menu-btn {
+            position: relative;
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 16px 60px;
+            background: linear-gradient(135deg, 
+                rgba(20, 18, 15, 0.90) 0%, 
+                rgba(30, 25, 20, 0.90) 100%
+            );
+            border: 2px solid rgba(90, 77, 58, 0.5);
+            border-top: 1px solid rgba(138, 125, 106, 0.3);
+            border-left: 1px solid rgba(138, 125, 106, 0.3);
+            color: rgba(244, 232, 208, 0.95);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 
+                inset 0 1px 0 rgba(138, 125, 106, 0.15),
+                0 4px 16px rgba(0, 0, 0, 0.6);
+            text-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.9);
+            overflow: hidden;
+            width: 300px; /* Largeur fixe pour tous les boutons */
+            text-align: center;
+        }
+
+        /* TEXTURE PARCHEMIN SUR BOUTON */
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="noise"><feTurbulence baseFrequency="0.05" numOctaves="4" /></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.1"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* REFLET DORÉ EN HAUT */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, 
+                rgba(212, 175, 55, 0.08) 0%, 
+                transparent 100%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .menu-btn:hover {
+            border-color: rgba(212, 175, 55, 0.75);
+            background: linear-gradient(135deg, 
+                rgba(35, 30, 25, 0.95) 0%, 
+                rgba(45, 38, 30, 0.95) 100%
+            );
+            color: var(--gold-bright);
+            transform: translateX(-5px);
+            box-shadow: 
+                inset 0 1px 0 rgba(212, 175, 55, 0.25),
+                0 6px 24px rgba(0, 0, 0, 0.8),
+                0 0 25px rgba(212, 175, 55, 0.15);
+            text-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.9),
+                0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .menu-btn:hover::after {
+            opacity: 1;
+        }
+
+        .menu-btn:active {
+            transform: translateX(-3px);
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.6),
+                0 3px 10px rgba(0, 0, 0, 0.7);
+            animation: btnShake 0.25s ease;
+        }
+
+        @keyframes btnShake {
+            0%, 100% { transform: translateX(-3px) translateY(0); }
+            33% { transform: translateX(-3px) translateY(-2px); }
+            66% { transform: translateX(-3px) translateY(2px); }
+        }
+
+        /* SUPPRESSION DES ICÔNES */
+        .btn-icon {
+            display: none;
+        }
+
+        /* SOUS-TEXTE DESCRIPTIF AU HOVER */
+        .menu-btn::before {
+            content: attr(data-description);
+            position: absolute;
+            bottom: -25px;
+            right: 0;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 0.05em;
+            text-transform: none;
+            color: rgba(212, 175, 55, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+        }
+
+        .menu-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* BADGE "VIDE" POUR CHARGER PARTIE */
+        .menu-btn[disabled]::after {
+            content: 'Aucune sauvegarde';
+            position: absolute;
+            top: -22px;
+            right: 0;
+            padding: 4px 10px;
+            background: rgba(139, 0, 0, 0.8);
+            border: 1px solid rgba(180, 0, 0, 0.6);
+            font-family: var(--font-ui);
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 200, 200, 0.9);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+        }
+
+        /* BOUTON DÉSACTIVÉ (Charger partie) */
+        .menu-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            border-color: rgba(90, 77, 58, 0.25);
+            color: rgba(244, 232, 208, 0.4);
+        }
+
+        .menu-btn:disabled:hover {
+            transform: none;
+            background: linear-gradient(135deg, 
+                rgba(20, 18, 15, 0.90) 0%, 
+                rgba(30, 25, 20, 0.90) 100%
+            );
+            box-shadow: 
+                inset 0 1px 0 rgba(138, 125, 106, 0.15),
+                0 4px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* FOOTER INFO */
+        /* ═══════════════════════════════════════════════════════ */
+        .menu-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            font-family: var(--font-ui);
+            font-size: 0.75rem;
+            color: rgba(212, 175, 55, 0.4);
+            letter-spacing: 0.1em;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            z-index: 150;
+        }
+
+        .footer-credits {
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .footer-credits:hover {
+            color: rgba(212, 175, 55, 0.8);
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* VIGNETTE */
+        /* ═══════════════════════════════════════════════════════ */
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(
+                ellipse at center, 
+                transparent 15%, 
+                rgba(10, 10, 15, 0.3) 45%, 
+                rgba(10, 10, 15, 0.7) 80%, 
+                rgba(10, 10, 15, 0.9) 100%
+            );
+            z-index: 100;
+            animation: vignetteBreathing 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes vignetteBreathing {
+            0% { 
+                opacity: 1;
+            }
+            100% { 
+                opacity: 0.85;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════ */
+        /* ANIMATIONS D'ENTRÉE SÉQUENTIELLES */
+        /* ═══════════════════════════════════════════════════════ */
+        .menu-btn {
+            opacity: 0;
+            animation: btnFadeIn 0.5s ease-out forwards;
+        }
+
+        .menu-btn:nth-child(1) { animation-delay: 0.2s; }
+        .menu-btn:nth-child(2) { animation-delay: 0.35s; }
+        .menu-btn:nth-child(3) { animation-delay: 0.5s; }
+        .menu-btn:nth-child(4) { animation-delay: 0.65s; }
+
+        @keyframes btnFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-menu">
+        <div class="menu-background"></div>
+        
+        <canvas id="particles"></canvas>
+        
+        <div class="menu-content">
+            <h1 class="menu-logo">THE LAST COVENANT</h1>
+            <p class="menu-tagline">Sept Dieux sont morts. Le pacte t'attend.</p>
+            
+            <div class="menu-buttons">
+                <button class="menu-btn" id="btnNewGame" data-description="Commencer une nouvelle aventure">
+                    Nouvelle Partie
+                </button>
+                
+                <button class="menu-btn" id="btnLoadGame" data-description="Reprendre une partie sauvegardée" disabled>
+                    Charger Partie
+                </button>
+                
+                <button class="menu-btn" id="btnOptions" data-description="Configurer l'expérience de jeu">
+                    Options
+                </button>
+                
+                <button class="menu-btn" id="btnCredits" data-description="Découvrir les créateurs">
+                    Crédits
+                </button>
+            </div>
+        </div>
+        
+        <div class="menu-footer">
+            <span class="game-version">v1.0.0 Alpha</span>
+            <span class="footer-credits" id="footerCredits">© 2024 - The Last Covenant</span>
+        </div>
+        
+        <div class="vignette"></div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // SYSTÈME DE PARTICULES (BRAISES & CENDRES)
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                
+                if (type === 'ember') {
+                    // Braises dorées montantes
+                    this.vx = (Math.random() - 0.5) * 0.2;
+                    this.vy = -Math.random() * 0.4 - 0.15;
+                    this.size = 1.5 + Math.random() * 2;
+                    this.color = [212, 175, 55];
+                    this.alpha = 0.5 + Math.random() * 0.3;
+                    this.gravity = -0.003;
+                    this.glow = true;
+                } else if (type === 'ash') {
+                    // Cendres grises tombantes
+                    this.vx = (Math.random() - 0.5) * 0.15;
+                    this.vy = Math.random() * 0.2 + 0.05;
+                    this.size = 1 + Math.random() * 1.5;
+                    this.color = [120, 110, 100];
+                    this.alpha = 0.3 + Math.random() * 0.2;
+                    this.gravity = 0.005;
+                    this.glow = false;
+                } else {
+                    // Poussière mystique (flotte)
+                    this.vx = (Math.random() - 0.5) * 0.25;
+                    this.vy = (Math.random() - 0.5) * 0.25;
+                    this.size = 1 + Math.random() * 1.8;
+                    this.color = [180, 160, 140];
+                    this.alpha = 0.2 + Math.random() * 0.2;
+                    this.gravity = 0;
+                    this.glow = false;
+                }
+                
+                this.life = 1.0;
+                this.decay = type === 'ember' ? 0.002 : (type === 'ash' ? 0.0015 : 0.003);
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.life -= this.decay;
+                
+                // Dérive subtile
+                this.vx += (Math.random() - 0.5) * 0.01;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                
+                const currentAlpha = this.alpha * this.life;
+                ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${currentAlpha})`;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Glow pour braises
+                if (this.glow) {
+                    ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${currentAlpha * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            isDead() {
+                return this.life <= 0 || 
+                       this.y > canvas.height + 20 || 
+                       this.y < -20 || 
+                       this.x < -20 || 
+                       this.x > canvas.width + 20;
+            }
+        }
+
+        function createParticle() {
+            const rand = Math.random();
+            let type, x, y;
+            
+            if (rand < 0.5) {
+                // Braises (50%)
+                type = 'ember';
+                x = Math.random() * canvas.width;
+                y = canvas.height + 10;
+            } else if (rand < 0.75) {
+                // Cendres (25%)
+                type = 'ash';
+                x = Math.random() * canvas.width;
+                y = -10;
+            } else {
+                // Poussière (25%)
+                type = 'dust';
+                x = Math.random() * canvas.width;
+                y = Math.random() * canvas.height;
+            }
+            
+            particles.push(new Particle(x, y, type));
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Créer nouvelles particules
+            if (Math.random() < 0.4) {
+                createParticle();
+            }
+            
+            // Update et draw
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                
+                if (p.isDead()) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Démarrer l'animation
+        animate();
+
+        // ═══════════════════════════════════════════════════════════
+        // POUSSIÈRE QUI SUIT LE CURSEUR (SUBTILE & GRISE)
+        // ═══════════════════════════════════════════════════════════
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        let cursorParticles = [];
+        let lastMouseX = mouseX;
+        let lastMouseY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Calculer la vitesse du mouvement
+            const dx = mouseX - lastMouseX;
+            const dy = mouseY - lastMouseY;
+            const speed = Math.sqrt(dx * dx + dy * dy);
+            
+            // Créer poussière seulement si on bouge (balayage)
+            if (speed > 1 && Math.random() < 0.08) { // Très rare (8%)
+                // Créer 1-2 particules de poussière grise
+                const numParticles = speed > 5 ? 2 : 1;
+                
+                for (let i = 0; i < numParticles; i++) {
+                    cursorParticles.push({
+                        x: mouseX + (Math.random() - 0.5) * 20,
+                        y: mouseY + (Math.random() - 0.5) * 20,
+                        vx: (Math.random() - 0.5) * 0.3 - dx * 0.05, // Sens inverse du mouvement
+                        vy: (Math.random() - 0.5) * 0.3 - dy * 0.05,
+                        size: 0.8 + Math.random() * 1.2, // Très petites
+                        color: [140, 130, 120], // Gris-beige (poussière)
+                        alpha: 0.15 + Math.random() * 0.1, // Très transparentes
+                        life: 1.0,
+                        decay: 0.015, // Disparaissent vite
+                        update() {
+                            this.x += this.vx;
+                            this.y += this.vy;
+                            this.vx *= 0.95; // Ralentissement
+                            this.vy *= 0.95;
+                            this.life -= this.decay;
+                        },
+                        draw() {
+                            if (this.life <= 0) return;
+                            const currentAlpha = this.alpha * this.life;
+                            ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${currentAlpha})`;
+                            ctx.beginPath();
+                            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                            ctx.fill();
+                        },
+                        isDead() {
+                            return this.life <= 0;
+                        }
+                    });
+                }
+            }
+            
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+        });
+
+        // Update des particules du curseur dans la loop
+        function animateWithCursor() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Créer nouvelles particules ambiantes
+            if (Math.random() < 0.4) {
+                createParticle();
+            }
+            
+            // Update et draw particules ambiantes
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                
+                if (p.isDead()) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            // Update et draw poussière du curseur
+            for (let i = cursorParticles.length - 1; i >= 0; i--) {
+                const p = cursorParticles[i];
+                p.update();
+                p.draw();
+                
+                if (p.isDead()) {
+                    cursorParticles.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animateWithCursor);
+        }
+
+        // Démarrer avec curseur
+        animateWithCursor();
+
+        // ═══════════════════════════════════════════════════════════
+        // INTERACTIONS BOUTONS
+        // ═══════════════════════════════════════════════════════════
+        
+        // Son au hover (simulation)
+        document.querySelectorAll('.menu-btn:not([disabled])').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                // Ici : jouer son de parchemin
+                console.log('🎵 Hover sound: parchment rustle');
+            });
+        });
+
+        document.getElementById('btnNewGame').addEventListener('click', () => {
+            console.log('⚔️ Nouvelle Partie - Transition vers Character Creation...');
+            window.location.href = 'test-character-creation.html';
+        });
+
+        document.getElementById('btnOptions').addEventListener('click', () => {
+            console.log('⚙️ Options - Ouvrir panneau options');
+            alert('⚙️ Panneau Options (à implémenter)');
+        });
+
+        document.getElementById('btnCredits').addEventListener('click', () => {
+            console.log('🎭 Crédits');
+            alert('🎭 Crédits:\n\nDéveloppement: [Ton nom]\nGraphismes: [Sources]\nMusique: [Sources]\n\nMerci d\'avoir joué !');
+        });
+
+        document.getElementById('footerCredits').addEventListener('click', () => {
+            document.getElementById('btnCredits').click();
+        });
+
+        console.log('✅ Menu Principal chargé !');
+        console.log('🎨 Inspiré de Divinity Original Sin 2');
+        console.log('💫 Particules: Braises + Cendres + Poussière');
+        console.log('🖱️ Poussière grise au mouvement de la souris (balayage)');
+        console.log('🎮 Ready to adventure!');
+        console.log('');
+        console.log('💡 IDÉES SUPPLÉMENTAIRES À IMPLÉMENTER :');
+        console.log('   1. 🎵 Son de parchemin au hover (rustling paper)');
+        console.log('   2. 💀 Rajouter très rarement un crâne transparent qui traverse');
+        console.log('   3. 🌫️ Effet de dissipation de brume au clic (transition)');
+        console.log('   4. ⚡ Éclair lointain occasionnel dans le background');
+        console.log('   5. 🔥 Augmenter braises quand hover sur "Nouvelle Partie"');
+        console.log('   6. 🌟 Légère lueur qui suit le curseur (halo subtil)');
+        console.log('   7. 📜 Animation du logo (léger float up/down)');
+    </script>
+</body>
+</html>

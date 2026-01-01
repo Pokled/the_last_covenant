@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Test Texture Isométrique</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0d0d0d;
+            color: #d4c5b0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            background: #0a0a0f;
+        }
+        
+        #canvas.grabbing {
+            cursor: grabbing;
+        }
+
+        /* HUD Overlay */
+        .hud {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .hud > * {
+            pointer-events: auto;
+        }
+
+        /* Info Panel */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-left: 4px solid rgba(212, 175, 55, 0.6);
+            padding: 20px;
+            min-width: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-panel h3 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(244, 208, 63, 0.5);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(90, 77, 58, 0.3);
+            font-size: 0.95em;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #c9a97a;
+        }
+
+        .info-value {
+            color: #d4c5b0;
+            font-weight: bold;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.95), rgba(30,25,20,0.95));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(40, 35, 30, 0.9), rgba(30, 25, 20, 0.9));
+            border: 2px solid rgba(80, 70, 50, 0.6);
+            color: #c9b998;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, rgba(60, 50, 40, 0.95), rgba(50, 40, 30, 0.95));
+            border-color: rgba(212, 175, 55, 0.8);
+            color: #f4d03f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .zoom-btn {
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .zoom-display {
+            width: 45px;
+            height: 35px;
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid rgba(90, 77, 58, 0.6);
+            color: #0f0;
+            font-family: monospace;
+            font-size: 0.75em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(20,18,15,0.98), rgba(30,25,20,0.98));
+            border: 3px solid rgba(212, 175, 55, 0.6);
+            padding: 40px 60px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .loading h2 {
+            font-family: 'Cinzel', serif;
+            color: #f4d03f;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #f4d03f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <!-- Loading Screen -->
+    <div class="loading" id="loadingScreen">
+        <h2>⚔️ Chargement des Textures</h2>
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="hud">
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <h3>🎨 Texture Test</h3>
+            <div class="info-item">
+                <span class="info-label">Texture</span>
+                <span class="info-value" id="textureStatus">⏳ Chargement...</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Zoom</span>
+                <span class="info-value" id="zoomValue">100%</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Camera X</span>
+                <span class="info-value" id="cameraX">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Camera Y</span>
+                <span class="info-value" id="cameraY">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Mouse</span>
+                <span class="info-value" id="mousePos">-</span>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button id="btnCenter">🎯 Centrer</button>
+            <button id="btnToggleGrid">📐 Grille</button>
+            <button id="btnToggleCoords">🔢 Coords</button>
+            <button id="btnReset">🔄 Reset</button>
+        </div>
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="btnZoomIn">+</button>
+            <div class="zoom-display" id="zoomDisplay">100%</div>
+            <button class="zoom-btn" id="btnZoomOut">−</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // ═══════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════
+        window.GRID_SIZE = 25;
+        window.ZOOM_LEVEL = 1.0;
+        const ZOOM_MIN = 0.3;
+        const ZOOM_MAX = 3.0;
+        const ZOOM_STEP = 0.1;
+
+        // ═══════════════════════════════════════════════════════════
+        // TEXTURE RENDERER
+        // ═══════════════════════════════════════════════════════════
+        class TextureRenderer {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                
+                // Camera
+                this.camera = { x: 0, y: 0, targetX: 0, targetY: 0 };
+                
+                // Options
+                this.showGrid = false;
+                this.showCoords = false;
+                
+                // Texture
+                this.texture = null;
+                this.textureLoaded = false;
+                
+                // Pan
+                this.isPanning = false;
+                this.panStart = { x: 0, y: 0 };
+                this.panOffset = { x: 0, y: 0 };
+                
+                // Mouse
+                this.mousePos = { x: 0, y: 0 };
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                this.loadTexture();
+            }
+            
+            loadTexture() {
+                console.log('🎨 Chargement texture...');
+                const img = new Image();
+                
+                img.onload = () => {
+                    this.texture = img;
+                    this.textureLoaded = true;
+                    console.log('✅ Texture chargée:', img.width, 'x', img.height);
+                    
+                    document.getElementById('textureStatus').textContent = '✅ Chargée';
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    
+                    this.render();
+                };
+                
+                img.onerror = () => {
+                    console.error('❌ Erreur chargement texture');
+                    document.getElementById('textureStatus').textContent = '❌ Erreur';
+                    document.getElementById('loadingScreen').innerHTML = `
+                        <h2 style="color: #d14343;">❌ Erreur de Chargement</h2>
+                        <p>Impossible de charger la texture</p>
+                    `;
+                };
+                
+                img.src = 'assets/images/combat/tiles/_c27c40ed-52af-4b39-83ca-e385d55d40bd.jpg';
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.render();
+            }
+            
+            render() {
+                // Clear
+                this.ctx.fillStyle = '#0a0a0f';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Smooth camera
+                this.camera.x += (this.camera.targetX - this.camera.x) * 0.1;
+                this.camera.y += (this.camera.targetY - this.camera.y) * 0.1;
+                
+                // Update UI
+                document.getElementById('cameraX').textContent = Math.round(this.camera.x);
+                document.getElementById('cameraY').textContent = Math.round(this.camera.y);
+                
+                // Setup transform
+                this.ctx.save();
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.scale(window.ZOOM_LEVEL, window.ZOOM_LEVEL);
+                this.ctx.translate(-this.camera.x, -this.camera.y);
+                
+                if (this.textureLoaded && this.texture) {
+                    // Dessiner la texture centrée et agrandie
+                    const scale = 2.5; // Agrandir l'image
+                    const w = this.texture.width * scale;
+                    const h = this.texture.height * scale;
+                    
+                    this.ctx.drawImage(
+                        this.texture,
+                        -w / 2,
+                        -h / 2,
+                        w,
+                        h
+                    );
+                    
+                    // Grille overlay (optionnel)
+                    if (this.showGrid) {
+                        this.renderGrid(w, h);
+                    }
+                } else {
+                    // Placeholder
+                    this.ctx.fillStyle = '#333';
+                    this.ctx.fillRect(-400, -400, 800, 800);
+                    
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.font = '24px Cinzel';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('Chargement...', 0, 0);
+                }
+                
+                this.ctx.restore();
+            }
+            
+            renderGrid(w, h) {
+                const gridSize = 25;
+                const tileW = w / gridSize;
+                const tileH = h / gridSize;
+                
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                this.ctx.lineWidth = 1;
+                
+                // Lignes verticales
+                for (let i = 0; i <= gridSize; i++) {
+                    const x = -w / 2 + i * tileW;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, -h / 2);
+                    this.ctx.lineTo(x, h / 2);
+                    this.ctx.stroke();
+                }
+                
+                // Lignes horizontales
+                for (let i = 0; i <= gridSize; i++) {
+                    const y = -h / 2 + i * tileH;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(-w / 2, y);
+                    this.ctx.lineTo(w / 2, y);
+                    this.ctx.stroke();
+                }
+                
+                // Coords
+                if (this.showCoords) {
+                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                    this.ctx.font = '10px monospace';
+                    this.ctx.textAlign = 'center';
+                    
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let x = 0; x < gridSize; x++) {
+                            const px = -w / 2 + x * tileW + tileW / 2;
+                            const py = -h / 2 + y * tileH + tileH / 2;
+                            this.ctx.fillText(`${x},${y}`, px, py);
+                        }
+                    }
+                }
+            }
+            
+            center() {
+                this.camera.targetX = 0;
+                this.camera.targetY = 0;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('canvas');
+        const renderer = new TextureRenderer(canvas);
+
+        // Pan controls
+        let isPanning = false;
+        let panStart = { x: 0, y: 0 };
+        let panOffset = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isPanning = true;
+                panStart = { x: e.clientX, y: e.clientY };
+                panOffset = { x: renderer.camera.x, y: renderer.camera.y };
+                canvas.classList.add('grabbing');
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            renderer.mousePos = { x: e.clientX, y: e.clientY };
+            document.getElementById('mousePos').textContent = `${e.clientX}, ${e.clientY}`;
+            
+            if (isPanning) {
+                const dx = e.clientX - panStart.x;
+                const dy = e.clientY - panStart.y;
+                
+                renderer.camera.targetX = panOffset.x - dx / window.ZOOM_LEVEL;
+                renderer.camera.targetY = panOffset.y - dy / window.ZOOM_LEVEL;
+                renderer.camera.x = renderer.camera.targetX;
+                renderer.camera.y = renderer.camera.targetY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (isPanning) {
+                isPanning = false;
+                canvas.classList.remove('grabbing');
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            if (isPanning) {
+                isPanning = false;
+                canvas.classList.remove('grabbing');
+            }
+        });
+
+        // Zoom
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+            setZoom(window.ZOOM_LEVEL + delta);
+        });
+
+        function setZoom(newZoom) {
+            window.ZOOM_LEVEL = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newZoom));
+            const percent = Math.round(window.ZOOM_LEVEL * 100);
+            document.getElementById('zoomValue').textContent = percent + '%';
+            document.getElementById('zoomDisplay').textContent = percent + '%';
+        }
+
+        // Buttons
+        document.getElementById('btnCenter').addEventListener('click', () => {
+            renderer.center();
+        });
+
+        document.getElementById('btnToggleGrid').addEventListener('click', () => {
+            renderer.showGrid = !renderer.showGrid;
+        });
+
+        document.getElementById('btnToggleCoords').addEventListener('click', () => {
+            renderer.showCoords = !renderer.showCoords;
+        });
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            renderer.center();
+            setZoom(1.0);
+        });
+
+        document.getElementById('btnZoomIn').addEventListener('click', () => {
+            setZoom(window.ZOOM_LEVEL + ZOOM_STEP);
+        });
+
+        document.getElementById('btnZoomOut').addEventListener('click', () => {
+            setZoom(window.ZOOM_LEVEL - ZOOM_STEP);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                setZoom(window.ZOOM_LEVEL + ZOOM_STEP);
+            } else if (e.key === '-') {
+                e.preventDefault();
+                setZoom(window.ZOOM_LEVEL - ZOOM_STEP);
+            } else if (e.key === '0') {
+                e.preventDefault();
+                setZoom(1.0);
+            } else if (e.key === 'c' || e.key === ' ') {
+                e.preventDefault();
+                renderer.center();
+            }
+        });
+
+        // Animation loop
+        function loop() {
+            renderer.render();
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        console.log('⚔️ Test Texture initialisé !');
+        console.log('🎮 Controls: Drag pour pan, Molette pour zoom, C pour centrer');
+    </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+{
+  "CAGE_TRIALS": {
+    "SYSTEM": {
+      "frequency": "1 cage guaranteed every 2 floors",
+      "timeLimit": 60,
+      "penaltyNoChoice": {
+        "effect": "Both prisoners die",
+        "corruption": 25,
+        "dialogue": "Tu as refusé de choisir. Mais ne rien choisir... c'est choisir aussi. Les deux meurent."
+      },
+      "loreReason": "Les Cages sont des fragments de Thalys - micro-univers où temps et espace plient. À l'intérieur, deux prisonniers. Tu dois en sauver un. L'autre meurt. Il n'y a pas de bon choix."
+    },
+
+    "TRIALS": {
+      "CAGE_01": {
+        "id": "CAGE_01",
+        "name": "Le Marchand ou l'Or",
+        "floor": 2,
+        "difficulty": "Introduction",
+
+        "setup": {
+          "visual": "Deux cages. Gauche: homme tremblant. Droite: coffre doré scintillant.",
+          "ambient": "Tic-tac. 60 secondes. Les cages vibrent."
+        },
+
+        "prisonerA": {
+          "name": "Aldric le Marchand",
+          "appearance": "Homme 50s, maigre, yeux suppliants",
+          "plea": "J'ai une famille! Mes enfants attendent! S'il vous plaît!",
+          "truth": "Ses enfants sont morts il y a 10 ans. Peste. Il ment. Mais il peut être utile.",
+          "save": {
+            "reward": "Aldric rejoint village, unlock shop",
+            "villageRole": "Merchant - vend items, prix normal si corruption < 50%, +20% si > 50%",
+            "dialogue": "Merci... merci... Je vous dois tout. Ma boutique est vôtre.",
+            "guilt": "+5% corruption (tu as choisi utilitaire sur or)"
+          },
+          "death": {
+            "immediate": "Aldric hurle. La cage s'effondre. Silence.",
+            "delayed": "Revient boss 'Greed Phantom' étage 4",
+            "bossDialogue": "Tu as choisi l'or... comme tout le monde... toujours l'or...",
+            "guilt": "+8% corruption"
+          }
+        },
+
+        "prisonerB": {
+          "name": "Coffre d'Or Ancien",
+          "appearance": "Coffre massif, or pur, gravures mystiques",
+          "plea": "...",
+          "truth": "Contient 500 gold + 1 item rare aléatoire. Mais l'or était maudit.",
+          "save": {
+            "reward": "500 gold + rare item",
+            "curse": "-10% all stats permanent (greed curse)",
+            "dialogue": "L'or coule entre tes doigts. Chaud. Lourd. Tentant. Mais... quelque chose ne va pas.",
+            "guilt": "+12% corruption (tu as tué un homme pour de l'or)"
+          },
+          "death": {
+            "immediate": "Le coffre explose en poussière dorée. Rien à récupérer.",
+            "npcReaction": "Aldric: 'Vous avez choisi... moi? Pourquoi?'",
+            "hidden": "Si corruption < 20%, +10% shop discount permanent (Aldric loyal)"
+          }
+        },
+
+        "twist": {
+          "trigger": "corruption > 50%",
+          "thalysOffer": {
+            "dialogue": "Les Dés murmurent: 'Il y a... une troisième option. Veux-tu la voir?'",
+            "option": "Tuer les deux, prendre l'or ET l'âme du marchand",
+            "reward": "500 gold + Aldric's Soul (accessory: +10 luck, +5% shop prices everywhere)",
+            "cost": "+30% corruption",
+            "reaction": "Thalys rit. 'Voilà. L'humanité dans toute sa splendeur.'"
+          }
+        }
+      },
+
+      "CAGE_02": {
+        "id": "CAGE_02",
+        "name": "L'Enfant ou le Héros",
+        "floor": 3,
+        "difficulty": "Moral",
+
+        "prisonerA": {
+          "name": "Mira, 8 ans",
+          "appearance": "Petite fille, cheveux blonds, robe déchirée, pleure",
+          "plea": "Maman? T'es ma maman? Aide-moi...",
+          "truth": "Orpheline. Pure. Innocente. Inutile en combat. Mais... c'est une enfant.",
+          "save": {
+            "reward": "Mira rejoint village",
+            "villageEffect": "+30 morale, NPCs te respectent (+15% all interactions)",
+            "noMechanicalBonus": "Elle ne donne aucun bonus combat/shop",
+            "dialogue": "Mira t'enlace. 'Merci... merci grande sœur...' Tu sens son cœur battre. Si fragile.",
+            "guilt": "+3% corruption (tu as sacrifié un guerrier pour une enfant inutile)"
+          },
+          "death": {
+            "immediate": "Mira crie. 'NON! MAMAN!' La cage s'écrase. Le cri s'arrête.",
+            "villageReaction": "NPCs te haïssent. -40 morale. Certains refusent de te parler.",
+            "dialogue": "Tu as tué une enfant. Pour quoi? Un soldat? De l'utilité? Monster.",
+            "guilt": "+40% corruption",
+            "nightmares": "Chaque repos au village, 10% chance d'entendre 'Maman?' (audio subtil)"
+          }
+        },
+
+        "prisonerB": {
+          "name": "Gareth, Champion Déchu",
+          "appearance": "Homme 30s, armure cassée, musclé, regard fuyant",
+          "plea": "Je peux t'aider! Je suis fort! Prends-moi!",
+          "truth": "Ancien héros, a fui un combat crucial. 50 alliés morts à cause de lui. Lâche. Mais compétent.",
+          "save": {
+            "reward": "Gareth devient companion (permanent)",
+            "stats": "+20% player damage quand ensemble, tank 30% dmg reçus",
+            "dialogue": "Je... merci. Je ne te décevrai pas. Cette fois.",
+            "hidden": "Si corruption < 30%, Gareth redemption arc (3 floors later, se sacrifie pour toi)",
+            "guilt": "+15% corruption (tu as tué une enfant pour un lâche)"
+          },
+          "death": {
+            "immediate": "Gareth hurle: 'NON PAS ENCORE!' Puis silence.",
+            "delayed": "Revient boss 'Coward's Regret' étage 5",
+            "bossDialogue": "Tu m'as abandonné... comme les autres... toujours abandonné...",
+            "guilt": "+5% corruption"
+          }
+        },
+
+        "dilemma": "Utilité vs Humanité. C'est quoi être un héros? Sauver qui peut se battre? Ou sauver qui ne peut pas se défendre?"
+      },
+
+      "CAGE_03": {
+        "id": "CAGE_03",
+        "name": "Le Bourreau ou la Victime",
+        "floor": 4,
+        "difficulty": "Justice",
+
+        "prisonerA": {
+          "name": "Thorne, ex-Bourreau Royal",
+          "appearance": "Homme massif, cicatrices, mains énormes",
+          "plea": "Je faisais mon devoir. Rien de plus. Les ordres sont les ordres.",
+          "truth": "A exécuté 200 innocents. Suivait les ordres du roi tyran. Jamais questionné.",
+          "save": {
+            "reward": "Teach skill 'Execution' (active: instant kill enemy <15% HP, cooldown 5 tours)",
+            "dialogue": "Tu as... sauvé un bourreau. Je t'enseignerai. Tuer proprement. C'est un art.",
+            "villageReaction": "NPCs mal à l'aise. -10 morale.",
+            "guilt": "+10% corruption (sauver un meurtrier de masse)"
+          },
+          "death": {
+            "immediate": "Thorne ne dit rien. Accepte. La hache tombe. Comme pour les 200 autres.",
+            "reward": "200 fantômes apparaissent brièvement. 'Merci.' -10% corruption.",
+            "hidden": "Secret: si class = SHATTERED_KNIGHT, dialogue: 'La justice... vraie justice.'"
+          }
+        },
+
+        "prisonerB": {
+          "name": "Elena, Dernière Condamnée",
+          "appearance": "Femme 20s, maigre, mains tremblantes",
+          "plea": "J'ai volé du pain. Pour ma petite sœur. Elle avait faim. Pitié.",
+          "truth": "A volé. Mais pour nourrir. Innocente? Coupable? Où est la ligne?",
+          "save": {
+            "reward": "Elena devient companion (support)",
+            "stats": "+15% heal reçus, peut craft potions avec herbs trouvées",
+            "dialogue": "Ma sœur... elle est morte pendant que j'étais emprisonnée. Mais... merci.",
+            "guilt": "+8% corruption (as-tu sauvé une voleuse?)"
+          },
+          "death": {
+            "immediate": "Elena pleure. 'Ma sœur... seule... pardon...' Silence.",
+            "guilt": "+12% corruption",
+            "haunt": "Chaque treasure chest, 5% chance d'entendre 'Pour ma sœur...'"
+          }
+        },
+
+        "dilemma": "Justice vs Vengeance vs Pitié. Les ordres excusent-ils le meurtre? Le besoin excuse-t-il le vol? Qui juge?"
+      },
+
+      "CAGE_07": {
+        "id": "CAGE_07",
+        "name": "Toi ou Ton Reflet",
+        "floor": 5,
+        "difficulty": "Philosophique",
+
+        "prisonerA": {
+          "name": "Toi (Passé)",
+          "appearance": "Toi, mais plus jeune, innocent, apeuré",
+          "plea": "Sauve-moi. Si je meurs, tu n'auras jamais existé. Paradoxe.",
+          "truth": "Peut-être vrai. Peut-être illusion de Thalys. Impossible à vérifier.",
+          "save": {
+            "reward": "+1 skill point, accès à un souvenir (cutscene: ta vie avant)",
+            "dialogue": "Tu te souviens... d'avant. Quand tu étais innocent. C'était... il y a longtemps.",
+            "guilt": "+0% corruption (sauver soi-même n'est ni bon ni mal)"
+          },
+          "death": {
+            "immediate": "Ton passé meurt. Tu existes toujours. C'était un mensonge.",
+            "reward": "+0% corruption",
+            "thalysDialogue": "Thalys: 'Je voulais voir si tu le ferais. Tuer toi-même. Fascinant.'"
+          }
+        },
+
+        "prisonerB": {
+          "name": "Toi (Futur)",
+          "appearance": "Toi, mais corrompu à 100%, yeux vides, aura démoniaque",
+          "plea": "Ne me sauve pas. Laisse-moi mourir. Brise le cycle. S'il te plaît.",
+          "truth": "Toi si tu atteins 100% corruption. Il veut que tu évites ce destin.",
+          "save": {
+            "reward": "+20% corruption, mais unlock hint secret ending",
+            "dialogue": "Futur-Toi: 'Pourquoi... pourquoi m'as-tu sauvé... je voulais juste... finir...'",
+            "warning": "Ael'mora murmure: 'Le futur n'est pas fixé. Pas encore.'"
+          },
+          "death": {
+            "immediate": "Futur-Toi sourit. 'Merci.' Se dissout pacifiquement.",
+            "reward": "-15% corruption",
+            "blessing": "Ael'mora: 'Tu as choisi de ne pas devenir... ça. Sage.'"
+          }
+        },
+
+        "dilemma": "Identité, cycles, libre arbitre. Es-tu ton passé? Ton futur? Ou quelque chose entre?"
+      },
+
+      "CAGE_10": {
+        "id": "CAGE_10",
+        "name": "Le Prêtre ou le Démon",
+        "floor": 6,
+        "difficulty": "Foi",
+
+        "prisonerA": {
+          "name": "Père Aldrin",
+          "appearance": "Vieux prêtre, soutane usée, croix dorée",
+          "plea": "J'ai prié toute ma vie. Les dieux sont morts. Mais la foi... reste.",
+          "truth": "A prié Morwyn pendant 60 ans. Jamais de réponse. Continue quand même.",
+          "save": {
+            "reward": "Père Aldrin rejoint village, build Chapel",
+            "service": "Prayer: -5% corruption, 1/floor",
+            "dialogue": "Les dieux ne répondent plus. Mais prier... apaise quand même. Viens. Prions ensemble.",
+            "guilt": "+0% corruption"
+          },
+          "death": {
+            "immediate": "Aldrin prie jusqu'au dernier souffle. '...amen.' Silence.",
+            "guilt": "+10% corruption",
+            "haunt": "Parfois, dans le silence, tu entends une prière lointaine"
+          }
+        },
+
+        "prisonerB": {
+          "name": "Azrath, Démon Mineur",
+          "appearance": "Créature cornue, chaînes divines, yeux rouges",
+          "plea": "Libère-moi. Je te servirai. 1000 ans. Pacte de sang.",
+          "truth": "Démontie vrai. Servira... mais corrompra aussi.",
+          "save": {
+            "reward": "Azrath devient summon permanent",
+            "stats": "+40% fire dmg, tank 50% dmg, mais +2% corruption/combat",
+            "dialogue": "Le pacte est scellé. Tu es mon maître. Et je suis ta damnation.",
+            "cost": "+25% corruption immédiate",
+            "danger": "Si corruption atteint 100% avec Azrath équipé, instant ending B"
+          },
+          "death": {
+            "immediate": "Azrath rit. 'Tu as choisi la foi. Intéressant. Nous nous reverrons.'",
+            "delayed": "Azrath revient boss étage 8, mais plus faible (half stats)",
+            "blessing": "Père Aldrin (si sauvé): 'Tu as résisté. Les dieux... ils te regardent peut-être.'"
+          }
+        },
+
+        "dilemma": "Foi vs Pouvoir. Croire en dieux morts ou pactiser avec démons vivants?"
+      },
+
+      "CAGE_13": {
+        "id": "CAGE_13",
+        "name": "La Mère ou l'Enfant (Revisité)",
+        "floor": 7,
+        "difficulty": "Impossible",
+
+        "prisonerA": {
+          "name": "Femme enceinte (9e mois)",
+          "appearance": "Ventre énorme, peau pâle, yeux terrifiés",
+          "plea": "Mon bébé... il vit encore... sauvez-nous... s'il vous plaît...",
+          "truth": "L'enfant à naître est possédé. Hybrid embryonnaire. Dangereux.",
+          "save": {
+            "immediate": "Elle rejoint village, accouche 1 floor plus tard",
+            "event": "Accouchement (cutscene)",
+            "choice": {
+              "keepBaby": {
+                "effect": "Bébé grandit (accéléré), devient NPC spécial",
+                "danger": "+1% corruption/jour, bébé peut devenir boss si corruption >80%",
+                "hope": "Si corruption < 30%, bébé guérit, devient bénédiction (+20% XP gain)"
+              },
+              "killBaby": {
+                "effect": "Mère se suicide. Village -50 morale.",
+                "guilt": "+35% corruption",
+                "haunt": "Pleurs de bébé audibles chaque nuit"
+              }
+            }
+          },
+          "death": {
+            "immediate": "Mère et enfant meurent ensemble. Deux âmes. Ou deux menaces évitées?",
+            "guilt": "+20% corruption",
+            "relief": "Prêtresse (si sauvée): 'Tu as fait... ce qui était nécessaire. Peut-être.'"
+          }
+        },
+
+        "prisonerB": {
+          "name": "Prêtresse de Ael'mora",
+          "appearance": "Femme 30s, robes blanches, symbole Ael'mora",
+          "plea": "Je peux purifier l'enfant! Rituel ancien! Sauvez-moi!",
+          "truth": "Peut PEUT-ÊTRE purifier. 50% chance. Si échoue, tue la mère.",
+          "save": {
+            "immediate": "Prêtresse rejoint village",
+            "ritual": {
+              "trigger": "Prochain repos",
+              "RNG": "50% purify enfant (Hybrid → humain), 50% tue mère + enfant",
+              "success": "Bébé sauvé, pur, +20 morale, -10% corruption",
+              "fail": "Mère + enfant meurent, Prêtresse traumatisée, +25% corruption"
+            },
+            "dialogue": "Le rituel est dangereux. Mais... c'est notre seul espoir."
+          },
+          "death": {
+            "immediate": "Prêtresse: 'Ael'mora... pardonne-moi...' Disparaît en lumière.",
+            "consequence": "Mère accouche seule. Bébé = Hybrid. Choice: kill ou keep (voir prisonerA)"
+          }
+        },
+
+        "dilemma": "Espoir vs Pragmatisme. Tous les enfants méritent-ils de vivre? Même les monstres à naître?"
+      },
+
+      "CAGE_16": {
+        "id": "CAGE_16",
+        "name": "Le Roi ou le Royaume (Final Cage)",
+        "floor": 9,
+        "difficulty": "Finale",
+
+        "prisonerA": {
+          "name": "Roi Malachai (fantôme)",
+          "appearance": "Spectre royal, couronne brisée, flèche dans le cœur",
+          "plea": "Je suis déjà mort. Mais si je disparais totalement... 1000 ans d'histoire oubliée.",
+          "truth": "C'est le roi tyran que Silent Archer a tué. Son fantôme préserve l'Histoire.",
+          "save": {
+            "reward": "Unlock 'Royal Archives' (lore codex complet: histoire pré-Déchirement)",
+            "dialogue": "Je n'étais pas bon. Mais j'étais roi. L'histoire doit se souvenir. Même des monstres.",
+            "hidden": "Si class = SILENT_ARCHER, dialogue spécial: 'Toi... c'était toi... je... pardonne.'",
+            "guilt": "+5% corruption (sauver un tyran)"
+          },
+          "death": {
+            "immediate": "Malachai: 'Alors... même l'Histoire m'oublie. C'est justice.' Disparaît.",
+            "consequence": "1000 ans d'histoire perdus. Certains lore codex inaccessibles.",
+            "reward": "-8% corruption (tuer tyran même mort = justice)"
+          }
+        },
+
+        "prisonerB": {
+          "name": "10 000 âmes (essence collective)",
+          "appearance": "Orbe lumineux, visages flottants, voix multiples",
+          "plea": "Nous sommes les 10 000. Tués par Malachai. Sauve-nous. Venge-nous.",
+          "truth": "Victimes innocentes. Familles. Enfants. Tous massacrés.",
+          "save": {
+            "reward": "10 000 fantômes te bénissent",
+            "effect": "+30% XP gain permanent, +10% all stats, spectral allies appear sometimes",
+            "dialogue": "Merci. Nous pouvons enfin... reposer. Ou te suivre. Toujours.",
+            "guilt": "+0% corruption",
+            "visual": "Parfois, en combat, 1-2 spectres apparaissent, aident 1 tour"
+          },
+          "death": {
+            "immediate": "Les 10 000 pleurent. 'Oubliés... même nos fantômes...' Silence.",
+            "consequence": "Leur souffrance persiste, errant éternellement",
+            "guilt": "+30% corruption",
+            "haunt": "Chaque combat, 10% chance d'entendre pleurs multiples"
+          }
+        },
+
+        "dilemma": "L'Histoire vs La Justice. Faut-il préserver même les monstres? Ou effacer et honorer leurs victimes?"
+      }
+    },
+
+    "STATISTICS_TRACKING": {
+      "tracked": [
+        "Total cages encountered",
+        "Prisoner A saved count",
+        "Prisoner B saved count",
+        "Both killed count (no choice)",
+        "Thalys third options taken",
+        "Average decision time",
+        "Pattern (always A, always B, mixed, time-based)"
+      ],
+
+      "endingDialogue": {
+        "allA": {
+          "trigger": "Saved A in 90%+ cages",
+          "dialogue": "Tu as toujours choisi la même main. Est-ce de la cohérence... ou de la lâcheté? Penser, c'est dur."
+        },
+        "allB": {
+          "trigger": "Saved B in 90%+ cages",
+          "dialogue": "Toujours B. Jamais A. Un pattern. Une prison mentale. Es-tu libre?"
+        },
+        "balanced": {
+          "trigger": "50/50 split",
+          "dialogue": "Parfois A. Parfois B. Tu pèses chaque choix. Ael'mora te regarde. Elle sourit."
+        },
+        "neverChose": {
+          "trigger": "Skipped 3+ cages",
+          "dialogue": "Tu refuses de choisir. Mais ne rien choisir... c'est choisir aussi. Le pire choix."
+        },
+        "instant": {
+          "trigger": "Decisions <5 secondes average",
+          "dialogue": "Tu choisis vite. Trop vite. Instinct ou... indifférence?"
+        },
+        "hesitant": {
+          "trigger": "Decisions >40 secondes average",
+          "dialogue": "Tu hésites. Longtemps. Chaque fois. Le poids des vies. Tu le sens."
+        }
+      }
+    },
+
+    "META": {
+      "totalCages": 16,
+      "implementedAbove": 7,
+      "difficulty": {
+        "introduction": ["CAGE_01"],
+        "moral": ["CAGE_02", "CAGE_03"],
+        "philosophique": ["CAGE_07", "CAGE_10"],
+        "impossible": ["CAGE_13", "CAGE_16"]
+      },
+      "corruptionImpact": "Cages sont le principal vecteur de corruption morale (30-40% total corruption vient des cages)",
+      "replayValue": "16 cages x 2 choix x variants = 100+ outcomes possibles",
+      "emotionalGoal": "Joueur doit pleurer au moins 1 fois, ou se sentir sale après un choix"
+    }
+  }
+}

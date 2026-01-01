@@ -1,0 +1,685 @@
+/**
+ * DICE SYSTEM CSS - THE LAST COVENANT
+ * Système visuel complet pour le Dé du Destin
+ * Supporte les 5 stades d'évolution
+ */
+
+/* ═══════════════════════════════════════════════════════
+   OVERLAY PRINCIPAL - Full-screen transparent
+   ═══════════════════════════════════════════════════════ */
+
+.dice-overlay-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  backdrop-filter: blur(5px);
+}
+
+.dice-overlay-container.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.dice-overlay-container.closing {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DÉ PRINCIPAL - Cube 3D
+   ═══════════════════════════════════════════════════════ */
+
+.dice-display {
+  perspective: 1200px;
+  perspective-origin: center;
+}
+
+.dice-cube {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+}
+
+/* Animation de rotation de base */
+.dice-cube.spinning {
+  animation: dice-spin 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes dice-spin {
+  0% {
+    transform: scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  25% {
+    transform: scale(1.2) rotateX(270deg) rotateY(270deg) rotateZ(90deg);
+  }
+  50% {
+    transform: scale(1) rotateX(540deg) rotateY(540deg) rotateZ(180deg);
+  }
+  75% {
+    transform: scale(1.2) rotateX(810deg) rotateY(810deg) rotateZ(270deg);
+  }
+  100% {
+    transform: scale(1) rotateX(1080deg) rotateY(1080deg) rotateZ(360deg);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   STADES VISUELS - 5 évolutions
+   ═══════════════════════════════════════════════════════ */
+
+/* STADE 1 : Ivoire Poli (Endormi) */
+.dice-cube.stage-1 {
+  background: linear-gradient(135deg, #f5f5f5 0%, #d3d3d3 100%);
+  border: 2px solid #aaa;
+  border-radius: 10px;
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 2px 5px rgba(255, 255, 255, 0.3);
+}
+
+/* STADE 2 : Os Craquelé (Éveillé) */
+.dice-cube.stage-2 {
+  background: linear-gradient(135deg, #fffacd 0%, #f5deb3 100%);
+  border: 2px solid #daa520;
+  border-radius: 10px;
+  box-shadow:
+    0 5px 20px rgba(255, 215, 0, 0.4),
+    inset 0 2px 5px rgba(255, 255, 255, 0.4),
+    0 0 30px rgba(255, 215, 0, 0.3);
+  position: relative;
+}
+
+.dice-cube.stage-2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(218, 165, 32, 0.3) 42%,
+    transparent 44%
+  );
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+/* STADE 3 : Chair Pulsante (Vivant) */
+.dice-cube.stage-3 {
+  background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+  border: 2px solid #ff6347;
+  border-radius: 10px;
+  box-shadow:
+    0 5px 25px rgba(220, 20, 60, 0.6),
+    inset 0 2px 8px rgba(255, 99, 71, 0.4),
+    0 0 40px rgba(220, 20, 60, 0.5);
+  animation: dice-pulse-heartbeat 2s infinite;
+  position: relative;
+}
+
+.dice-cube.stage-3::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      rgba(139, 0, 0, 0.5) 2px,
+      transparent 4px
+    );
+  border-radius: 10px;
+  pointer-events: none;
+  animation: veins-pulse 1.5s infinite;
+}
+
+@keyframes dice-pulse-heartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.05); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.08); }
+}
+
+@keyframes veins-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* STADE 4 : Vide Abyssal (Divin) */
+.dice-cube.stage-4 {
+  background:
+    radial-gradient(circle at 30% 30%, #9370db 0%, #4b0082 50%, #000 100%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="10" cy="10" r="1" fill="white" opacity="0.8"/><circle cx="40" cy="30" r="1" fill="white" opacity="0.6"/><circle cx="70" cy="50" r="1" fill="white" opacity="0.9"/><circle cx="20" cy="70" r="1" fill="white" opacity="0.5"/><circle cx="80" cy="20" r="1" fill="white" opacity="0.7"/></svg>');
+  border: 2px solid #9370db;
+  border-radius: 10px;
+  box-shadow:
+    0 10px 40px rgba(147, 112, 219, 0.7),
+    inset 0 0 20px rgba(147, 112, 219, 0.5),
+    0 0 60px rgba(147, 112, 219, 0.6);
+  animation:
+    dice-cosmic-float 4s infinite ease-in-out,
+    dice-cosmic-glow 2s infinite;
+  position: relative;
+}
+
+@keyframes dice-cosmic-float {
+  0%, 100% { transform: translateY(0) rotateZ(0deg); }
+  50% { transform: translateY(-10px) rotateZ(5deg); }
+}
+
+@keyframes dice-cosmic-glow {
+  0%, 100% { box-shadow:
+    0 10px 40px rgba(147, 112, 219, 0.7),
+    0 0 60px rgba(147, 112, 219, 0.6); }
+  50% { box-shadow:
+    0 10px 40px rgba(147, 112, 219, 1),
+    0 0 80px rgba(147, 112, 219, 0.9); }
+}
+
+/* STADE 5 : Symbiose Totale (Fusionné) */
+.dice-cube.stage-5 {
+  background:
+    linear-gradient(45deg,
+      #000 0%,
+      #dc143c 25%,
+      #9370db 50%,
+      #ffd700 75%,
+      #000 100%
+    );
+  background-size: 400% 400%;
+  border: 3px solid transparent;
+  border-image: linear-gradient(45deg, #ffd700, #dc143c, #9370db, #ffd700) 1;
+  border-radius: 10px;
+  box-shadow:
+    0 15px 50px rgba(255, 215, 0, 0.8),
+    0 0 100px rgba(220, 20, 60, 0.6),
+    inset 0 0 30px rgba(147, 112, 219, 0.7);
+  animation:
+    dice-chaos-morph 3s infinite,
+    dice-chaos-gradient 5s infinite linear;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes dice-chaos-morph {
+  0%, 100% { transform: scale(1) rotate(0deg); border-radius: 10px; }
+  33% { transform: scale(1.1) rotate(5deg); border-radius: 20px; }
+  66% { transform: scale(0.95) rotate(-5deg); border-radius: 5px; }
+}
+
+@keyframes dice-chaos-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.dice-cube.stage-5::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 215, 0, 0.1) 1px,
+      transparent 2px
+    );
+  animation: glitch-scan 3s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes glitch-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   RÉSULTAT - Chiffre géant
+   ═══════════════════════════════════════════════════════ */
+
+#result-number {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 200px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow:
+    0 0 20px currentColor,
+    0 0 40px currentColor,
+    0 0 60px currentColor;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 10000;
+  pointer-events: none;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+}
+
+#result-number.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.5);
+}
+
+/* ═══════════════════════════════════════════════════════
+   YEUX DU DÉ - Apparaissent selon stade
+   ═══════════════════════════════════════════════════════ */
+
+.dice-eye {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #ff0000 30%, #8b0000 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 10px rgba(255, 0, 0, 0.8),
+    inset 0 2px 5px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.5s ease, clip-path 0.5s ease;
+  clip-path: circle(0% at 50% 50%);
+}
+
+.dice-eye.open {
+  opacity: 1;
+  clip-path: circle(50% at 50% 50%);
+  animation: eye-blink 3s infinite;
+}
+
+@keyframes eye-blink {
+  0%, 90%, 100% { clip-path: circle(50% at 50% 50%); }
+  95% { clip-path: circle(0% at 50% 50%); }
+}
+
+/* Position des yeux */
+.dice-eye-1 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.dice-eye-2 { top: 20%; left: 50%; transform: translate(-50%, 0); }
+.dice-eye-3 { top: 80%; left: 50%; transform: translate(-50%, -100%); }
+.dice-eye-4 { top: 50%; left: 20%; transform: translate(0, -50%); }
+.dice-eye-5 { top: 50%; left: 80%; transform: translate(-100%, -50%); }
+.dice-eye-6 { top: 20%; left: 20%; }
+
+/* Pupille qui suit la souris (via JS) */
+.dice-eye::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #000;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MURMURES / DIALOGUES DU DÉ
+   ═══════════════════════════════════════════════════════ */
+
+.dice-whisper {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffd700;
+  padding: 15px 30px;
+  border-radius: 10px;
+  border: 2px solid #ffd700;
+  font-size: 18px;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  box-shadow:
+    0 5px 20px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(255, 215, 0, 0.3);
+  z-index: 10001;
+  opacity: 0;
+  transition: all 0.5s ease;
+  pointer-events: none;
+  max-width: 80%;
+  text-align: center;
+}
+
+.dice-whisper.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dice-whisper.betrayal {
+  color: #dc143c;
+  border-color: #dc143c;
+  box-shadow:
+    0 5px 20px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(220, 20, 60, 0.5);
+  animation: whisper-shake 0.5s;
+}
+
+@keyframes whisper-shake {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  10% { transform: translateX(-48%) translateY(0); }
+  20% { transform: translateX(-52%) translateY(0); }
+  30% { transform: translateX(-48%) translateY(0); }
+  40% { transform: translateX(-52%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   EFFETS VISUELS - Screen shake, flash, ripple
+   ═══════════════════════════════════════════════════════ */
+
+/* Screen Shake (appliqué sur body via JS) */
+.screen-shake {
+  animation: screen-shake-anim 0.5s;
+}
+
+@keyframes screen-shake-anim {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5px, 5px); }
+  20% { transform: translate(5px, -5px); }
+  30% { transform: translate(-5px, -5px); }
+  40% { transform: translate(5px, 5px); }
+  50% { transform: translate(-5px, 5px); }
+  60% { transform: translate(5px, -5px); }
+  70% { transform: translate(-5px, -5px); }
+  80% { transform: translate(5px, 5px); }
+  90% { transform: translate(-5px, 5px); }
+}
+
+/* Ripple effect (créé dynamiquement via JS) */
+.ripple-effect {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 3px solid #ffd700;
+  opacity: 1;
+  animation: ripple-expand 1s ease-out forwards;
+}
+
+@keyframes ripple-expand {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(20); opacity: 0; }
+}
+
+/* Flash lumineux (overlay blanc/coloré) */
+.dice-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  opacity: 0.8;
+  z-index: 9998;
+  pointer-events: none;
+  animation: flash-fade 0.3s ease-out forwards;
+}
+
+@keyframes flash-fade {
+  0% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PARTICULES CSS (Fallback si Canvas désactivé)
+   ═══════════════════════════════════════════════════════ */
+
+.dice-particle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: #ffd700;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  animation: particle-fall 1s ease-out forwards;
+}
+
+@keyframes particle-fall {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0);
+  }
+}
+
+/* Particules variantes */
+.dice-particle.gold { background: #ffd700; }
+.dice-particle.red { background: #dc143c; }
+.dice-particle.purple { background: #9370db; }
+.dice-particle.white { background: #fff; }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE - Mobile
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .dice-cube {
+    width: 80px;
+    height: 80px;
+  }
+
+  #result-number {
+    font-size: 120px;
+  }
+
+  .dice-whisper {
+    font-size: 14px;
+    padding: 10px 20px;
+    max-width: 90%;
+  }
+
+  .dice-eye {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ACCESSIBILITÉ - Réduction de mouvement
+   ═══════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .dice-cube,
+  .dice-cube.spinning,
+  .dice-whisper,
+  .dice-eye,
+  .ripple-effect {
+    animation: none !important;
+    transition: opacity 0.3s ease !important;
+  }
+
+  .dice-cube.stage-3,
+  .dice-cube.stage-4,
+  .dice-cube.stage-5 {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎲 CUBE 3D RÉEL - COMBAT STYLE (VRAI CUBE AVEC 6 FACES)
+   ═══════════════════════════════════════════════════════ */
+
+.dice-3d-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  perspective: 800px;
+}
+
+.dice-3d {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s;
+}
+
+.dice-3d.rolling {
+  animation: diceRoll 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.dice-3d.impact {
+  animation: diceImpact 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes diceRoll {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  25% {
+    transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg);
+  }
+  50% {
+    transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg);
+  }
+  75% {
+    transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg);
+  }
+  100% {
+    transform: rotateX(1440deg) rotateY(720deg) rotateZ(360deg);
+  }
+}
+
+@keyframes diceImpact {
+  0% {
+    transform: scale(1) rotateX(0deg);
+  }
+  20% {
+    transform: scale(1.3) rotateX(-10deg);
+  }
+  40% {
+    transform: scale(0.9) rotateX(5deg);
+  }
+  60% {
+    transform: scale(1.1) rotateX(-3deg);
+  }
+  80% {
+    transform: scale(0.95) rotateX(2deg);
+  }
+  100% {
+    transform: scale(1) rotateX(0deg);
+  }
+}
+
+.dice-face {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, #2a1510 0%, #1a0a05 100%);
+  border: 3px solid #C9A877;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 80px;
+  color: #C9A877;
+  font-weight: 900;
+  text-shadow:
+    0 0 20px rgba(201, 168, 119, 1),
+    0 3px 6px rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 4px 8px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(201, 168, 119, 0.5);
+}
+
+.dice-face.front { transform: rotateY(0deg) translateZ(75px); }
+.dice-face.back { transform: rotateY(180deg) translateZ(75px); }
+.dice-face.right { transform: rotateY(90deg) translateZ(75px); }
+.dice-face.left { transform: rotateY(-90deg) translateZ(75px); }
+.dice-face.top { transform: rotateX(90deg) translateZ(75px); }
+.dice-face.bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+/* Effet d'impact flash */
+.dice-impact-flash {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dice-impact-flash.active {
+  animation: impactFlash 0.5s ease-out;
+}
+
+@keyframes impactFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+/* Shake container lors de l'impact */
+.dice-3d-container.shake {
+  animation: diceContainerShake 0.3s;
+}
+
+@keyframes diceContainerShake {
+  0%, 100% { transform: translate(0, 0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate(-3px, 3px); }
+  20%, 40%, 60%, 80% { transform: translate(3px, -3px); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILITAIRES
+   ═══════════════════════════════════════════════════════ */
+
+.dice-hidden {
+  display: none !important;
+}
+
+.dice-fade-in {
+  animation: fade-in 0.5s ease-in forwards;
+}
+
+.dice-fade-out {
+  animation: fade-out 0.5s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

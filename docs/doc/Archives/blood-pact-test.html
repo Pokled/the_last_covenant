@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🩸 Blood Pact System - Test</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Crimson Text', serif;
+      background: linear-gradient(180deg, #0a0a0f 0%, #1a0a0a 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .test-container {
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 3em;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.2em;
+      color: #999;
+      margin-bottom: 40px;
+      font-style: italic;
+    }
+
+    .player-info {
+      background: rgba(10, 10, 15, 0.9);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .player-info h2 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      margin-bottom: 20px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-item {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 3px solid #d4af37;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.8em;
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    .stat-value.danger {
+      color: #ff4444;
+    }
+
+    .pact-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .pact-btn {
+      background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+      border: 2px solid rgba(139, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(139, 0, 0, 0.3);
+    }
+
+    .pact-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(139, 0, 0, 0.6);
+      border-color: #8b0000;
+    }
+
+    .pact-btn-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+    }
+
+    .pact-btn-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3em;
+      color: #d4af37;
+      margin-bottom: 10px;
+    }
+
+    .pact-btn-desc {
+      font-size: 0.9em;
+      color: #bbb;
+      line-height: 1.4;
+    }
+
+    .pact-btn-rarity {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 0.75em;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-top: 10px;
+    }
+
+    .pact-btn-rarity.common { background: rgba(128, 128, 128, 0.3); color: #999; }
+    .pact-btn-rarity.uncommon { background: rgba(0, 255, 0, 0.2); color: #0f0; }
+    .pact-btn-rarity.rare { background: rgba(0, 112, 221, 0.3); color: #4fc3f7; }
+    .pact-btn-rarity.epic { background: rgba(163, 53, 238, 0.3); color: #d896ff; }
+    .pact-btn-rarity.legendary { background: rgba(255, 128, 0, 0.3); color: #ff9800; }
+
+    .history {
+      background: rgba(10, 10, 15, 0.9);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .history h2 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      margin-bottom: 20px;
+    }
+
+    .history-item {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 3px solid #8b0000;
+      border-radius: 5px;
+    }
+
+    .history-empty {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .reset-btn {
+      display: block;
+      margin: 30px auto 0;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+      border: 2px solid #555;
+      border-radius: 8px;
+      color: #999;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .reset-btn:hover {
+      background: linear-gradient(135deg, #555 0%, #333 100%);
+      color: #ccc;
+      transform: translateY(-2px);
+    }
+
+    .warning {
+      background: rgba(139, 0, 0, 0.2);
+      border: 2px solid rgba(139, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .warning strong {
+      color: #ff6b6b;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🩸 Système de Pacte de Sang</h1>
+    <p class="subtitle">"Dans les cendres des dieux, nous avons trouvé les dés. Et les dés... nous ont trouvés."</p>
+
+    <!-- Warning -->
+    <div class="warning">
+      <strong>⚠️ Attention</strong><br>
+      Chaque pacte signé augmente ta corruption. À 100%, tu ne seras plus humain.
+    </div>
+
+    <!-- Player Info -->
+    <div class="player-info">
+      <h2>🧙 Le Pactisé</h2>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-label">💀 Corruption</div>
+          <div class="stat-value" id="corruptionStat">0%</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">❤️ Points de Vie</div>
+          <div class="stat-value" id="hpStat">100 / 100</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">⚡ Momentum</div>
+          <div class="stat-value" id="momentumStat">0 / 3</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">📜 Pactes Signés</div>
+          <div class="stat-value" id="pactsStat">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pact Buttons -->
+    <h2 style="color: #d4af37; font-family: 'Cinzel', serif; text-align: center; margin-bottom: 20px;">
+      ⚔️ Pactes Disponibles
+    </h2>
+    <div class="pact-buttons" id="pactButtons">
+      <!-- Généré dynamiquement -->
+    </div>
+
+    <!-- History -->
+    <div class="history">
+      <h2>📜 Historique des Pactes</h2>
+      <div id="historyList">
+        <div class="history-empty">Aucun pacte signé pour le moment...</div>
+      </div>
+      <button class="reset-btn" id="resetBtn">🔄 Réinitialiser (Reset Corruption)</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/blood-pact-system.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // TEST APPLICATION
+    // ═══════════════════════════════════════════════════════════════
+
+    class TestApp {
+      constructor() {
+        // État du joueur (mock)
+        this.player = {
+          name: 'Le Pactisé',
+          hp: 100,
+          maxHp: 100,
+          corruption: 0,
+          momentum: 0,
+          pactsSigned: 0,
+          rerollsAvailable: 0,
+          nextRollForced: null,
+          atkBonus: 0,
+          hpBonus: 0,
+          phantomPathsUnlocked: false,
+          canChooseFate: false
+        };
+
+        // Initialiser le système de pacte
+        this.pactSystem = new BloodPactSystem(this);
+
+        // Setup UI
+        this.setupUI();
+        this.updateStats();
+
+        console.log('✅ Test App initialisée');
+      }
+
+      setupUI() {
+        // Générer boutons de pactes
+        const pactTypes = this.pactSystem.getPactTypes();
+        const container = document.getElementById('pactButtons');
+
+        Object.values(pactTypes).forEach(pact => {
+          const btn = document.createElement('div');
+          btn.className = 'pact-btn';
+          btn.innerHTML = `
+            <div class="pact-btn-icon">${pact.icon}</div>
+            <div class="pact-btn-name">${pact.name}</div>
+            <div class="pact-btn-desc">${pact.description}</div>
+            <div class="pact-btn-rarity ${pact.rarity}">${pact.rarity.toUpperCase()}</div>
+          `;
+
+          btn.onclick = () => this.offerPact(pact.id);
+          container.appendChild(btn);
+        });
+
+        // Bouton reset
+        document.getElementById('resetBtn').onclick = () => this.reset();
+
+        // Écouter événements de pacte
+        window.addEventListener('pactSigned', (e) => {
+          console.log('🩸 Événement pactSigned reçu:', e.detail);
+          this.updateStats();
+          this.updateHistory();
+        });
+      }
+
+      async offerPact(pactType) {
+        console.log(`🩸 Proposition de pacte: ${pactType}`);
+
+        const result = await this.pactSystem.offerPact(pactType, {
+          source: 'test'
+        });
+
+        if (result.accepted) {
+          console.log('✅ Pacte accepté !');
+        } else if (result.refused) {
+          console.log('❌ Pacte refusé');
+        }
+
+        this.updateStats();
+        this.updateHistory();
+      }
+
+      updateStats() {
+        // Corruption
+        const corruptionEl = document.getElementById('corruptionStat');
+        corruptionEl.textContent = `${this.player.corruption}%`;
+        if (this.player.corruption >= 75) {
+          corruptionEl.classList.add('danger');
+        } else {
+          corruptionEl.classList.remove('danger');
+        }
+
+        // HP
+        const hpEl = document.getElementById('hpStat');
+        const maxHp = this.player.maxHp + (this.player.hpBonus || 0);
+        hpEl.textContent = `${this.player.hp} / ${maxHp}`;
+        if (this.player.hpBonus > 0) {
+          hpEl.innerHTML += ` <span style="color: #0f0; font-size: 0.6em;">(+${this.player.hpBonus})</span>`;
+        }
+
+        // Momentum
+        document.getElementById('momentumStat').textContent = `${this.player.momentum} / 3`;
+
+        // Pactes
+        document.getElementById('pactsStat').textContent = this.pactSystem.pactHistory.length;
+      }
+
+      updateHistory() {
+        const listEl = document.getElementById('historyList');
+
+        if (this.pactSystem.pactHistory.length === 0) {
+          listEl.innerHTML = '<div class="history-empty">Aucun pacte signé pour le moment...</div>';
+          return;
+        }
+
+        listEl.innerHTML = '';
+        this.pactSystem.pactHistory.forEach((pact, index) => {
+          const item = document.createElement('div');
+          item.className = 'history-item';
+          item.innerHTML = `
+            <strong>${pact.icon} ${pact.name}</strong><br>
+            <span style="color: #999; font-size: 0.9em;">
+              Corruption: +${pact.corruption}% | 
+              ${new Date(pact.signedAt).toLocaleTimeString('fr-FR')}
+            </span>
+          `;
+          listEl.appendChild(item);
+        });
+      }
+
+      reset() {
+        if (!confirm('Réinitialiser la corruption et l\'historique ?')) return;
+
+        this.player.corruption = 0;
+        this.player.momentum = 0;
+        this.player.pactsSigned = 0;
+        this.player.rerollsAvailable = 0;
+        this.player.nextRollForced = null;
+        this.player.atkBonus = 0;
+        this.player.hpBonus = 0;
+        this.player.phantomPathsUnlocked = false;
+        this.player.canChooseFate = false;
+
+        this.pactSystem.pactHistory = [];
+
+        this.updateStats();
+        this.updateHistory();
+
+        console.log('🔄 Reset complet');
+      }
+    }
+
+    // Lancer l'app au chargement
+    window.addEventListener('DOMContentLoaded', () => {
+      window.testApp = new TestApp();
+    });
+  </script>
+</body>
+</html>

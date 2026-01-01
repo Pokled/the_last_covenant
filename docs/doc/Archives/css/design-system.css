@@ -1,0 +1,419 @@
+/* ═══════════════════════════════════════════════════════
+   🎨 DESIGN SYSTEM AAA+ - COIN-COIN DUNGEON
+   Système de design unifié pour toutes les modales
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  /* ═══════════════════════════════════════════════════════
+     🎨 PALETTE DE COULEURS
+     ═══════════════════════════════════════════════════════ */
+
+  /* Or & Métaux */
+  --color-gold-primary: #D4AF37;      /* Or standard (titres principaux) */
+  --color-gold-secondary: #FFD700;     /* Or vif (accents, valeurs) */
+  --color-gold-dark: #C9A877;          /* Or pâle/beige (texte subtil) */
+  --color-silver: #C0C0C0;             /* Argent */
+  --color-bronze: #CD7F32;             /* Bronze */
+
+  /* Rouge & Danger */
+  --color-red-primary: #DC2626;        /* Rouge moderne (danger, erreurs) */
+  --color-red-dark: #8B0000;           /* Rouge sombre (backgrounds) */
+  --color-red-crimson: #DC143C;        /* Cramoisi (accents intenses) */
+  --color-red-blood: #8B1A1A;          /* Rouge sang (combat) */
+
+  /* Vert & Succès */
+  --color-green-primary: #10B981;      /* Vert moderne (succès) */
+  --color-green-dark: #047857;         /* Vert sombre (backgrounds) */
+  --color-green-light: #34D399;        /* Vert clair (highlights) */
+  --color-green-emerald: #6EE7B7;      /* Émeraude (bordures) */
+
+  /* Bleu & Magie */
+  --color-blue-primary: #3B82F6;       /* Bleu moderne */
+  --color-blue-dark: #1E40AF;          /* Bleu sombre */
+  --color-blue-light: #60A5FA;         /* Bleu clair */
+  --color-purple: #8B5CF6;             /* Violet (énigme, magie) */
+
+  /* Gris & Neutres */
+  --color-gray-100: #F3F4F6;           /* Gris très clair */
+  --color-gray-300: #D1D5DB;           /* Gris clair */
+  --color-gray-500: #6B7280;           /* Gris moyen */
+  --color-gray-700: #374151;           /* Gris sombre */
+  --color-gray-900: #111827;           /* Gris très sombre */
+
+  /* Blanc & Noir */
+  --color-white: #FFFFFF;
+  --color-white-80: rgba(255, 255, 255, 0.8);
+  --color-white-10: rgba(255, 255, 255, 0.1);
+  --color-black: #000000;
+  --color-black-30: rgba(0, 0, 0, 0.3);
+  --color-black-60: rgba(0, 0, 0, 0.6);
+  --color-black-80: rgba(0, 0, 0, 0.8);
+
+  /* ═══════════════════════════════════════════════════════
+     🌑 BACKGROUNDS DARK
+     ═══════════════════════════════════════════════════════ */
+
+  /* Backgrounds standards (marron/medieval) */
+  --bg-dark-1: #0f0707;                /* Très sombre (base) */
+  --bg-dark-2: #1a0f0a;                /* Sombre (fin) */
+  --bg-dark-3: #2a1510;                /* Moyen sombre */
+
+  /* Gradients backgrounds */
+  --bg-gradient-primary: linear-gradient(135deg, #0f0707 0%, #1a0f0a 100%);
+  --bg-gradient-secondary: linear-gradient(135deg, #2a1510 0%, #1a0a05 100%);
+
+  /* Backgrounds modaux (avec opacité) */
+  --bg-modal: linear-gradient(135deg, rgba(15, 7, 7, 0.98) 0%, rgba(26, 15, 10, 0.99) 100%);
+  --bg-modal-overlay: radial-gradient(ellipse at center, rgba(20, 20, 30, 0.85) 0%, rgba(10, 10, 15, 0.95) 100%);
+
+  /* Backgrounds spécialisés (avec teintes) */
+  --bg-treasure: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+  --bg-combat: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+  --bg-puzzle: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+  --bg-rest: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+  --bg-merchant: radial-gradient(ellipse at center, rgba(139, 69, 19, 0.15) 0%, rgba(10, 10, 15, 0.95) 100%);
+
+  /* ═══════════════════════════════════════════════════════
+     🪆 BORDURES & OMBRES
+     ═══════════════════════════════════════════════════════ */
+
+  /* Bordures */
+  --border-color-primary: var(--color-gold-primary);
+  --border-color-secondary: #6B4423;   /* Marron cuir */
+  --border-color-danger: var(--color-red-primary);
+  --border-color-success: var(--color-green-emerald);
+
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 3px;
+  --border-width-extra: 4px;
+
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;          /* STANDARD AAA+ */
+  --border-radius-large: 12px;
+  --border-radius-xl: 16px;
+
+  /* Ombres */
+  --shadow-text-subtle: 0 2px 4px rgba(0, 0, 0, 0.6);
+  --shadow-text-medium: 0 0 10px rgba(201, 168, 119, 0.5);
+  --shadow-text-strong: 0 0 20px rgba(212, 175, 55, 0.8);
+  --shadow-text-glow: 0 0 30px rgba(255, 215, 0, 1);
+
+  --shadow-box-small: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-box-medium: 0 10px 30px rgba(0, 0, 0, 0.6);
+  --shadow-box-large: 0 10px 50px rgba(0, 0, 0, 0.8);
+  --shadow-box-glow-gold: 0 0 30px rgba(212, 175, 55, 0.3);
+
+  /* Ombres inset (profondeur) */
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-inset-deep: inset 0 4px 8px rgba(0, 0, 0, 0.4);
+
+  /* ═══════════════════════════════════════════════════════
+     ✍️ TYPOGRAPHIE
+     ═══════════════════════════════════════════════════════ */
+
+  /* Fonts */
+  --font-title: 'Cinzel', serif;        /* Titres, labels */
+  --font-body: 'Crimson Text', serif;   /* Corps de texte */
+  --font-mono: 'Courier New', monospace; /* Code, stats */
+
+  /* Font Sizes */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-md: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 36px;
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.5px;
+  --letter-spacing-normal: 0px;
+  --letter-spacing-wide: 1px;
+  --letter-spacing-wider: 2px;
+
+  /* ═══════════════════════════════════════════════════════
+     🎬 ANIMATIONS & TRANSITIONS
+     ═══════════════════════════════════════════════════════ */
+
+  /* Durées */
+  --duration-instant: 0.1s;
+  --duration-fast: 0.2s;
+  --duration-normal: 0.3s;
+  --duration-medium: 0.4s;
+  --duration-slow: 0.5s;
+  --duration-very-slow: 1s;
+
+  /* Easing */
+  --ease-linear: linear;
+  --ease-in: ease-in;
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);      /* STANDARD AAA+ (bounce) */
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);   /* Smooth alternative */
+  --ease-sharp: cubic-bezier(0.4, 0, 0.2, 1);            /* Material Design */
+
+  /* Transition combos */
+  --transition-fast: all var(--duration-fast) var(--ease-in-out);
+  --transition-normal: all var(--duration-normal) var(--ease-in-out);
+  --transition-slow: all var(--duration-slow) var(--ease-smooth);
+  --transition-bounce: all var(--duration-medium) var(--ease-bounce);
+
+  /* ═══════════════════════════════════════════════════════
+     📐 SPACING & SIZING
+     ═══════════════════════════════════════════════════════ */
+
+  /* Spacing (padding, margin) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 20px;                     /* STANDARD AAA+ padding */
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 40px;
+  --space-4xl: 48px;
+
+  /* Modal Sizes */
+  --modal-width-small: 500px;           /* Corridor modals */
+  --modal-width-medium: 700px;          /* Event/Room modals */
+  --modal-width-large: 900px;           /* Shop modals */
+  --modal-width-xl: 1200px;             /* Combat modal */
+
+  /* Icon Sizes */
+  --icon-size-sm: 24px;
+  --icon-size-md: 36px;
+  --icon-size-lg: 48px;
+  --icon-size-xl: 64px;
+  --icon-size-2xl: 72px;
+  --icon-size-3xl: 96px;
+  --icon-size-4xl: 100px;
+
+  /* ═══════════════════════════════════════════════════════
+     🎯 Z-INDEX
+     ═══════════════════════════════════════════════════════ */
+
+  --z-base: 1;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 9998;             /* STANDARD AAA+ */
+  --z-modal-overlay: 9999;              /* STANDARD AAA+ */
+  --z-modal-content: 10000;             /* STANDARD AAA+ */
+  --z-popover: 10010;
+  --z-tooltip: 10020;
+  --z-notification: 10030;
+
+  /* ═══════════════════════════════════════════════════════
+     🌟 PARTICULES
+     ═══════════════════════════════════════════════════════ */
+
+  --particle-size-small: 2px;
+  --particle-size-medium: 4px;          /* STANDARD AAA+ */
+  --particle-size-large: 6px;
+
+  --particle-opacity: 0.6;
+  --particle-duration: 4s;              /* STANDARD AAA+ */
+  --particle-color: var(--color-gold-secondary);
+
+  /* ═══════════════════════════════════════════════════════
+     🎨 BOUTONS
+     ═══════════════════════════════════════════════════════ */
+
+  /* Bouton Primary (Rouge sang) */
+  --btn-primary-bg: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+  --btn-primary-bg-hover: linear-gradient(135deg, #A00000 0%, #F01848 100%);
+  --btn-primary-border: var(--color-gold-secondary);
+  --btn-primary-color: var(--color-white);
+
+  /* Bouton Success (Vert) */
+  --btn-success-bg: linear-gradient(135deg, #047857 0%, #10B981 100%);
+  --btn-success-bg-hover: linear-gradient(135deg, #059669 0%, #34D399 100%);
+  --btn-success-border: var(--color-green-emerald);
+  --btn-success-color: var(--color-white);
+
+  /* Bouton Secondary (Gris) */
+  --btn-secondary-bg: linear-gradient(135deg, #4B5563 0%, #6B7280 100%);
+  --btn-secondary-bg-hover: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  --btn-secondary-border: #9CA3AF;
+  --btn-secondary-color: var(--color-white);
+
+  /* Bouton Danger (Rouge intense) */
+  --btn-danger-bg: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  --btn-danger-bg-hover: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+  --btn-danger-border: #FCA5A5;
+  --btn-danger-color: var(--color-white);
+
+  /* Bouton padding & sizing */
+  --btn-padding-sm: 8px 16px;
+  --btn-padding-md: 12px 24px;          /* STANDARD AAA+ */
+  --btn-padding-lg: 14px 32px;
+
+  --btn-font-size-sm: 14px;
+  --btn-font-size-md: 16px;             /* STANDARD AAA+ */
+  --btn-font-size-lg: 18px;
+
+  /* ═══════════════════════════════════════════════════════
+     📜 SCROLLBAR
+     ═══════════════════════════════════════════════════════ */
+
+  --scrollbar-width: 8px;               /* STANDARD AAA+ */
+  --scrollbar-track-bg: rgba(0, 0, 0, 0.3);
+  --scrollbar-thumb-bg: linear-gradient(180deg, #C9A877 0%, #6B4423 100%);
+  --scrollbar-thumb-bg-hover: linear-gradient(180deg, #D4AF37 0%, #8B6423 100%);
+  --scrollbar-border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🌈 CLASSES UTILITAIRES
+   ═══════════════════════════════════════════════════════ */
+
+/* Scrollbar global */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-bg);
+  border-radius: var(--scrollbar-border-radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+  border-radius: var(--scrollbar-border-radius);
+  transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-bg-hover);
+}
+
+/* Text utilities */
+.text-gold { color: var(--color-gold-primary); }
+.text-red { color: var(--color-red-primary); }
+.text-green { color: var(--color-green-primary); }
+.text-white { color: var(--color-white); }
+
+.text-glow-gold { text-shadow: var(--shadow-text-glow); }
+.text-glow-subtle { text-shadow: var(--shadow-text-subtle); }
+
+/* Background utilities */
+.bg-dark { background: var(--bg-gradient-primary); }
+.bg-modal { background: var(--bg-modal); }
+
+/* Border utilities */
+.border-gold { border-color: var(--color-gold-primary); }
+.border-red { border-color: var(--color-red-primary); }
+
+/* Animation utilities */
+.animate-bounce { animation: bounce var(--duration-slow) var(--ease-bounce) infinite; }
+.animate-pulse { animation: pulse 2s var(--ease-in-out) infinite; }
+.animate-fade-in { animation: fadeIn var(--duration-normal) var(--ease-in-out); }
+
+/* ═══════════════════════════════════════════════════════
+   🎬 KEYFRAMES PARTAGÉS
+   ═══════════════════════════════════════════════════════ */
+
+/* Fade In */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Pulse universel */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Bounce universel */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Slide In (modales) */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Glow (particules, effets) */
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.5;
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 15px currentColor);
+  }
+}
+
+/* Shake (screen shake) */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate(-10px, 0); }
+  20%, 40%, 60%, 80% { transform: translate(10px, 0); }
+}
+
+/* Screen Flash */
+@keyframes screenFlash {
+  0% { opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* Particule Float */
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--particle-opacity);
+  }
+  90% {
+    opacity: var(--particle-opacity);
+  }
+  100% {
+    transform: translateY(-100vh) translateX(50px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📊 LOGS
+   ═══════════════════════════════════════════════════════ */
+
+console.log('%c🎨 Design System AAA+ chargé', 'color: #D4AF37; font-weight: bold; font-size: 14px;');
+console.log('%cVariables CSS disponibles via var(--nom-variable)', 'color: #C9A877; font-size: 12px;');

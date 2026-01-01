@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎲 Test Dé 3D Isolé</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .test-container {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 50px;
+      color: #d4af37;
+    }
+
+    /* ═══════════════════════════════════════════════════════════ */
+    /* DÉ 3D - VERSION SIMPLIFIÉE POUR TEST */
+    /* ═══════════════════════════════════════════════════════════ */
+
+    .dice-container {
+      perspective: 1000px;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .dice-cube {
+      width: 200px;
+      height: 200px;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotateCube 8s infinite linear;
+    }
+
+    @keyframes rotateCube {
+      0% { transform: rotateX(0deg) rotateY(0deg); }
+      100% { transform: rotateX(360deg) rotateY(360deg); }
+    }
+
+    /* Faces du cube */
+    .dice-face {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #e8dcc8 0%, #d4c4a8 50%, #baa88a 100%);
+      border: 3px solid rgba(100, 80, 60, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5em;
+      font-weight: bold;
+      color: #3d2817;
+      text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+      box-shadow: 
+        inset 0 4px 10px rgba(0, 0, 0, 0.4),
+        0 10px 25px rgba(0, 0, 0, 0.6);
+      backface-visibility: hidden;
+    }
+
+    .dice-face.front  { transform: rotateY(0deg) translateZ(100px); }
+    .dice-face.back   { transform: rotateY(180deg) translateZ(100px); }
+    .dice-face.right  { transform: rotateY(90deg) translateZ(100px); }
+    .dice-face.left   { transform: rotateY(-90deg) translateZ(100px); }
+    .dice-face.top    { transform: rotateX(90deg) translateZ(100px); }
+    .dice-face.bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+    .info {
+      margin-top: 50px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .info p {
+      margin: 10px 0;
+      font-size: 1.1em;
+    }
+
+    .success {
+      color: #0f0;
+    }
+
+    .error {
+      color: #f00;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🎲 Test Dé 3D Isolé</h1>
+
+    <div class="dice-container">
+      <div class="dice-cube">
+        <div class="dice-face front">1</div>
+        <div class="dice-face back">6</div>
+        <div class="dice-face right">2</div>
+        <div class="dice-face left">5</div>
+        <div class="dice-face top">3</div>
+        <div class="dice-face bottom">4</div>
+      </div>
+    </div>
+
+    <div class="info">
+      <p><strong>Ce que tu devrais voir :</strong></p>
+      <p class="success">✅ Un cube qui tourne lentement</p>
+      <p class="success">✅ Les 6 faces visibles (1, 2, 3, 4, 5, 6)</p>
+      <p class="success">✅ Texture beige/marron (osseux)</p>
+      
+      <p style="margin-top: 20px;"><strong>Si tu ne vois qu'une seule face :</strong></p>
+      <p class="error">❌ Problème de support 3D CSS dans ton navigateur</p>
+      <p class="error">❌ Ou conflit avec d'autres styles</p>
+      
+      <p style="margin-top: 20px;">
+        <strong>Navigateur :</strong> <span id="browserInfo"></span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Détection du navigateur
+    const browserInfo = navigator.userAgent;
+    document.getElementById('browserInfo').textContent = browserInfo;
+
+    // Test support 3D
+    const testDiv = document.createElement('div');
+    testDiv.style.transformStyle = 'preserve-3d';
+    const support3D = testDiv.style.transformStyle === 'preserve-3d';
+
+    console.log('Support CSS 3D Transform:', support3D);
+    console.log('User Agent:', browserInfo);
+
+    if (!support3D) {
+      alert('⚠️ Ton navigateur ne supporte pas CSS 3D Transform !');
+    }
+  </script>
+</body>
+</html>

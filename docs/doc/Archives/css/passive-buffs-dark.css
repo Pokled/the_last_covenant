@@ -1,0 +1,488 @@
+/* 🎭 SYSTÈME DE BUFFS PASSIFS - STYLE DARK MEDIEVAL */
+/* Inspiré de Diablo / Path of Exile */
+
+/* ═══════════════════════════════════════════════════════════
+   📜 LISTE DES BUFFS PASSIFS (SOUS LE JOURNAL)
+   ═══════════════════════════════════════════════════════════ */
+
+#passiveBuffsContainer {
+  margin-top: 15px;
+  padding: 12px;
+  background: linear-gradient(145deg, #1a1410 0%, #0d0d0d 100%);
+  border: 2px solid #3d2817;
+  border-radius: 4px;
+  box-shadow: 
+    inset 0 2px 8px rgba(0,0,0,0.6),
+    0 4px 12px rgba(0,0,0,0.8);
+}
+
+#passiveBuffsContainer h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #d4a574;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #3d2817;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+#passiveBuffsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Scrollbar dark */
+#passiveBuffsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#passiveBuffsList::-webkit-scrollbar-track {
+  background: #0d0d0d;
+  border-radius: 3px;
+}
+
+#passiveBuffsList::-webkit-scrollbar-thumb {
+  background: #3d2817;
+  border-radius: 3px;
+}
+
+#passiveBuffsList::-webkit-scrollbar-thumb:hover {
+  background: #4d3827;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🎯 BUFF INDIVIDUEL
+   ═══════════════════════════════════════════════════════════ */
+
+.passive-buff {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: linear-gradient(135deg, #1a1410 0%, #0d0d0d 100%);
+  border: 1px solid #3d2817;
+  border-left: 3px solid;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  cursor: help;
+}
+
+.passive-buff:hover {
+  background: linear-gradient(135deg, #2a2420 0%, #1d1d1d 100%);
+  border-color: #4d3827;
+  transform: translateX(3px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Couleurs selon rareté */
+.passive-buff.buff-common {
+  border-left-color: #8e8e8e;
+}
+
+.passive-buff.buff-uncommon {
+  border-left-color: #5fa85f;
+}
+
+.passive-buff.buff-rare {
+  border-left-color: #4d9fd4;
+}
+
+.passive-buff.buff-legendary {
+  border-left-color: #d4a574;
+  box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
+}
+
+/* Icône du buff */
+.buff-icon {
+  font-size: 24px;
+  min-width: 32px;
+  text-align: center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+/* Info du buff */
+.buff-info {
+  flex: 1;
+}
+
+.buff-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e8dcc4;
+  margin-bottom: 3px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.buff-desc {
+  font-size: 11px;
+  color: #a0958a;
+  line-height: 1.3;
+}
+
+/* Message "Aucun buff" */
+.no-buffs {
+  text-align: center;
+  padding: 20px;
+  color: #5d4e37;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🔔 NOTIFICATION NOUVEAU BUFF
+   ═══════════════════════════════════════════════════════════ */
+
+.buff-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1a1410 0%, #0d0d0d 100%);
+  border: 2px solid;
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.9);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateX(400px);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.buff-notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.buff-notification.buff-common {
+  border-color: #8e8e8e;
+}
+
+.buff-notification.buff-uncommon {
+  border-color: #5fa85f;
+  box-shadow: 0 8px 32px rgba(95, 168, 95, 0.3);
+}
+
+.buff-notification.buff-rare {
+  border-color: #4d9fd4;
+  box-shadow: 0 8px 32px rgba(77, 159, 212, 0.3);
+}
+
+.buff-notification.buff-legendary {
+  border-color: #d4a574;
+  box-shadow: 0 8px 32px rgba(212, 165, 116, 0.4);
+  animation: legendaryGlow 2s ease-in-out infinite;
+}
+
+@keyframes legendaryGlow {
+  0%, 100% { box-shadow: 0 8px 32px rgba(212, 165, 116, 0.4); }
+  50% { box-shadow: 0 8px 48px rgba(212, 165, 116, 0.6); }
+}
+
+.buff-notif-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+}
+
+.buff-notif-text {
+  flex: 1;
+}
+
+.buff-notif-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8b7355;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.buff-notif-name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8dcc4;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🪶 RÉSURRECTION PHÉNIX
+   ═══════════════════════════════════════════════════════════ */
+
+.phoenix-resurrection {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 60px;
+  background: radial-gradient(circle, rgba(212, 165, 116, 0.2) 0%, rgba(13, 13, 13, 0.95) 100%);
+  border: 4px solid #d4a574;
+  border-radius: 12px;
+  box-shadow: 0 0 80px rgba(212, 165, 116, 0.6);
+  z-index: 10001;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.phoenix-resurrection.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.phoenix-icon {
+  font-size: 80px;
+  animation: phoenixRise 1s ease-in-out infinite;
+}
+
+@keyframes phoenixRise {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.1); }
+}
+
+.phoenix-text {
+  font-family: 'Cinzel', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #d4a574;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 
+    0 0 20px rgba(212, 165, 116, 0.8),
+    0 4px 8px rgba(0,0,0,0.8);
+  animation: phoenixGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes phoenixGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(212, 165, 116, 0.8), 0 4px 8px rgba(0,0,0,0.8); }
+  50% { text-shadow: 0 0 40px rgba(212, 165, 116, 1), 0 4px 8px rgba(0,0,0,0.8); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🎨 NOUVELLES MODALES DARK (STYLE DIABLO/POE)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Backdrop */
+.modal-dark {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dark.active {
+  display: flex;
+}
+
+/* Contenu modal */
+.modal-dark-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  padding: 30px;
+  background: linear-gradient(145deg, #1a1410 0%, #0d0d0d 100%);
+  border: 3px solid #3d2817;
+  border-radius: 8px;
+  box-shadow: 
+    0 0 60px rgba(0,0,0,0.9),
+    inset 0 2px 8px rgba(0,0,0,0.4);
+  overflow: auto;
+}
+
+/* En-tête modal */
+.modal-dark-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #3d2817;
+}
+
+.modal-dark-title {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #d4a574;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+}
+
+.modal-dark-close {
+  width: 40px;
+  height: 40px;
+  background: #3d2817;
+  border: 2px solid #5d4e37;
+  border-radius: 4px;
+  color: #e8dcc4;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dark-close:hover {
+  background: #5d4e37;
+  border-color: #8b7355;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Corps modal */
+.modal-dark-body {
+  color: #a0958a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Grille de sélection */
+.modal-dark-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Carte sélectionnable */
+.modal-dark-item {
+  padding: 15px;
+  background: linear-gradient(135deg, #1a1410 0%, #0d0d0d 100%);
+  border: 2px solid #3d2817;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.modal-dark-item:hover {
+  background: linear-gradient(135deg, #2a2420 0%, #1d1d1d 100%);
+  border-color: #d4a574;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.3);
+}
+
+.modal-dark-item-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.modal-dark-item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8dcc4;
+  margin-bottom: 8px;
+}
+
+.modal-dark-item-desc {
+  font-size: 12px;
+  color: #8b7355;
+  line-height: 1.4;
+}
+
+/* Boutons */
+.btn-dark {
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #3d2817 0%, #2d1f12 100%);
+  border: 2px solid #5d4e37;
+  border-radius: 4px;
+  color: #e8dcc4;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.btn-dark:hover {
+  background: linear-gradient(135deg, #5d4e37 0%, #3d2817 100%);
+  border-color: #8b7355;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+}
+
+.btn-dark:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🎲 REPOSITIONNER BOUTON DÉ
+   ═══════════════════════════════════════════════════════════ */
+
+.btn-dice-sidebar {
+  width: 100%;
+  margin-top: 15px !important;
+  padding: 15px !important;
+  background: linear-gradient(135deg, #4a0000 0%, #2d0000 100%) !important;
+  border: 3px solid #8b4513 !important;
+  border-radius: 6px !important;
+  color: #e8dcc4 !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 2px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 
+    0 4px 12px rgba(74, 0, 0, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+.btn-dice-sidebar:hover {
+  background: linear-gradient(135deg, #6a0000 0%, #4d0000 100%) !important;
+  border-color: #a85c2b !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 6px 20px rgba(106, 0, 0, 0.8),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+}
+
+.btn-dice-sidebar:active {
+  transform: scale(0.98) !important;
+  box-shadow: 
+    0 2px 8px rgba(74, 0, 0, 0.8),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dice-icon {
+  font-size: 24px !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) !important;
+}
+
+.dice-label {
+  font-size: 14px !important;
+}

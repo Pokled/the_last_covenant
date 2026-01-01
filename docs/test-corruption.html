@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💀 Test - CorruptionSystem</title>
+    
+    <!-- Fonts (BG3/Diablo style) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #0d0d0d url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+            color: #d4c5b0;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* PARTICULES DE POUSSIÈRE (Canvas) */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        /* BROUILLARD ANIMÉ */
+        .fog {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.15;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(40,30,25,0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(30,25,20,0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(35,28,23,0.2) 0%, transparent 60%);
+            animation: fogMove 60s ease-in-out infinite;
+        }
+
+        @keyframes fogMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-5%, 5%) rotate(5deg); }
+            66% { transform: translate(5%, -5%) rotate(-5deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            color: #c9a97a;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(201, 169, 122, 0.3);
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* PANELS - Style Diablo/BG3 */
+        .panel {
+            background: 
+                linear-gradient(135deg, rgba(20,18,15,0.95) 0%, rgba(30,25,20,0.95) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="paper"><feTurbulence baseFrequency="0.04" numOctaves="5" /></filter><rect width="200" height="200" filter="url(%23paper)" opacity="0.08"/></svg>');
+            border: 2px solid #3d3426;
+            border-top: 1px solid #5a4d3a;
+            border-left: 1px solid #5a4d3a;
+            box-shadow: 
+                inset 0 1px 0 rgba(90,77,58,0.3),
+                0 4px 12px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(0,0,0,0.8);
+            padding: 20px;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,169,122,0.2), transparent);
+        }
+
+        .panel h2 {
+            font-family: 'Cinzel', serif;
+            color: #c9a97a;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #3d3426;
+            padding-bottom: 8px;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #2a2419;
+            border-left: 2px solid #4a3d2a;
+            transition: all 0.2s ease;
+        }
+
+        .stat:hover {
+            background: rgba(0,0,0,0.4);
+            border-left-color: #6a5d4a;
+        }
+
+        .stat-label {
+            color: #8a7d6a;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: #c9a97a;
+            font-weight: 600;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* CORRUPTION BAR - ANIMÉE ! (VIOLET/POURPRE) */
+        .corruption-bar {
+            width: 100%;
+            height: 32px;
+            background: 
+                linear-gradient(180deg, #1a1612 0%, #0d0a08 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.1"/></svg>');
+            border: 2px solid #2a2419;
+            border-top: 1px solid #1a1612;
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.8),
+                0 1px 0 rgba(90,77,58,0.2);
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .corruption-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.5), transparent);
+        }
+
+        .corruption-fill {
+            height: 100%;
+            background: 
+                linear-gradient(90deg, 
+                    #2a1a2a 0%, 
+                    #4a2a4a 50%, 
+                    #6a3a6a 100%
+                );
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4c5b0;
+            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Reflet lumineux en haut */
+        .corruption-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent);
+        }
+
+        /* BULLES DE SANG ANIMÉES */
+        .corruption-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(0,0,0,0.3) 2px, transparent 2px),
+                radial-gradient(circle at 60% 60%, rgba(0,0,0,0.2) 3px, transparent 3px),
+                radial-gradient(circle at 40% 30%, rgba(0,0,0,0.25) 2px, transparent 2px),
+                radial-gradient(circle at 80% 50%, rgba(0,0,0,0.3) 2.5px, transparent 2.5px),
+                radial-gradient(circle at 15% 40%, rgba(0,0,0,0.2) 2px, transparent 2px),
+                radial-gradient(circle at 70% 85%, rgba(0,0,0,0.25) 3px, transparent 3px),
+                radial-gradient(circle at 35% 70%, rgba(0,0,0,0.2) 2px, transparent 2px),
+                radial-gradient(circle at 90% 20%, rgba(0,0,0,0.3) 2.5px, transparent 2.5px);
+            background-size: 200% 200%;
+            animation: bloodBubbles 8s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes bloodBubbles {
+            0%, 100% { 
+                background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%, 25% 75%, 60% 40%, 40% 60%, 80% 80%;
+                opacity: 0.6;
+            }
+            25% { 
+                background-position: 10% 20%, 90% 80%, 60% 40%, 65% 35%, 35% 65%, 70% 50%, 30% 70%, 70% 90%;
+                opacity: 0.7;
+            }
+            50% { 
+                background-position: 20% 40%, 80% 60%, 70% 30%, 55% 45%, 45% 55%, 80% 60%, 20% 80%, 60% 100%;
+                opacity: 0.6;
+            }
+            75% { 
+                background-position: 10% 60%, 90% 40%, 40% 70%, 75% 25%, 25% 75%, 50% 70%, 50% 50%, 90% 70%;
+                opacity: 0.7;
+            }
+        }
+
+        /* Pulse subtil sur la barre (violet) */
+        @keyframes corruptionPulse {
+            0%, 100% { 
+                box-shadow: inset 0 0 20px rgba(0,0,0,0.4), inset 0 0 10px rgba(106,58,106,0.2);
+            }
+            50% { 
+                box-shadow: inset 0 0 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(106,58,106,0.4);
+            }
+        }
+
+        .corruption-fill {
+            animation: corruptionPulse 4s ease-in-out infinite;
+        }
+
+        /* ACTIONS GRID */
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        /* BUTTONS - Style Diablo compact */
+        button {
+            padding: 12px 16px;
+            background: 
+                linear-gradient(180deg, #2d1f15 0%, #1d1208 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.1"/></svg>');
+            border: 2px solid #3d2a1a;
+            border-top: 1px solid #4d3a2a;
+            border-left: 1px solid #4d3a2a;
+            box-shadow: 
+                inset 0 1px 0 rgba(77,58,42,0.3),
+                0 2px 6px rgba(0,0,0,0.5);
+            color: #d4c5b0;
+            cursor: pointer;
+            font-family: 'Crimson Text', serif;
+            font-size: 14px;
+            transition: all 0.15s ease;
+            position: relative;
+            line-height: 1.3;
+        }
+
+        button:hover {
+            background: 
+                linear-gradient(180deg, #3d2f25 0%, #2d1f18 100%);
+            border-color: #5d4a3a;
+            box-shadow: 
+                inset 0 1px 0 rgba(93,74,58,0.4),
+                0 3px 10px rgba(0,0,0,0.6);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.6),
+                0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        button.safe {
+            background: 
+                linear-gradient(180deg, #1a2d1f 0%, #0a1d12 100%);
+            border-color: #2a3d2a;
+        }
+
+        button.safe:hover {
+            background: 
+                linear-gradient(180deg, #2a3d2f 0%, #1a2d1f 100%);
+            border-color: #3a4d3a;
+        }
+
+        /* HISTORY */
+        .history {
+            max-height: 280px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border: 1px solid #2a2419;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+        }
+
+        .history::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history::-webkit-scrollbar-track {
+            background: #1a1612;
+            border: 1px solid #2a2419;
+        }
+
+        .history::-webkit-scrollbar-thumb {
+            background: #3d3426;
+            border: 1px solid #2a2419;
+        }
+
+        .history::-webkit-scrollbar-thumb:hover {
+            background: #4d4436;
+        }
+
+        .history-item {
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: rgba(42,36,25,0.4);
+            border-left: 2px solid #5a4530;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* THRESHOLD ALERT - Plus lent, plus lisible */
+        .threshold-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: 
+                linear-gradient(135deg, rgba(40,20,15,0.98) 0%, rgba(30,15,10,0.98) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="paper"><feTurbulence baseFrequency="0.04" numOctaves="5" /></filter><rect width="200" height="200" filter="url(%23paper)" opacity="0.1"/></svg>');
+            border: 3px solid #6a3a2a;
+            border-top: 2px solid #8a5a4a;
+            border-left: 2px solid #8a5a4a;
+            box-shadow: 
+                inset 0 2px 0 rgba(138,90,74,0.3),
+                0 10px 40px rgba(0,0,0,0.9),
+                0 0 0 1px rgba(0,0,0,0.9);
+            padding: 40px 50px;
+            text-align: center;
+            z-index: 1001;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 650px;
+            min-width: 500px;
+        }
+
+        .threshold-alert.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .threshold-alert h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2em;
+            color: #c9a97a;
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(201,169,122,0.5);
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .threshold-alert p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #d4c5b0;
+            margin-bottom: 15px;
+        }
+
+        .threshold-alert em {
+            display: block;
+            margin-top: 20px;
+            font-style: italic;
+            color: #a08970;
+            font-size: 0.95em;
+            border-top: 1px solid #3d3426;
+            padding-top: 15px;
+        }
+
+        /* Overlay sombre */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* VIGNETTE DYNAMIQUE (réagit à la corruption - violet) */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                transparent 50%,
+                rgba(0,0,0,0.3) 100%
+            );
+            transition: background 2s ease;
+        }
+
+        .vignette.corrupted {
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                transparent 40%,
+                rgba(42,26,42,0.4) 80%,
+                rgba(26,10,26,0.7) 100%
+            );
+        }
+
+        /* SHAKE ANIMATION (changement de seuil) */
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-3px, 2px); }
+            20% { transform: translate(3px, -2px); }
+            30% { transform: translate(-2px, 3px); }
+            40% { transform: translate(2px, -3px); }
+            50% { transform: translate(-3px, -2px); }
+            60% { transform: translate(3px, 2px); }
+            70% { transform: translate(-2px, -3px); }
+            80% { transform: translate(2px, 3px); }
+            90% { transform: translate(-1px, -1px); }
+        }
+
+        .container.shake {
+            animation: screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* FLASH VIOLET (corruption gain important) */
+        @keyframes purpleFlash {
+            0% { box-shadow: inset 0 0 0 rgba(106,58,106,0); }
+            50% { box-shadow: inset 0 0 100px rgba(106,58,106,0.6); }
+            100% { box-shadow: inset 0 0 0 rgba(106,58,106,0); }
+        }
+
+        .corruption-bar.flash {
+            animation: purpleFlash 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- CANVAS PARTICULES -->
+    <canvas id="particles"></canvas>
+    
+    <!-- BROUILLARD ANIMÉ -->
+    <div class="fog"></div>
+    
+    <!-- VIGNETTE DYNAMIQUE -->
+    <div class="vignette" id="vignette"></div>
+    <div class="container">
+        <h1>Corruption System</h1>
+
+        <div class="dashboard">
+            <!-- Panel Gauche : Stats -->
+            <div class="panel">
+                <h2>État Actuel</h2>
+                
+                <div class="corruption-bar">
+                    <div class="corruption-fill" id="corruptionBar">0</div>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">💀 Corruption</span>
+                    <span class="stat-value" id="corruptionValue">0</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">🔥 Seuil Actuel</span>
+                    <span class="stat-value" id="thresholdName">Pacte Intact</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">⚔️ Bonus ATK</span>
+                    <span class="stat-value" id="bonusAtk">+0%</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">📜 Dettes Narratives</span>
+                    <span class="stat-value" id="debtsCount">0</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">🎲 Mémoire : 6 Forcés</span>
+                    <span class="stat-value" id="forcedSixes">0</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">🎲 Mémoire : Échecs Évités</span>
+                    <span class="stat-value" id="avoidedFailures">0</span>
+                </div>
+            </div>
+
+            <!-- Panel Droite : Actions -->
+            <div class="panel">
+                <h2>Actions</h2>
+                
+                <div class="actions">
+                    <button onclick="testCorruption(1, 'Relancer Dé')">
+                        🎲 Relancer Dé<br>+1 corruption
+                    </button>
+
+                    <button onclick="testPact('transform', 2)">
+                        🎲 Transformer (1→3)<br>+2 corruption
+                    </button>
+
+                    <button onclick="testPact('force_six', 4)">
+                        🎲 Forcer un 6<br>+4 corruption + dette
+                    </button>
+
+                    <button onclick="testCorruption(3, 'Sacrifice NPC')">
+                        ⚰️ Sacrifice NPC<br>+3 corruption
+                    </button>
+
+                    <button onclick="testCorruption(2, 'Objet Maudit')">
+                        💀 Objet Maudit<br>+2 corruption
+                    </button>
+
+                    <button onclick="testCorruption(1, 'Éviter Échec')">
+                        🛡️ Éviter Échec<br>+1 corruption
+                    </button>
+
+                    <button class="safe" onclick="reduceCorruption(3, 'Talisman Sacré')">
+                        ✨ Talisman Sacré<br>-3 corruption
+                    </button>
+
+                    <button class="safe" onclick="resetCorruption()">
+                        🔄 Reset<br>Tout remettre à 0
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique -->
+        <div class="panel">
+            <h2>Historique</h2>
+            <div class="history" id="history">
+                <p style="color: #666; font-style: italic;">Aucune action encore...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay sombre -->
+    <div class="overlay" id="overlay" onclick="closeAlert()"></div>
+
+    <!-- Alert Changement de Seuil -->
+    <div class="threshold-alert" id="thresholdAlert">
+        <h2 id="alertTitle">Seuil Franchi</h2>
+        <p id="alertMessage"></p>
+        <p style="margin-top: 25px; font-size: 0.9em; color: #8a7d6a; cursor: pointer;" onclick="closeAlert()">
+            [ Cliquez pour fermer ]
+        </p>
+    </div>
+
+    <!-- Script -->
+    <script type="module">
+        import { CorruptionSystem } from './src/systems/CorruptionSystem.js';
+
+        // Mock game instance
+        const gameInstance = {
+            player: {
+                corruptionModifier: 1.0  // Classe neutre
+            }
+        };
+
+        // Initialiser le système
+        window.corruptionSystem = new CorruptionSystem(gameInstance);
+
+        // Écouter les events
+        window.addEventListener('corruptionChanged', (e) => {
+            updateUI();
+            addHistoryItem(e.detail);
+            flashCorruptionBar(e.detail.gain); // NOUVEAU : Flash si gros gain
+        });
+
+        window.addEventListener('thresholdChanged', (e) => {
+            showThresholdAlert(e.detail.newThreshold);
+            
+            // NOUVEAU : Shake screen au changement de seuil
+            const container = document.querySelector('.container');
+            container.classList.add('shake');
+            setTimeout(() => container.classList.remove('shake'), 500);
+        });
+
+        // Fonction test : pacte avec effet spécial
+        window.testPact = function(type, corruption) {
+            window.corruptionSystem.addCorruption(corruption, `Pacte: ${type}`);
+            
+            if (type === 'force_six') {
+                // Enregistrer dans mémoire du dé
+                window.corruptionSystem.rememberAction('force_six');
+                
+                // Ajouter dette narrative
+                window.corruptionSystem.addNarrativeDebt({
+                    type: 'rest_nightmare',
+                    description: 'Le prochain repos devient un cauchemar',
+                    triggerCondition: 'rest',
+                    effect: 'transform_rest_to_combat'
+                });
+            } else if (type === 'transform') {
+                window.corruptionSystem.rememberAction('reroll');
+            }
+        };
+
+        // Fonction test : ajouter corruption
+        window.testCorruption = function(baseValue, source) {
+            window.corruptionSystem.addCorruption(baseValue, source);
+            
+            if (source === 'Éviter Échec') {
+                window.corruptionSystem.rememberAction('avoid_failure');
+            }
+        };
+
+        // Fonction test : réduire corruption
+        window.reduceCorruption = function(amount, source) {
+            window.corruptionSystem.reduceCorruption(amount, source);
+        };
+
+        // Fonction test : reset
+        window.resetCorruption = function() {
+            if (confirm('Réinitialiser la corruption ?')) {
+                window.corruptionSystem.reset();
+                updateUI();
+                document.getElementById('history').innerHTML = 
+                    '<p style="color: #666; font-style: italic;">Aucune action encore...</p>';
+            }
+        };
+
+        // Mettre à jour l'UI
+        function updateUI() {
+            const stats = window.corruptionSystem.getStats();
+            const threshold = window.corruptionSystem.getCurrentThreshold();
+            const memory = window.corruptionSystem.diceMemory;
+            const debts = window.corruptionSystem.narrativeDebts;
+
+            // Barre de corruption (max 15 pour affichage)
+            const barWidth = Math.min(100, (stats.current / 15) * 100);
+            const bar = document.getElementById('corruptionBar');
+            bar.style.width = `${barWidth}%`;
+            bar.textContent = `${stats.current.toFixed(1)}`;
+
+            // Stats
+            document.getElementById('corruptionValue').textContent = `${stats.current.toFixed(1)}`;
+            document.getElementById('thresholdName').textContent = threshold.name;
+            document.getElementById('bonusAtk').textContent = `Équité: ${(threshold.effects.worldFairness * 100).toFixed(0)}%`;
+            document.getElementById('debtsCount').textContent = debts.length;
+            document.getElementById('forcedSixes').textContent = memory.forcedSixes;
+            document.getElementById('avoidedFailures').textContent = memory.avoidedFailures;
+            
+            // NOUVEAU : Mettre à jour vignette selon corruption
+            updateVignette(stats.current);
+            
+            // NOUVEAU : Mettre à jour particules selon corruption
+            updateParticlesForCorruption(stats.current);
+        }
+        
+        // NOUVEAU : Vignette dynamique
+        function updateVignette(corruption) {
+            const vignette = document.getElementById('vignette');
+            
+            if (corruption >= 10) {
+                vignette.classList.add('corrupted');
+            } else {
+                vignette.classList.remove('corrupted');
+            }
+        }
+        
+        // NOUVEAU : Flash violet sur gain important
+        function flashCorruptionBar(gain) {
+            if (gain >= 3) {
+                const bar = document.querySelector('.corruption-bar');
+                bar.classList.add('flash');
+                setTimeout(() => bar.classList.remove('flash'), 600);
+            }
+        }
+
+        // Ajouter un item à l'historique
+        function addHistoryItem(detail) {
+            const historyDiv = document.getElementById('history');
+            
+            // Enlever le message "Aucune action"
+            if (historyDiv.querySelector('p')) {
+                historyDiv.innerHTML = '';
+            }
+
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <strong>${detail.source}</strong><br>
+                ${detail.oldValue.toFixed(1)} → ${detail.newValue.toFixed(1)} 
+                <span style="color: ${detail.gain > 0 ? '#8a6a8a' : '#6a8a6a'}">
+                    (${detail.gain > 0 ? '+' : ''}${detail.gain.toFixed(1)})
+                </span>
+                <br>
+                <small style="color: #666;">${new Date().toLocaleTimeString('fr-FR')}</small>
+            `;
+
+            historyDiv.insertBefore(item, historyDiv.firstChild);
+
+            // Garder seulement les 20 derniers
+            while (historyDiv.children.length > 20) {
+                historyDiv.removeChild(historyDiv.lastChild);
+            }
+        }
+
+        // Afficher l'alerte de changement de seuil (reste ouverte jusqu'au clic)
+        function showThresholdAlert(threshold) {
+            const overlay = document.getElementById('overlay');
+            const alert = document.getElementById('thresholdAlert');
+            const title = document.getElementById('alertTitle');
+            const message = document.getElementById('alertMessage');
+
+            title.textContent = threshold.name.toUpperCase();
+            message.innerHTML = `
+                <strong>Corruption: ${threshold.range[0]}-${threshold.range[1]}</strong><br><br>
+                ${threshold.narrative}<br><br>
+                <em>"${threshold.diceComment}"</em><br><br>
+                Équité du monde: ${(threshold.effects.worldFairness * 100).toFixed(0)}%
+            `;
+
+            overlay.classList.add('show');
+            alert.classList.add('show');
+        }
+
+        // Fermer l'alerte
+        window.closeAlert = function() {
+            const overlay = document.getElementById('overlay');
+            const alert = document.getElementById('thresholdAlert');
+            
+            overlay.classList.remove('show');
+            alert.classList.remove('show');
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        // PARTICULES DE POUSSIÈRE (Canvas Animation) - INIT EN PREMIER !
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        
+        // Resize canvas to window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Particules (déclaré en PREMIER avant updateUI)
+        const particles = [];
+        let particleCount = 60;
+
+        class Particle {
+            constructor(isCorrupted = false) {
+                this.isCorrupted = isCorrupted;
+                this.reset();
+                this.y = Math.random() * canvas.height; // Position initiale aléatoire
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -10;
+                this.size = Math.random() * 2 + 0.5; // 0.5-2.5px
+                this.speedY = Math.random() * 0.3 + 0.1; // Vitesse lente
+                this.speedX = (Math.random() - 0.5) * 0.2; // Drift horizontal
+                
+                if (this.isCorrupted) {
+                    // Particules violettes/corruption
+                    this.opacity = Math.random() * 0.4 + 0.2; // Plus visibles
+                    this.color = [138, 69, 138]; // Violet/pourpre
+                } else {
+                    // Particules poussière normales
+                    this.opacity = Math.random() * 0.3 + 0.1;
+                    this.color = [201, 169, 122]; // Beige
+                }
+                
+                this.life = Math.random() * 2000 + 3000; // 3-5 secondes
+                this.birthTime = Date.now();
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Fade in/out
+                const age = Date.now() - this.birthTime;
+                if (age > this.life) {
+                    this.reset();
+                } else if (age < 500) {
+                    // Fade in
+                    this.currentOpacity = this.opacity * (age / 500);
+                } else if (age > this.life - 500) {
+                    // Fade out
+                    this.currentOpacity = this.opacity * ((this.life - age) / 500);
+                } else {
+                    this.currentOpacity = this.opacity;
+                }
+
+                // Reset si hors écran
+                if (this.y > canvas.height || this.x < 0 || this.x > canvas.width) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.currentOpacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Glow pour particules corrompues
+                if (this.isCorrupted) {
+                    ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.currentOpacity * 0.3})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // Créer particules initiales
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle(false));
+        }
+
+        // Fonction pour ajuster les particules selon corruption
+        function updateParticlesForCorruption(corruption) {
+            // Plus de corruption = plus de particules + particules rouges
+            const targetCount = 60 + Math.floor(corruption * 3); // 60-105 particules max
+            const corruptedRatio = corruption / 15; // 0-1
+            
+            // Ajouter particules si nécessaire
+            while (particles.length < targetCount) {
+                const shouldBeCorrupted = Math.random() < corruptedRatio;
+                particles.push(new Particle(shouldBeCorrupted));
+            }
+            
+            // Retirer particules si nécessaire
+            while (particles.length > targetCount) {
+                particles.pop();
+            }
+            
+            // Transformer particules existantes
+            particles.forEach((particle, i) => {
+                const shouldBeCorrupted = (i / particles.length) < corruptedRatio;
+                if (particle.isCorrupted !== shouldBeCorrupted) {
+                    particle.isCorrupted = shouldBeCorrupted;
+                    particle.reset();
+                }
+            });
+        }
+
+        // Animation loop
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // Init UI (APRÈS l'init des particules)
+        updateUI();
+
+        console.log('✅ CorruptionSystem Test chargé !');
+        console.log('💀 Design inspiré Diablo/BG3');
+        console.log('💜 Corruption en VIOLET (pas rouge pour éviter confusion avec HP)');
+        console.log('✨ Particules & animations ajoutées');
+    </script>
+</body>
+</html>

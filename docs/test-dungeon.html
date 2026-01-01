@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dungeon Generator - THE LAST COVENANT</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #111;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            border: 2px solid #666;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #444;
+            border-color: #888;
+        }
+        
+        #canvas {
+            border: 2px solid #444;
+            background: #000;
+            width: 90vw;
+            height: 85vh;
+            max-width: 1600px;
+            display: block;
+        }
+        
+        #info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #222;
+            border: 1px solid #444;
+            max-width: 800px;
+        }
+        
+        #ascii {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            max-width: 800px;
+            overflow: auto;
+            font-size: 10px;
+            line-height: 10px;
+            display: none;
+        }
+        
+        .legend {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Générateur Procédural de Donjons</h1>
+    
+    <div id="controls">
+        <button id="btnGenerate">🎲 Générer Nouveau Donjon</button>
+        <button id="btnToggleASCII">📝 Afficher ASCII</button>
+        <input type="number" id="seedInput" placeholder="Seed (optionnel)" style="padding: 8px; background: #222; color: #fff; border: 2px solid #666;">
+    </div>
+    
+    <canvas id="canvas" width="1600" height="1000"></canvas>
+    
+    <div id="info">
+        <strong>🎮 Contrôles :</strong>
+        <ul>
+            <li>⬆️⬇️⬅️➡️ ou ZQSD : Déplacer</li>
+            <li>🖱️ Molette / + - : Zoom</li>
+            <li>Générer : Créer un nouveau donjon</li>
+        </ul>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #1a1a1a;"></div>
+                <span>█ Mur</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2a2a2a;"></div>
+                <span>· Sol</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4a9eff;"></div>
+                <span>S Départ</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff4a4a;"></div>
+                <span>E Sortie</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffd700;"></div>
+                <span>T Trésor</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff00ff;"></div>
+                <span>M Ennemi</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #00ff00;"></div>
+                <span>● Joueur</span>
+            </div>
+        </div>
+        
+        <p id="stats" style="margin-top: 15px; color: #888;"></p>
+    </div>
+    
+    <pre id="ascii"></pre>
+    
+    <script type="module">
+        import { DungeonGenerator } from './src/systems/DungeonGenerator.js';
+        import { DungeonRenderer } from './src/systems/DungeonRenderer.js';
+        import { DiceMovementSystem } from './src/systems/DiceMovementSystem.js';
+        
+        const canvas = document.getElementById('canvas');
+        const btnGenerate = document.getElementById('btnGenerate');
+        const btnToggleASCII = document.getElementById('btnToggleASCII');
+        const seedInput = document.getElementById('seedInput');
+        const asciiDisplay = document.getElementById('ascii');
+        const statsDisplay = document.getElementById('stats');
+        
+        let generator, renderer, diceSystem;
+        
+        function generateDungeon() {
+            const seed = seedInput.value ? parseInt(seedInput.value) : Date.now();
+            generator = new DungeonGenerator(seed);
+            const dungeon = generator.generate();
+            
+            renderer = new DungeonRenderer(canvas, dungeon);
+            
+            // Initialiser le système de dé
+            diceSystem = new DiceMovementSystem(generator, renderer);
+            renderer.diceSystem = diceSystem; // Lier au renderer pour le draw
+            
+            renderer.render();
+            
+            // Stats
+            statsDisplay.innerHTML = `
+                <strong>Statistiques :</strong><br>
+                Seed: ${seed} | 
+                Salles: ${dungeon.rooms.length} | 
+                Taille: ${dungeon.width}x${dungeon.height}
+            `;
+            
+            // ASCII
+            asciiDisplay.textContent = generator.toASCII();
+        }
+        
+        // Génération initiale
+        generateDungeon();
+        
+        // Boutons
+        btnGenerate.addEventListener('click', generateDungeon);
+        
+        btnToggleASCII.addEventListener('click', () => {
+            asciiDisplay.style.display = 
+                asciiDisplay.style.display === 'none' ? 'block' : 'none';
+        });
+        
+        // Contrôles clavier (désactivés si en mode sélection)
+        document.addEventListener('keydown', (e) => {
+            if (!renderer) return;
+            
+            // Bloquer les contrôles manuels pendant la sélection de dé
+            if (diceSystem && diceSystem.isSelectingMove) {
+                return;
+            }
+            
+            let moved = false;
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'z':
+                case 'Z':
+                    moved = renderer.movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    moved = renderer.movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'q':
+                case 'Q':
+                    moved = renderer.movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    moved = renderer.movePlayer(1, 0);
+                    break;
+                case '+':
+                case '=':
+                    renderer.zoom(0.1);
+                    e.preventDefault();
+                    break;
+                case '-':
+                case '_':
+                    renderer.zoom(-0.1);
+                    e.preventDefault();
+                    break;
+            }
+            
+            if (moved || e.key === '+' || e.key === '=' || e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                renderer.render();
+            }
+        });
+        
+        // Zoom avec la molette
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (!renderer) return;
+            
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            renderer.zoom(delta);
+            renderer.render();
+        });
+        
+        // Animation continue pour le bob et smooth zoom
+        function animate() {
+            if (renderer) {
+                renderer.render();
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
